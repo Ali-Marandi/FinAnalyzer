@@ -33,3 +33,11 @@ venv/
 
 # Backups
 backups/
+
+# Local credentials, encryption state, and generated financial outputs
+.env
+.env.*
+!.env.example
+data/.finanalyzer.key
+data/report_schedules.json
+reports/

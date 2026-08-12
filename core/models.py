@@ -53,6 +53,7 @@ class Company(Base):
     budgets: Mapped[List["Budget"]] = relationship("Budget", back_populates="company", cascade="all, delete-orphan")
     assets: Mapped[List["Asset"]] = relationship("Asset", back_populates="company", cascade="all, delete-orphan")
     invoices: Mapped[List["Invoice"]] = relationship("Invoice", back_populates="company", cascade="all, delete-orphan")
+    plaid_items: Mapped[List["PlaidItem"]] = relationship("PlaidItem", back_populates="company", cascade="all, delete-orphan")
 
 
 class User(Base):
@@ -198,6 +199,66 @@ class Asset(Base):
     depreciation_method: Mapped[str] = mapped_column(String(50), default="straight_line")
 
     company: Mapped["Company"] = relationship("Company", back_populates="assets")
+
+
+class PlaidItem(Base):
+    """A consented Plaid connection; its API access token is encrypted at rest."""
+    __tablename__ = "plaid_items"
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    company_id: Mapped[int] = mapped_column(ForeignKey("companies.id"), nullable=False, index=True)
+    item_id: Mapped[str] = mapped_column(String(128), nullable=False, unique=True, index=True)
+    encrypted_access_token: Mapped[str] = mapped_column(Text, nullable=False)
+    cursor: Mapped[Optional[str]] = mapped_column(String(256))
+    institution_id: Mapped[Optional[str]] = mapped_column(String(128))
+    institution_name: Mapped[Optional[str]] = mapped_column(String(255))
+    status: Mapped[str] = mapped_column(String(30), default="linked")
+    last_synced_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    company: Mapped["Company"] = relationship("Company", back_populates="plaid_items")
+    accounts: Mapped[List["PlaidAccount"]] = relationship("PlaidAccount", back_populates="item", cascade="all, delete-orphan")
+    transaction_mappings: Mapped[List["PlaidTransactionMapping"]] = relationship("PlaidTransactionMapping", back_populates="item", cascade="all, delete-orphan")
+
+
+class PlaidAccount(Base):
+    """A financial account returned for a linked Plaid Item."""
+    __tablename__ = "plaid_accounts"
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    plaid_item_id: Mapped[int] = mapped_column(ForeignKey("plaid_items.id"), nullable=False, index=True)
+    provider_account_id: Mapped[str] = mapped_column(String(128), nullable=False, unique=True, index=True)
+    local_account_id: Mapped[Optional[int]] = mapped_column(ForeignKey("accounts.id"))
+    name: Mapped[str] = mapped_column(String(255), default="")
+    account_type: Mapped[Optional[str]] = mapped_column(String(50))
+    account_subtype: Mapped[Optional[str]] = mapped_column(String(80))
+    mask: Mapped[Optional[str]] = mapped_column(String(16))
+    current_balance: Mapped[Optional[Decimal]] = mapped_column(Numeric(15, 4))
+    available_balance: Mapped[Optional[Decimal]] = mapped_column(Numeric(15, 4))
+    currency_code: Mapped[Optional[str]] = mapped_column(String(10))
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    item: Mapped["PlaidItem"] = relationship("PlaidItem", back_populates="accounts")
+    local_account: Mapped[Optional["Account"]] = relationship("Account")
+
+
+class PlaidTransactionMapping(Base):
+    """Idempotency and provenance record for an imported bank transaction."""
+    __tablename__ = "plaid_transaction_mappings"
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    plaid_item_id: Mapped[int] = mapped_column(ForeignKey("plaid_items.id"), nullable=False, index=True)
+    provider_transaction_id: Mapped[str] = mapped_column(String(128), nullable=False, unique=True, index=True)
+    provider_account_id: Mapped[Optional[str]] = mapped_column(String(128))
+    journal_entry_id: Mapped[Optional[int]] = mapped_column(ForeignKey("journal_entries.id"), unique=True)
+    pending: Mapped[bool] = mapped_column(Boolean, default=False)
+    raw_payload: Mapped[Optional[str]] = mapped_column(Text)
+    imported_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    item: Mapped["PlaidItem"] = relationship("PlaidItem", back_populates="transaction_mappings")
+    journal_entry: Mapped[Optional["JournalEntry"]] = relationship("JournalEntry")
 
 
 class AuditLog(Base):

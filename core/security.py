@@ -103,3 +103,42 @@ class SecurityManager:
         )
         session.add(audit)
         session.commit()
+
+
+class LocalSecretStore:
+    """Persist or obtain a Fernet key for local integration secrets.
+
+    A deployment may supply ``FINANALYZER_MASTER_KEY``. Otherwise a locally scoped
+    key is created. The key file belongs to the operating-system user and must not
+    be committed or copied outside the device without an approved recovery process.
+    """
+
+    def __init__(self, key_path: str = "data/.finanalyzer.key"):
+        from pathlib import Path
+        import os
+
+        self._path = Path(key_path)
+        configured_key = os.getenv("FINANALYZER_MASTER_KEY")
+        if configured_key:
+            key = configured_key.encode("utf-8")
+        else:
+            self._path.parent.mkdir(parents=True, exist_ok=True)
+            if self._path.exists():
+                key = self._path.read_bytes().strip()
+            else:
+                key = Fernet.generate_key()
+                self._path.write_bytes(key)
+                try:
+                    os.chmod(self._path, 0o600)
+                except OSError:
+                    # Windows permissions are governed by the current user profile/ACL.
+                    pass
+        self._cipher = Fernet(key)
+
+    def encrypt(self, plaintext: str) -> str:
+        if not plaintext:
+            raise ValueError("A non-empty secret is required.")
+        return self._cipher.encrypt(plaintext.encode("utf-8")).decode("utf-8")
+
+    def decrypt(self, ciphertext: str) -> str:
+        return self._cipher.decrypt(ciphertext.encode("utf-8")).decode("utf-8")

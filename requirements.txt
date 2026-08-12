@@ -12,4 +12,7 @@ fpdf2>=2.7.0
 bcrypt>=4.0.0
 python-dateutil>=2.8.2
 requests>=2.31.0
+plaid-python>=20.0.0
+ofxparse>=0.21
+qifparse>=0.9
 pyinstaller>=6.0.0

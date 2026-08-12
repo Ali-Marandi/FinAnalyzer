@@ -1,55 +1,50 @@
-"""
-build_exe.py - Build script for FinAnalyzer Enterprise v2.0.0
-Creates standalone executable using PyInstaller.
-Supports Windows (EXE) and Linux binary builds.
-"""
+"""Build the FinAnalyzer Enterprise v2 desktop executable with v1.1 integrations."""
+
+from __future__ import annotations
+
+import platform
+import sys
+from pathlib import Path
 
 import PyInstaller.__main__
-import platform
-import os
-import sys
 
-def build():
+
+PROJECT_ROOT = Path(__file__).resolve().parent
+
+
+def build() -> None:
     print("=" * 60)
-    print("  FinAnalyzer Enterprise v2.0.0 - Build System")
+    print("  FinAnalyzer Enterprise v2.1.0 — Banking & Reporting Build")
     print(f"  Platform: {platform.system()} {platform.machine()}")
     print(f"  Python: {sys.version}")
     print("=" * 60)
 
-    # Configuration
     app_name = "FinAnalyzer_Enterprise_v2"
-    entry_point = "main.py"
     separator = ";" if platform.system() == "Windows" else ":"
-
     args = [
-        entry_point,
-        '--onefile',
-        '--windowed',
-        f'--name={app_name}',
-        f'--add-data=core{separator}core',
-        f'--add-data=ui{separator}ui',
-        '--clean',
-        '--noconfirm',
+        str(PROJECT_ROOT / "main.py"),
+        "--onefile",
+        "--windowed",
+        f"--name={app_name}",
+        f"--add-data={PROJECT_ROOT / 'core'}{separator}core",
+        f"--add-data={PROJECT_ROOT / 'ui'}{separator}ui",
+        "--hidden-import=core.plaid_connector",
+        "--hidden-import=core.plaid_link_desktop",
+        "--hidden-import=core.automated_reporting",
+        "--hidden-import=core.security",
+        "--hidden-import=plaid",
+        "--collect-submodules=plaid",
+        "--clean",
+        "--noconfirm",
     ]
+    icon_path = PROJECT_ROOT / "assets" / "icon.ico"
+    if platform.system() == "Windows" and icon_path.exists():
+        args.append(f"--icon={icon_path}")
 
-    # Windows-specific options
-    if platform.system() == "Windows":
-        icon_path = os.path.join("assets", "icon.ico")
-        if os.path.exists(icon_path):
-            args.append(f'--icon={icon_path}')
-
-    print(f"\nBuild command: pyinstaller {' '.join(args)}")
-    print("\nBuilding... (this may take several minutes)\n")
-
-    try:
-        PyInstaller.__main__.run(args)
-        print("\n" + "=" * 60)
-        print("  BUILD SUCCESSFUL!")
-        print(f"  Output: dist/{app_name}")
-        print("=" * 60)
-    except Exception as e:
-        print(f"\n  BUILD FAILED: {e}")
-        sys.exit(1)
+    PyInstaller.__main__.run(args)
+    print("=" * 60)
+    print(f"  BUILD SUCCESSFUL — dist/{app_name}.exe (on Windows)")
+    print("=" * 60)
 
 
 if __name__ == "__main__":

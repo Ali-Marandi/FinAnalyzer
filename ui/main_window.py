@@ -1,5 +1,5 @@
 """
-ui/main_window.py - Main Application Window for FinAnalyzer Enterprise v2.0.0
+ui/main_window.py - Main Application Window for FinAnalyzer Enterprise v2.1.0
 """
 
 from PySide6.QtWidgets import (
@@ -12,6 +12,7 @@ from PySide6.QtGui import QIcon, QKeySequence, QShortcut
 from ui.pages.dashboard import DashboardPage
 from ui.pages.transactions import TransactionsPage
 from ui.pages.accounts import AccountsPage
+from ui.pages.banking import BankingPage
 from ui.pages.reports import ReportsPage
 from ui.pages.forecasting import ForecastingPage
 from ui.pages.settings import SettingsPage
@@ -21,7 +22,7 @@ class MainWindow(QMainWindow):
     def __init__(self, app_instance=None):
         super().__init__()
         self.app_instance = app_instance
-        self.setWindowTitle("FinAnalyzer Enterprise v2.0.0")
+        self.setWindowTitle("FinAnalyzer Enterprise v2.1.0")
         self.resize(1400, 900)
 
         self.init_ui()
@@ -79,6 +80,7 @@ class MainWindow(QMainWindow):
             "📈 Executive Dashboard",
             "💳 Transactions",
             "📚 Chart of Accounts",
+            "🏦 Bank Connections",
             "📑 Financial Reports",
             "🤖 AI Forecasting",
             "⚙️ Settings"
@@ -131,6 +133,7 @@ class MainWindow(QMainWindow):
         self.dashboard_page = DashboardPage()
         self.transactions_page = TransactionsPage()
         self.accounts_page = AccountsPage()
+        self.banking_page = BankingPage()
         self.reports_page = ReportsPage()
         self.forecasting_page = ForecastingPage()
         self.settings_page = SettingsPage(theme_toggle_callback=self.change_theme)
@@ -138,6 +141,7 @@ class MainWindow(QMainWindow):
         self.stack.addWidget(self.dashboard_page)
         self.stack.addWidget(self.transactions_page)
         self.stack.addWidget(self.accounts_page)
+        self.stack.addWidget(self.banking_page)
         self.stack.addWidget(self.reports_page)
         self.stack.addWidget(self.forecasting_page)
         self.stack.addWidget(self.settings_page)
