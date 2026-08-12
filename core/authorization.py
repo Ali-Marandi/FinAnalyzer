@@ -8,7 +8,6 @@ Unmatched requests are denied by default and recorded in the audit trail.
 
 from __future__ import annotations
 
-import json
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Any, Iterable, Mapping, Optional
@@ -16,6 +15,7 @@ from typing import Any, Iterable, Mapping, Optional
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from core.audit import AuditLogger
 from core.models import (
     AuditLog,
     CompanyMembership,
@@ -85,6 +85,9 @@ DEFAULT_ROLE_PERMISSIONS: dict[str, set[str]] = {
 
 class AuthorizationService:
     """Denies access unless a live company membership explicitly grants it."""
+
+    def __init__(self, audit_logger: Optional[AuditLogger] = None) -> None:
+        self.audit_logger = audit_logger or AuditLogger()
 
     def bootstrap_defaults(self, session: Session) -> None:
         """Create the canonical permission catalog and system roles idempotently."""
@@ -237,15 +240,27 @@ class AuthorizationService:
         )
         return set(result)
 
-    @staticmethod
-    def _audit(session: Session, user_id: Optional[int], action: str, details: Mapping[str, Any]) -> None:
-        session.add(AuditLog(
-            user_id=user_id,
+    def _audit(self, session: Session, user_id: Optional[int], action: str, details: Mapping[str, Any]) -> None:
+        permission = details.get("permission")
+        target_type = "permission" if permission else "membership" if "membership" in action else None
+        target_id = str(permission) if permission else str(details.get("subject_user_id")) if details.get("subject_user_id") else None
+        outcome = "denied" if action.endswith("denied") else "success"
+        severity = "warning" if outcome == "denied" else "notice" if "sensitive" in action else "info"
+        self.audit_logger.record(
+            session,
             action=action,
-            details=json.dumps(details, sort_keys=True, default=str),
-            timestamp=datetime.now(timezone.utc),
-        ))
-        session.flush()
+            category="authorization",
+            outcome=outcome,
+            severity=severity,
+            actor_id=user_id,
+            company_id=details.get("company_id"),
+            session_id=details.get("session_id"),
+            request_id=details.get("request_id"),
+            source=str(details.get("auth_source") or "authorization_service"),
+            target_type=target_type,
+            target_id=target_id,
+            details=details,
+        )
 
 
 __all__ = [

@@ -23,7 +23,7 @@ import bcrypt
 from cryptography.fernet import Fernet
 from sqlalchemy.orm import Session
 
-from core.models import AuditLog, User, UserRole
+from core.models import User, UserRole
 
 
 class KeyProtectionError(RuntimeError):
@@ -33,9 +33,10 @@ class KeyProtectionError(RuntimeError):
 class SecurityManager:
     """Compatibility helpers for password hashing, licensing, and legacy role checks."""
 
-    def __init__(self, encryption_key: Optional[bytes] = None):
+    def __init__(self, encryption_key: Optional[bytes] = None, audit_logger=None):
         self.fernet_key = encryption_key or Fernet.generate_key()
         self.cipher = Fernet(self.fernet_key)
+        self.audit_logger = audit_logger
 
     def hash_password(self, password: str) -> str:
         return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
@@ -72,7 +73,23 @@ class SecurityManager:
         return role_hierarchy.get(user.role, 0) >= role_hierarchy.get(required_role, 3)
 
     def log_audit(self, session: Session, user_id: Optional[int], action: str, details: Optional[str] = None) -> None:
-        session.add(AuditLog(user_id=user_id, action=action, details=details, timestamp=datetime.utcnow()))
+        """Compatibility bridge that records legacy calls in the v2.4 audit chain."""
+        if self.audit_logger is None:
+            # Imported lazily because core.audit imports the DPAPI protector from this module.
+            from core.audit import AuditLogger
+            self.audit_logger = AuditLogger()
+        self.audit_logger.record(
+            session,
+            action=action,
+            category="security",
+            outcome="success",
+            severity="info",
+            actor_id=user_id,
+            source="security_manager",
+            target_type="user" if user_id is not None else None,
+            target_id=str(user_id) if user_id is not None else None,
+            details={"legacy_details_present": bool(details)},
+        )
 
 
 class WindowsDpapiProtector:

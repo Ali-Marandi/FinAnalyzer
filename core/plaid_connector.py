@@ -11,7 +11,7 @@ from __future__ import annotations
 import json
 import os
 from dataclasses import dataclass
-from datetime import datetime, date, timedelta
+from datetime import datetime, date, timedelta, timezone
 import time
 from decimal import Decimal
 from typing import Any, Dict, Iterable, Optional
@@ -20,6 +20,7 @@ from uuid import uuid4
 from sqlalchemy import select
 
 from core.accounting_engine import AccountingEngine
+from core.audit import AuditLogger
 from core.authorization import AuthorizationService
 from core.identity import AuthenticatedPrincipal, IdentityValidationError
 from core.database import DatabaseManager
@@ -108,6 +109,7 @@ class PlaidConnector:
         settings: Optional[PlaidSettings] = None,
         secret_store: Optional[LocalSecretStore] = None,
         authorization: Optional[AuthorizationService] = None,
+        audit_logger: Optional[AuditLogger] = None,
     ) -> None:
         if not PLAID_SDK_AVAILABLE:
             raise PlaidConfigurationError("The Plaid SDK is missing. Install plaid-python first.")
@@ -115,6 +117,7 @@ class PlaidConnector:
         self.settings = settings or PlaidSettings.from_environment()
         self.secret_store = secret_store or LocalSecretStore()
         self.authorization = authorization or AuthorizationService()
+        self.audit_logger = audit_logger or AuditLogger()
         self.client = self._build_client()
 
     def _build_client(self):
@@ -160,7 +163,13 @@ class PlaidConnector:
             payload["webhook"] = self.settings.webhook_url
         if self.settings.redirect_uri:
             payload["redirect_uri"] = self.settings.redirect_uri
-        return self._dict(self.client.link_token_create(LinkTokenCreateRequest(**payload)))
+        result = self._dict(self.client.link_token_create(LinkTokenCreateRequest(**payload)))
+        with self.database.get_session() as session:
+            self._audit(
+                session, principal, "bank.link_token_created", company_id, "link_token",
+                outcome="success", severity="notice", details={"environment": self.settings.environment},
+            )
+        return result
 
     def exchange_public_token(
         self,
@@ -205,7 +214,11 @@ class PlaidConnector:
                 item.institution_id = institution.get("institution_id") or item.institution_id
                 item.institution_name = institution.get("name") or item.institution_name
                 item.status = "linked"
-            self._audit(session, "plaid_item_linked", f"Plaid item {item_id} linked to company {company_id}.")
+            self._audit(
+                session, principal, "bank.item_linked", company_id, item_id,
+                outcome="success", severity="notice",
+                details={"institution_id": item.institution_id, "environment": self.settings.environment},
+            )
         return {"item_id": item_id, "status": "linked"}
 
     def sync_company(self, company_id: int, principal: AuthenticatedPrincipal) -> list[Dict[str, Any]]:
@@ -229,6 +242,7 @@ class PlaidConnector:
                 self._context(principal, item.company_id, "plaid_sync_item"),
                 "bank.sync",
             )
+            item_company_id = item.company_id
             access_token = self.secret_store.decrypt(item.encrypted_access_token)
             original_cursor = item.cursor
 
@@ -253,6 +267,11 @@ class PlaidConnector:
                 has_more = bool(page.get("has_more"))
         except Exception as exc:
             # Do not persist a partially advanced cursor; the next sync retries safely.
+            with self.database.get_session() as session:
+                self._audit(
+                    session, principal, "bank.sync_failed", item_company_id, item_id,
+                    outcome="failure", severity="warning", details={"error_type": type(exc).__name__},
+                )
             raise PlaidSyncError("Transaction sync failed before completion. No partial cursor was saved; retry the sync.") from exc
 
         with self.database.get_session() as session:
@@ -262,9 +281,12 @@ class PlaidConnector:
             local_accounts = self._upsert_accounts(session, item, accounts.values())
             counts = self._apply_changes(session, item, added, modified, removed, local_accounts)
             item.cursor = cursor
-            item.last_synced_at = datetime.utcnow()
+            item.last_synced_at = datetime.now(timezone.utc)
             item.status = "synced"
-            self._audit(session, "plaid_item_synced", f"Item {item_id}: {counts}")
+            self._audit(
+                session, principal, "bank.item_synced", item.company_id, item_id,
+                outcome="success", severity="info", details=counts,
+            )
         return {"item_id": item_id, **counts, "cursor_advanced": bool(cursor and cursor != original_cursor)}
 
     def remove_item(self, item_id: str, principal: AuthenticatedPrincipal) -> bool:
@@ -287,7 +309,10 @@ class PlaidConnector:
         with self.database.get_session() as session:
             item = session.scalar(select(PlaidItem).where(PlaidItem.item_id == item_id))
             if item:
-                self._audit(session, "plaid_item_removed", f"Item {item_id} revoked and removed.")
+                self._audit(
+                    session, principal, "bank.item_removed", item.company_id, item_id,
+                    outcome="success", severity="notice", details={"environment": self.settings.environment},
+                )
                 session.delete(item)
         return True
 
@@ -445,9 +470,33 @@ class PlaidConnector:
     def _decimal_or_none(value: Any) -> Optional[Decimal]:
         return Decimal(str(value)) if value is not None else None
 
-    @staticmethod
-    def _audit(session, action: str, details: str) -> None:
-        session.add(AuditLog(user_id=None, action=action, details=details))
+    def _audit(
+        self,
+        session,
+        principal: AuthenticatedPrincipal,
+        action: str,
+        company_id: int,
+        target_id: str,
+        *,
+        outcome: str,
+        severity: str,
+        details: Dict[str, Any],
+    ) -> None:
+        self.audit_logger.record(
+            session,
+            action=action,
+            category="banking",
+            outcome=outcome,
+            severity=severity,
+            actor_id=principal.user_id,
+            company_id=company_id,
+            session_id=principal.session_id,
+            request_id=principal.session_id,
+            source="plaid_connector",
+            target_type="plaid_item",
+            target_id=target_id,
+            details=details,
+        )
 
 
 __all__ = ["PlaidConnector", "PlaidSettings", "PlaidConfigurationError", "PlaidSyncError", "PLAID_SDK_AVAILABLE"]

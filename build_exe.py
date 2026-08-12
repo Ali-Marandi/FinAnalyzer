@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import platform
+import subprocess
 import sys
 from pathlib import Path
 
@@ -13,6 +14,11 @@ PROJECT_ROOT = Path(__file__).resolve().parent
 
 
 def build() -> None:
+    if platform.system() == "Windows":
+        gate = PROJECT_ROOT / "scripts" / "verify_windows_release.py"
+        print("Running the mandatory Windows dependency security gate...")
+        subprocess.run([sys.executable, str(gate)], cwd=PROJECT_ROOT, check=True)  # nosec B603
+
     print("=" * 60)
     print("  FinAnalyzer Enterprise v2.3.0 — Enterprise Identity & Security Build")
     print(f"  Platform: {platform.system()} {platform.machine()}")

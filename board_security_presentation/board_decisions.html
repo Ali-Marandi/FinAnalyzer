@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<style>
+body{margin:0}
+.slide-container{width:1280px;min-height:720px;box-sizing:border-box;background:#0b1424;color:#f7fbff;font-family:Tahoma,Arial,sans-serif;position:relative;}
+.slide-container .grid{position:absolute;inset:0;background-image:linear-gradient(rgba(97,216,205,.055) 1px,transparent 1px),linear-gradient(90deg,rgba(97,216,205,.055) 1px,transparent 1px);background-size:72px 72px;}
+.slide-container .frame{position:relative;min-height:720px;padding:66px 48px 0;box-sizing:border-box;}
+.slide-container .kicker{font-size:16px;color:#57d7ca;letter-spacing:.7px;margin-bottom:14px;}
+.slide-container h1{font-size:40px;line-height:1.3;margin:0;}
+.slide-container .lead{font-size:19px;line-height:1.6;color:#b7c6d9;margin:10px 0 14px;max-width:700px;}
+.slide-container .decision-row{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.slide-container .decision{min-height:180px;border-top:2px solid #57d7ca;padding-top:8px;position:relative;}
+.slide-container .number{font-size:54px;line-height:1;color:#57d7ca;font-weight:700;direction:ltr;text-align:right;}
+.slide-container .decision h2{font-size:24px;line-height:1.45;margin:10px 0 8px;color:#f7fbff;}
+.slide-container .decision p{font-size:17px;line-height:1.6;color:#b7c6d9;margin:0;max-width:280px;}
+.slide-container .divider{width:1px;height:100px;background:#34516c;position:absolute;left:-12px;top:34px;}
+.slide-container .decision:last-child .divider{display:none;}
+.slide-container .request{position:absolute;right:48px;left:48px;bottom:16px;border-top:1px solid rgba(87,215,202,.55);padding-top:8px;font-size:22px;line-height:1.55;color:#eaf6ff;}
+.slide-container .request strong{color:#57d7ca;}
+.slide-container .foot{position:absolute;left:48px;bottom:8px;color:#7891aa;font-size:13px;letter-spacing:.5px;direction:ltr;}
+</style>
+</head>
+<body>
+<div class="slide-container">
+ <div class="grid" aria-hidden="true"></div>
+ <main class="frame">
+  <div class="kicker">06 / BOARD DECISIONS</div>
+  <h1>تصمیم‌های پیشنهادی هیئت‌مدیره</h1>
+  <p class="lead">v2.2.0 پایه‌ای برای کنترل دسترسی و حفاظت کلید فراهم می‌کند؛ مسیر Enterprise نیازمند تصمیم و مالکیت است.</p>
+  <section class="decision-row">
+   <article class="decision"><div class="number">01</div><h2>پذیرش پایه امنیتی v2.2.0</h2><p>نسخه جدید به‌عنوان مبنای توسعه و فروش Enterprise پذیرفته شود؛ کنترل سرویس‌محور جایگزین اتکای صرف به UI گردد.</p><div class="divider"></div></article>
+   <article class="decision"><div class="number">02</div><h2>اولویت‌گذاری IAM سازمانی</h2><p>OIDC/SAML، MFA و service accountهای حداقل‌دسترسی اولویت سرمایه‌گذاری نسخه بعدی باشند.</p><div class="divider"></div></article>
+   <article class="decision"><div class="number">03</div><h2>الزام assurance مستقل</h2><p>پیش از استقرار حساس یا فعال‌سازی Production، بازبینی امنیتی و تست نفوذ مستقل انجام شود.</p><div class="divider"></div></article>
+  </section>
+  <div class="request"><strong>درخواست:</strong> تأیید بودجه، مالک اجرایی و نقاط عطف برای تکمیل IAM و assurance مستقل.</div>
+  <div class="foot">FINANALYZER ENTERPRISE / SECURITY ROADMAP</div>
+ </main>
+</div>
+</body>
+</html>

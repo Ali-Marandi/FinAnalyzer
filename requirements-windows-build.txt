@@ -1,0 +1,7 @@
+# Install this manifest in a clean, isolated Windows build virtual environment.
+-c constraints-windows.txt
+-r requirements.txt
+
+# Build and release-validation tools.
+wheel>=0.46.2
+pip-audit>=2.7.3

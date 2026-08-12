@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<style>
+html,body{margin:0;padding:0}
+.slide-container{width:1280px;min-height:720px;box-sizing:border-box;background:#0b1424;color:#f7fbff;font-family:Tahoma,Arial,sans-serif;position:relative;margin-top:-1px}
+.slide-container .grid{position:absolute;inset:0;background-image:linear-gradient(rgba(97,216,205,.055) 1px,transparent 1px),linear-gradient(90deg,rgba(97,216,205,.055) 1px,transparent 1px);background-size:72px 72px}
+.slide-container .frame{position:relative;min-height:720px;box-sizing:border-box;padding:62px 86px 0}
+.slide-container .kicker{color:#57d7ca;font-size:16px;letter-spacing:.6px;margin-bottom:8px}
+.slide-container h1{font-size:38px;line-height:1.35;margin:0}
+.slide-container .lead{font-size:18px;line-height:1.6;color:#b7c6d9;margin:12px 0 18px}
+.slide-container .head{display:grid;grid-template-columns:31% 28% 41%;color:#7891aa;font-size:15px;letter-spacing:.3px;border-bottom:1px solid #34516c;padding-top:8px;padding-bottom:8px;box-sizing:border-box}
+.slide-container .head div:first-child{text-align:right}.slide-container .head div:nth-child(2){text-align:center}.slide-container .head div:last-child{text-align:right}
+.slide-container .line{display:grid;grid-template-columns:31% 28% 41%;min-height:72px;align-items:center;border-bottom:1px solid rgba(52,81,108,.72);box-sizing:border-box;padding:6px 0}
+.slide-container .operation{font-size:20px;font-weight:700;color:#f7fbff}
+.slide-container .control{font-size:17px;color:#57d7ca;text-align:center;direction:ltr}
+.slide-container .detail{font-size:17px;line-height:1.55;color:#c8d7e5}
+.slide-container .marker{display:inline-block;width:10px;height:10px;background:#57d7ca;margin-left:10px}
+.slide-container .footer{position:absolute;right:86px;left:86px;bottom:53px;border-top:1px solid rgba(87,215,202,.55);padding-top:14px;font-size:22px;line-height:1.45;color:#eaf6ff}
+.slide-container .footer strong{color:#57d7ca}
+</style>
+</head>
+<body>
+<div class="slide-container">
+ <div class="grid"></div>
+ <main class="frame">
+  <div class="kicker">03 / HIGH-RISK FINANCIAL OPERATIONS</div>
+  <h1>کنترل‌های ویژه عملیات مالی حساس</h1>
+  <p class="lead">کنترل‌ها در مرز سرویس اعمال می‌شوند؛ بنابراین صرفاً به نمایش یا پنهان‌سازی رابط کاربری متکی نیستند.</p>
+  <section class="head"><div>عملیات</div><div>مجوز / شرط اصلی</div><div>کنترل تکمیلی</div></section>
+  <section class="line"><div class="operation"><span class="marker"></span>اتصال بانک با Plaid</div><div class="control">bank.link + MFA</div><div class="detail">فقط عضو مجاز همان شرکت، پس از تأیید عامل دوم، می‌تواند Link را آغاز و تکمیل کند.</div></section>
+  <section class="line"><div class="operation"><span class="marker"></span>همگام‌سازی تراکنش</div><div class="control">bank.sync</div><div class="detail">Item و تراکنش فقط در محدوده شرکت مالک آن پردازش می‌شوند؛ تغییرات قابل‌ردیابی‌اند.</div></section>
+  <section class="line"><div class="operation"><span class="marker"></span>تولید گزارش</div><div class="control">report.generate</div><div class="detail">گزارش از دفتر کل همان شرکت ساخته می‌شود و اسرار بانکی یا کلیدهای ارسال در آن ظاهر نمی‌شوند.</div></section>
+  <section class="line"><div class="operation"><span class="marker"></span>ارسال خارجی گزارش</div><div class="control">report.deliver.external + MFA</div><div class="detail">زمان‌بندی یا تحویل برون‌سازمانی فقط با مجوز حساس و هویت صریح اجرا می‌شود.</div></section>
+  <div class="footer"><strong>اصل حاکم:</strong> پنهان‌بودن یک دکمه، جایگزین کنترل مجوز در سرویس نیست.</div>
+ </main>
+</div>
+</body>
+</html>

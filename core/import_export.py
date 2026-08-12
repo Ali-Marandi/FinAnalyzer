@@ -16,7 +16,10 @@ from reportlab.lib import colors
 import openpyxl
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from ofxparse import OfxParser
-from qifparse.parser import QifParser
+try:
+    from qifparse.parser import QifParser
+except ImportError:  # Optional QIF import capability; not required by the core Windows build.
+    QifParser = None
 
 class DataImportExport:
     """Handles multi-format data ingestion, financial reporting (PDF/Excel), and JSON export."""
@@ -55,7 +58,12 @@ class DataImportExport:
 
     @staticmethod
     def parse_qif(file_path: str) -> List[Dict[str, Any]]:
-        """Parse QIF bank statement format."""
+        """Parse QIF bank statement format when the optional QIF extra is installed."""
+        if QifParser is None:
+            raise RuntimeError(
+                "QIF import is optional and not installed in this Windows build. "
+                "Install a vetted QIF parser extra after security review to enable it."
+            )
         with open(file_path, 'r', encoding='latin1') as f:
             qif = QifParser.parse(f)
 

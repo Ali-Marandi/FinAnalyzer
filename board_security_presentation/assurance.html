@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<style>
+body{margin:0}
+.slide-container{width:1280px;min-height:720px;box-sizing:border-box;background:#0b1424;color:#f7fbff;font-family:Tahoma,Arial,sans-serif;position:relative;}
+.slide-container .grid{position:absolute;inset:0;background-image:linear-gradient(rgba(97,216,205,.055) 1px,transparent 1px),linear-gradient(90deg,rgba(97,216,205,.055) 1px,transparent 1px);background-size:72px 72px;}
+.slide-container .frame{position:relative;min-height:720px;box-sizing:border-box;padding:62px 72px 0;} /* keep top padding */
+.slide-container .kicker{color:#57d7ca;font-size:16px;letter-spacing:.6px;margin-bottom:11px;}
+.slide-container h1{font-size:38px;line-height:1.35;margin:0;}
+.slide-container .lead{font-size:18px;line-height:1.6;color:#b7c6d9;margin:12px 0 20px;} /* slightly reduced bottom margin */
+.slide-container .content{display:grid;grid-template-columns:300px 1fr 300px;gap:24px;direction:rtl;align-items:stretch;} /* narrower gap */
+.slide-container .evidence{border-top:3px solid #57d7ca;padding-top:20px;min-height:300px;} /* reduced from 338 */
+.slide-container .test-number{font-size:108px;line-height:.9;color:#57d7ca;font-weight:700;direction:ltr;text-align:right;}
+.slide-container .test-label{font-size:23px;line-height:1.55;margin-top:16px;color:#f7fbff;}
+.slide-container .test-note{font-size:16px;line-height:1.65;color:#b7c6d9;margin-top:18px;}
+.slide-container .coverage{border-top:1px solid #34516c;padding-top:17px;min-height:300px;} /* reduced */
+.slide-container .coverage h2,.slide-container .limits h2{font-size:18px;color:#57d7ca;margin:0 0 17px;}
+.slide-container .coverage-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px 18px;} /* reduced gaps */
+.slide-container .coverage-item{border-top:1px solid rgba(121,145,170,.55);padding-top:10px;min-height:60px;} /* reduced */
+.slide-container .coverage-item strong{display:block;font-size:16px;color:#f7fbff;margin-bottom:6px;}
+.slide-container .coverage-item span{font-size:14px;color:#b7c6d9;line-height:1.5;}
+.slide-container .limits{border-top:1px solid #34516c;padding-top:17px;min-height:300px;} /* reduced */
+.slide-container .limits p{font-size:16px;line-height:1.72;color:#dce9f5;margin:0 0 14px;border-top:1px solid rgba(121,145,170,.42);padding-top:11px;}
+.slide-container .limits strong{color:#57d7ca;font-size:14px;letter-spacing:.3px;display:block;direction:ltr;text-align:right;margin-bottom:4px;}
+.slide-container .footer{position:absolute;right:72px;left:72px;bottom:40px;border-top:1px solid rgba(87,215,202,.52);padding-top:12px;color:#eaf6ff;font-size:21px;line-height:1.5;} /* slightly adjusted */
+.slide-container .footer span{color:#57d7ca;font-weight:700;}
+</style>
+</head>
+<body>
+<div class="slide-container">
+  <div class="grid"></div>
+  <main class="frame">
+    <div class="kicker">05 / ASSURANCE &amp; CONTROL QUALITY</div>
+    <h1>شواهد اجرا و کیفیت کنترل</h1>
+    <p class="lead">پایه امنیتی با آزمون‌های یکپارچه اعتبارسنجی شده است؛ محدوده‌های تکمیل‌نشده نیز صریح و قابل‌پیگیری هستند.</p>
+    <section class="content">
+      <article class="evidence">
+        <div class="test-number">7</div>
+        <div class="test-label">آزمون یکپارچه<br>با نتیجه موفق</div>
+        <p class="test-note">اعتبارسنجی در سطح مدل داده، سرویس، رمزنگاری و گردش‌کار مالی انجام شده است.</p>
+      </article>
+      <article class="coverage">
+        <h2>حوزه‌های پوشش آزمون</h2>
+        <div class="coverage-grid">
+          <div class="coverage-item"><strong>رد پیش‌فرض</strong><span>درخواست بدون مجوز صریح، رد و audit می‌شود.</span></div>
+          <div class="coverage-item"><strong>تفکیک شرکت</strong><span>مجوز شرکت A به داده شرکت B تعمیم نمی‌یابد.</span></div>
+          <div class="coverage-item"><strong>MFA Context</strong><span>عملیات حساس بانکی بدون context معتبر متوقف می‌شود.</span></div>
+          <div class="coverage-item"><strong>Windows DPAPI</strong><span>کلید خام محلی در سناریوی ویندوز ذخیره نمی‌شود.</span></div>
+        </div>
+      </article>
+      <article class="limits">
+        <h2>شفافیت درباره گام‌های بعدی</h2>
+        <p><strong>IDENTITY</strong>SSO مبتنی بر OIDC/SAML و MFA واقعی باید به لایه هویت افزوده شود.</p>
+        <p><strong>OPERATIONS</strong>Service account حداقل‌دسترسی برای jobهای زمان‌بندی‌شده نیاز است.</p>
+        <p><strong>ASSURANCE</strong>پیش از استقرار حساس، تست نفوذ و بازبینی مستقل الزامی است.</p>
+      </article>
+    </section>
+    <div class="footer"><span>برداشت مدیریتی:</span> کنترل‌ها قابل‌آزمون شده‌اند؛ مسیر تکمیل assurance نیز مشخص و قابل‌بودجه‌بندی است.</div>
+  </main>
+</div>
+</body>
+</html>

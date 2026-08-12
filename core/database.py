@@ -9,7 +9,7 @@ import shutil
 import sqlite3
 from contextlib import contextmanager
 from typing import Generator, Optional
-from sqlalchemy import create_engine, event
+from sqlalchemy import create_engine, event, inspect, text
 from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.pool import QueuePool
 
@@ -48,9 +48,47 @@ class DatabaseManager:
         )
 
     def init_database(self) -> None:
-        """Create schema objects and idempotently seed the authorization catalog."""
+        """Create schema objects, apply additive local migrations, and seed security defaults."""
         Base.metadata.create_all(bind=self.engine)
+        self._migrate_v24_audit_schema()
         self.bootstrap_enterprise_security()
+
+    def _migrate_v24_audit_schema(self) -> None:
+        """Apply additive SQLite-safe columns/indexes for v2.4 structured audit events."""
+        inspector = inspect(self.engine)
+        if "audit_logs" not in inspector.get_table_names():
+            return
+        existing = {column["name"] for column in inspector.get_columns("audit_logs")}
+        additions = {
+            "event_id": "VARCHAR(36)",
+            "sequence": "INTEGER",
+            "company_id": "INTEGER",
+            "session_id": "VARCHAR(64)",
+            "request_id": "VARCHAR(128)",
+            "category": "VARCHAR(64)",
+            "severity": "VARCHAR(16)",
+            "outcome": "VARCHAR(32)",
+            "source": "VARCHAR(128)",
+            "target_type": "VARCHAR(64)",
+            "target_id": "VARCHAR(128)",
+            "previous_hash": "VARCHAR(64)",
+            "event_hash": "VARCHAR(64)",
+            "key_id": "VARCHAR(32)",
+        }
+        with self.engine.begin() as connection:
+            for name, sql_type in additions.items():
+                if name not in existing:
+                    connection.execute(text(f"ALTER TABLE audit_logs ADD COLUMN {name} {sql_type}"))
+            connection.execute(text(
+                "CREATE UNIQUE INDEX IF NOT EXISTS uq_audit_logs_event_id_v24 "
+                "ON audit_logs(event_id) WHERE event_id IS NOT NULL"
+            ))
+            connection.execute(text(
+                "CREATE UNIQUE INDEX IF NOT EXISTS uq_audit_logs_sequence_v24 "
+                "ON audit_logs(sequence) WHERE sequence IS NOT NULL"
+            ))
+            for name in ("company_id", "session_id", "request_id", "category", "severity", "outcome", "event_hash"):
+                connection.execute(text(f"CREATE INDEX IF NOT EXISTS ix_audit_logs_{name}_v24 ON audit_logs({name})"))
 
     def bootstrap_enterprise_security(self) -> None:
         """Ensure canonical roles and permissions exist without granting any user access."""

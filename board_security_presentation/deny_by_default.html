@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<style>
+body{margin:0}
+.slide-container{width:1280px;min-height:720px;box-sizing:border-box;background:#0b1424;color:#f7fbff;font-family:Tahoma,Arial,sans-serif;position:relative}
+.slide-container .grid{position:absolute;inset:0;background-image:linear-gradient(rgba(97,216,205,.055) 1px,transparent 1px),linear-gradient(90deg,rgba(97,216,205,.055) 1px,transparent 1px);background-size:72px 72px}
+.slide-container .frame{position:relative;min-height:720px;padding:65px 82px 0;box-sizing:border-box}
+.slide-container .kicker{color:#57d7ca;font-size:16px;letter-spacing:.6px;margin-bottom:12px}
+.slide-container h1{font-size:38px;margin:0;line-height:1.35}
+.slide-container .intro{font-size:18px;color:#b7c6d9;margin:13px 0 18px}
+.slide-container .chain{direction:ltr;display:grid;grid-template-columns:1.18fr 34px 1.25fr 34px 1fr 34px 1.2fr 34px 1.45fr;align-items:center;border-top:1px solid rgba(87,215,202,.4);border-bottom:1px solid rgba(87,215,202,.4);min-height:150px}
+.slide-container .node{min-height:100px;display:flex;flex-direction:column;justify-content:center;text-align:center;box-sizing:border-box;border-top:4px solid #57d7ca;padding:6px 8px}
+.slide-container .node .en{font-size:16px;color:#57d7ca;letter-spacing:.4px;margin-bottom:9px}
+.slide-container .node .fa{font-size:19px;line-height:1.55;color:#f7fbff;direction:rtl}
+.slide-container .arrow{font-size:28px;color:#7891aa;text-align:center}
+.slide-container .rule-title{font-size:17px;color:#57d7ca;margin-top:24px;margin-bottom:12px}
+.slide-container .rules{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.slide-container .rule{font-size:18px;line-height:1.55;color:#dce9f5;border-top:1px solid #34516c;padding-top:8px}
+.slide-container .rule strong{display:block;color:#57d7ca;font-size:15px;letter-spacing:.4px;margin-bottom:5px;direction:ltr;text-align:right}
+.slide-container .conclusion{position:absolute;right:82px;left:82px;bottom:52px;font-size:22px;color:#eaf6ff}
+.slide-container .conclusion span{color:#57d7ca;font-weight:700}
+</style>
+</head>
+<body>
+<div class="slide-container">
+ <div class="grid"></div>
+ <main class="frame">
+  <div class="kicker">02 / ACCESS CONTROL ARCHITECTURE</div>
+  <h1>رد پیش‌فرض؛ مجوز فقط با اثبات صریح</h1>
+  <p class="intro">هر عملیات محافظت‌شده، پیش از اجرا از زنجیره هویت تا محدوده شرکت عبور می‌کند.</p>
+  <section class="chain">
+   <div class="node"><div class="en">USER</div><div class="fa">کاربر فعال</div></div><div class="arrow">→</div>
+   <div class="node"><div class="en">MEMBERSHIP</div><div class="fa">عضویت معتبر در شرکت</div></div><div class="arrow">→</div>
+   <div class="node"><div class="en">ROLE</div><div class="fa">نقش سازمانی</div></div><div class="arrow">→</div>
+   <div class="node"><div class="en">PERMISSION</div><div class="fa">مجوز صریح resource.action</div></div><div class="arrow">→</div>
+   <div class="node"><div class="en">SERVICE ACTION</div><div class="fa">عمل تأییدشده در سرویس</div></div>
+  </section>
+  <div class="rule-title">سه شرط پذیرش درخواست</div>
+  <section class="rules">
+   <div class="rule"><strong>IDENTITY</strong>کاربر باید وجود داشته باشد و فعال باشد.</div>
+   <div class="rule"><strong>TENANT SCOPE</strong>عضویت باید متعلق به همان شرکتِ داده یا عملیات باشد.</div>
+   <div class="rule"><strong>EXPLICIT GRANT</strong>مجوز باید از نقش فعال کاربر به‌صورت صریح به ارث برسد.</div>
+  </section>
+  <div class="conclusion"><span>نتیجه:</span> هر مسیر نامنطبق، خارج از محدوده یا فاقد مجوز ثبت و رد می‌شود.</div>
+ </main>
+</div>
+</body>
+</html>

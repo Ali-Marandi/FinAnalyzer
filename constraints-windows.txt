@@ -1,0 +1,8 @@
+# FinAnalyzer Enterprise Windows release constraints.
+# Use: py -m pip install --upgrade -r requirements.txt -c constraints-windows.txt
+# These minimums remediate known dependency findings from the v2.3 sandbox audit.
+
+pypdf>=6.15.0
+wheel>=0.46.2
+# xhtml2pdf is intentionally excluded: it is not used by FinAnalyzer runtime and
+# the affected 0.2.x line has no fixed release for PYSEC-2026-2056/CVE-2024-25885.

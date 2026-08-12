@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<style>
+body{margin:0}
+.slide-container{width:1280px;min-height:720px;box-sizing:border-box;background:#0b1424;color:#f7fbff;font-family:Tahoma,Arial,sans-serif;position:relative;}
+.slide-container .grid{position:absolute;inset:0;background-image:linear-gradient(rgba(97,216,205,.055) 1px,transparent 1px),linear-gradient(90deg,rgba(97,216,205,.055) 1px,transparent 1px);background-size:72px 72px;}
+.slide-container .frame{position:relative;min-height:720px;box-sizing:border-box;padding:58px 48px 0;}
+.slide-container .kicker{font-size:16px;letter-spacing:.7px;color:#57d7ca;margin-bottom:8px}
+.slide-container h1{font-size:38px;line-height:1.35;margin:0}
+.slide-container .sub{font-size:18px;line-height:1.6;color:#b7c6d9;margin:8px 0 16px}
+.slide-container .split{display:grid;grid-template-columns:1.08fr .92fr;gap:30px;direction:rtl}
+.slide-container .panel-title{font-size:17px;color:#57d7ca;margin-bottom:10px}
+.slide-container .flow{display:flex;align-items:stretch;direction:rtl;border-top:1px solid rgba(87,215,202,.45);border-bottom:1px solid rgba(87,215,202,.45);min-height:160px;padding-top:14px}
+.slide-container .flow-step{flex:1;padding-top:8px;text-align:center;position:relative}
+.slide-container .flow-step:not(:last-child):after{content:"←";position:absolute;left:-9px;top:65px;color:#7891aa;font-size:22px}
+.slide-container .flow-label{color:#57d7ca;font-size:15px;letter-spacing:.45px;direction:ltr;margin-bottom:8px}
+.slide-container .flow-main{font-size:21px;line-height:1.5;color:#f6fbff;padding:0 6px}
+.slide-container .flow-note{font-size:14px;line-height:1.55;color:#9fb2c5;margin-top:8px;padding:0 6px}
+.slide-container .key-mark{width:36px;height:36px;border:2px solid #57d7ca;box-sizing:border-box;margin:0 auto 10px;position:relative}
+.slide-container .key-mark:after{content:"";position:absolute;width:9px;height:9px;background:#57d7ca;right:11px;top:11px}
+.slide-container .migration{border-top:1px solid #34516c;min-height:150px;padding-top:8px}
+.slide-container .migration-row{display:grid;grid-template-columns:38px 1fr;gap:12px;align-items:start;padding-top:10px}
+.slide-container .migration-row .n{font-size:22px;color:#57d7ca;line-height:1;direction:ltr}
+.slide-container .migration-row .text{font-size:17px;line-height:1.45;color:#dce9f5}
+.slide-container .migration-row .text strong{color:#f7fbff}
+.slide-container .statement{border-top:1px solid rgba(87,215,202,.55);padding-top:12px;font-size:21px;line-height:1.5;color:#eaf6ff;margin-top:12px}
+.slide-container .statement strong{color:#57d7ca}
+</style>
+</head>
+<body>
+<div class="slide-container">
+  <div class="grid"></div>
+  <main class="frame">
+    <div class="kicker">04 / WINDOWS KEY PROTECTION</div>
+    <h1>Windows DPAPI؛ حذف فایل کلید خام</h1>
+    <p class="sub">کلید رمزنگاری محلی در ویندوز به پروفایل کاربر متصل می‌شود؛ توکن بانکی در دیتابیس همچنان ciphertext باقی می‌ماند.</p>
+    <section class="split">
+      <section>
+        <div class="panel-title">مسیر حفاظت در اجرای عادی</div>
+        <div class="flow">
+          <div class="flow-step"><div class="key-mark"></div><div class="flow-label">FERNET KEY</div><div class="flow-main">کلید محلی</div><div class="flow-note">برای رمزکردن اسرار یکپارچه‌سازی</div></div>
+          <div class="flow-step"><div class="flow-label">WINDOWS DPAPI</div><div class="flow-main">حفاظت با پروفایل کاربر</div><div class="flow-note">کلید خام در فایل ویندوزی نگهداری نمی‌شود</div></div>
+          <div class="flow-step"><div class="flow-label">LOCAL STORAGE</div><div class="flow-main">فایل .dpapi</div><div class="flow-note">مقدار محافظت‌شده و قابل بازیابی فقط در context مجاز</div></div>
+          <div class="flow-step"><div class="flow-label">SQLITE</div><div class="flow-main">توکن Plaid رمز‌شده</div><div class="flow-note">دیتابیس، access token plaintext ندارد</div></div>
+        </div>
+      </section>
+      <section>
+        <div class="panel-title">مهاجرت یک‌باره از نسخه‌های قبلی</div>
+        <div class="migration">
+          <div class="migration-row"><div class="n">01</div><div class="text"><strong>خواندن کنترل‌شده</strong><br>کلید legacy فقط در نخستین اجرای migration خوانده می‌شود.</div></div>
+          <div class="migration-row"><div class="n">02</div><div class="text"><strong>حفاظت DPAPI</strong><br>نسخه محافظت‌شده با نوشتن اتمیک در فایل `.dpapi` ایجاد می‌شود.</div></div>
+          <div class="migration-row"><div class="n">03</div><div class="text"><strong>حذف نسخه خام</strong><br>پس از ایجاد موفق نسخه DPAPI، فایل raw حذف می‌شود.</div></div>
+        </div>
+      </section>
+    </section>
+    <div class="statement"><strong>رفتار fail-closed:</strong> در صورت خطای DPAPI، برنامه به فایل کلید خام بازنمی‌گردد؛ مسیر بازیابی باید کنترل‌شده و مورد تأیید سازمان باشد.</div>
+  </main>
+</div>
+</body>
+</html>

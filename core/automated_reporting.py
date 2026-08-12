@@ -23,6 +23,7 @@ import requests
 from sqlalchemy import select
 
 from core.accounting_engine import AccountingEngine
+from core.audit import AuditLogger
 from core.authorization import AuthorizationService
 from core.identity import AuthenticatedPrincipal, IdentityValidationError
 from core.database import DatabaseManager
@@ -162,6 +163,7 @@ class AutomatedReportService:
         schedules_path: str = "data/report_schedules.json",
         output_dir: str = "reports",
         authorization: Optional[AuthorizationService] = None,
+        audit_logger: Optional[AuditLogger] = None,
     ):
         self.database = database
         self.builder = ManagementReportBuilder(database)
@@ -169,6 +171,7 @@ class AutomatedReportService:
         self.schedules_path = Path(schedules_path)
         self.schedules_path.parent.mkdir(parents=True, exist_ok=True)
         self.authorization = authorization or AuthorizationService()
+        self.audit_logger = audit_logger or AuditLogger()
 
     def create_schedule(
         self,
@@ -210,6 +213,12 @@ class AutomatedReportService:
         schedules = self.list_schedules()
         schedules.append(schedule)
         self._write_schedules(schedules)
+        with self.database.get_session() as session:
+            self._audit(
+                session, principal, "report.schedule_created", company_id, schedule.id,
+                outcome="success", severity="notice",
+                details={"cadence": cadence, "formats": list(schedule.formats), "external_delivery": bool(recipients or telegram_chat_id)},
+            )
         return schedule
 
     def list_schedules(self) -> List[ReportSchedule]:
@@ -234,6 +243,11 @@ class AutomatedReportService:
                 schedule.last_run_at = now.isoformat()
                 outcomes.append({"schedule_id": schedule.id, "status": "completed", "files": files})
             except Exception as exc:
+                with self.database.get_session() as session:
+                    self._audit(
+                        session, principal, "report.schedule_failed", schedule.company_id, schedule.id,
+                        outcome="failure", severity="warning", details={"error_type": type(exc).__name__},
+                    )
                 outcomes.append({"schedule_id": schedule.id, "status": "failed", "error": str(exc)})
             schedule.next_run_at = self._next_run(schedule, now).isoformat()
             changed = True
@@ -251,7 +265,25 @@ class AutomatedReportService:
         start = self._start_date(schedule.cadence, end)
         report = self.builder.build(schedule.company_id, start, end)
         files = self.generator.generate_all(report, schedule.formats, prefix=self._safe_name(schedule.name))
-        self._deliver(files, schedule)
+        try:
+            self._deliver(files, schedule)
+        except Exception as exc:
+            with self.database.get_session() as session:
+                self._audit(
+                    session, principal, "report.delivery_failed", schedule.company_id, schedule.id,
+                    outcome="failure", severity="warning", details={"error_type": type(exc).__name__},
+                )
+            raise
+        with self.database.get_session() as session:
+            self._audit(
+                session, principal, "report.generated", schedule.company_id, schedule.id,
+                outcome="success", severity="info", details={"formats": list(files), "external_delivery": bool(schedule.recipients or schedule.telegram_chat_id)},
+            )
+            if schedule.recipients or schedule.telegram_chat_id:
+                self._audit(
+                    session, principal, "report.delivered", schedule.company_id, schedule.id,
+                    outcome="success", severity="notice", details={"channel_count": int(bool(schedule.recipients)) + int(bool(schedule.telegram_chat_id))},
+                )
         return files
 
     @staticmethod
@@ -259,6 +291,34 @@ class AutomatedReportService:
         if not isinstance(principal, AuthenticatedPrincipal):
             raise IdentityValidationError("A validated Enterprise session principal is required for report operations.")
         return principal.authorization_context(company_id, reason, mfa_max_age=timedelta(minutes=15))
+
+    def _audit(
+        self,
+        session,
+        principal: AuthenticatedPrincipal,
+        action: str,
+        company_id: int,
+        target_id: str,
+        *,
+        outcome: str,
+        severity: str,
+        details: Mapping[str, Any],
+    ) -> None:
+        self.audit_logger.record(
+            session,
+            action=action,
+            category="reporting",
+            outcome=outcome,
+            severity=severity,
+            actor_id=principal.user_id,
+            company_id=company_id,
+            session_id=principal.session_id,
+            request_id=principal.session_id,
+            source="automated_reporting",
+            target_type="report_schedule",
+            target_id=target_id,
+            details=details,
+        )
 
     def _deliver(self, files: Dict[str, str], schedule: ReportSchedule) -> None:
         if schedule.recipients:

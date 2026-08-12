@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <style>
+    html,body{height:100%;margin:0;padding:0}
+    .slide-container { width: 1280px; min-height: 720px; box-sizing: border-box; background: #0b1424; color: #f7fbff; font-family: Tahoma, Arial, sans-serif; overflow: hidden; position: relative; }
+    .slide-container .grid { position: absolute; inset: 0; background-image: linear-gradient(rgba(97, 216, 205, .07) 1px, transparent 1px), linear-gradient(90deg, rgba(97, 216, 205, .07) 1px, transparent 1px); background-size: 72px 72px; }
+    .slide-container .top-line { position: absolute; top: 72px; right: 90px; width: 150px; height: 5px; background: #57d7ca; }
+    .slide-container .content { position: relative; min-height: 720px; display: grid; grid-template-columns: 58% 42%; align-items: center; }
+    .slide-container .copy { padding: 0 90px; text-align: right; }
+    .slide-container .eyebrow { color: #57d7ca; font-size: 19px; letter-spacing: .8px; margin-bottom: 24px; }
+    .slide-container h1 { font-size: 57px; line-height: 1.27; margin: 0; max-width: 690px; font-weight: 700; }
+    .slide-container .subtitle { color: #b7c6d9; font-size: 23px; line-height: 1.7; margin-top: 16px; max-width: 650px; }
+    .slide-container .audience { color: #dce9f5; font-size: 17px; margin-top: 24px; }
+    .slide-container .visual { min-height: 440px; display: flex; align-items: center; justify-content: center; position: relative; }
+    .slide-container .orb { width: 308px; height: 308px; border: 1px solid rgba(87, 215, 202, .55); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 0 32px rgba(87, 215, 202, .05), 0 0 0 68px rgba(87, 215, 202, .03); }
+    .slide-container .lock { width: 132px; height: 108px; border: 5px solid #57d7ca; border-radius: 14px; position: relative; box-sizing: border-box; }
+    .slide-container .lock:before { content: ""; position: absolute; width: 76px; height: 72px; border: 5px solid #57d7ca; border-bottom: 0; border-radius: 48px 48px 0 0; right: 22px; top: -76px; box-sizing: border-box; }
+    .slide-container .lock:after { content: ""; position: absolute; width: 18px; height: 18px; background: #57d7ca; border-radius: 50%; right: 53px; top: 34px; box-shadow: 0 22px 0 -5px #57d7ca; }
+    .slide-container .foot { position: absolute; left: 90px; bottom: 62px; color: #7891aa; font-size: 15px; direction: ltr; }
+  </style>
+</head>
+<body>
+  <div class="slide-container">
+    <div class="grid"></div>
+    <div class="top-line"></div>
+    <div class="content">
+      <section class="copy">
+        <div class="eyebrow">FINANALYZER ENTERPRISE v2.2.0</div>
+        <h1>امنیت سازمانی، کنترل دسترسی و حفاظت از داده‌های مالی</h1>
+        <p class="subtitle">پایه امنیتی جدید برای توسعه، فروش و استقرار سازمانی FinAnalyzer</p>
+        <p class="audience">ارائه برای هیئت‌مدیره</p>
+      </section>
+      <section class="visual" aria-hidden="true"><div class="orb"><div class="lock"></div></div></section>
+    </div>
+    <div class="foot">BOARD SECURITY BRIEFING</div>
+  </div>
+</body>
+</html>

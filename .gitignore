@@ -39,6 +39,8 @@ backups/
 .env.*
 !.env.example
 data/.finanalyzer.key
+data/.finanalyzer.audit.hmac
+data/.finanalyzer.audit.hmac.tmp
 data/report_schedules.json
 reports/
 

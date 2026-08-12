@@ -28,9 +28,10 @@ from uuid import uuid4
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from core.audit import AuditLogger
 from core.authorization import AuthorizationContext
 from core.database import DatabaseManager
-from core.models import AuditLog, AuthSession, ExternalIdentity, IdentityProvider, User
+from core.models import AuthSession, ExternalIdentity, IdentityProvider, User
 from core.security import KeyProtectionError, WindowsDpapiProtector
 
 
@@ -221,11 +222,13 @@ class IdentityService:
         *,
         cache_store: Optional[DpapiMsalCache] = None,
         token_validator: Optional[IdTokenValidator] = None,
+        audit_logger: Optional[AuditLogger] = None,
     ) -> None:
         self.database = database
         self.settings = settings or EntraOidcSettings.from_environment()
         self.cache_store = cache_store or DpapiMsalCache()
         self.validator = token_validator or IdTokenValidator(self.settings)
+        self.audit_logger = audit_logger or AuditLogger()
 
     @property
     def mfa_max_age(self) -> timedelta:
@@ -254,6 +257,18 @@ class IdentityService:
                 })
         result = self._msal_app().acquire_token_interactive(scopes=scopes, **extra)
         if "error" in result:
+            with self.database.get_session() as session:
+                self.audit_logger.record(
+                    session,
+                    action="identity.interactive_sign_in_failed",
+                    category="identity",
+                    outcome="failure",
+                    severity="warning",
+                    source=self.settings.provider_code,
+                    target_type="identity_provider",
+                    target_id=self.settings.provider_code,
+                    details={"error_code": str(result.get("error") or "unknown")},
+                )
             description = str(result.get("error_description", "Authentication was not completed."))
             raise IdentityValidationError(f"Enterprise sign-in was not completed: {description}")
         raw_id_token = result.get("id_token")
@@ -414,15 +429,22 @@ class IdentityService:
         except (TypeError, ValueError, OSError):
             raise IdentityValidationError("A required identity-token timestamp is invalid.")
 
-    @staticmethod
-    def _audit(session: Session, user_id: Optional[int], action: str, details: Mapping[str, Any]) -> None:
-        session.add(AuditLog(
-            user_id=user_id,
+    def _audit(self, session: Session, user_id: Optional[int], action: str, details: Mapping[str, Any]) -> None:
+        outcome = "denied" if action.endswith("denied") else "success"
+        severity = "warning" if outcome == "denied" else "notice" if "sign_" in action else "info"
+        self.audit_logger.record(
+            session,
             action=action,
-            details=json.dumps(dict(details), sort_keys=True),
-            timestamp=datetime.now(timezone.utc),
-        ))
-        session.flush()
+            category="identity",
+            outcome=outcome,
+            severity=severity,
+            actor_id=user_id,
+            session_id=details.get("session_id"),
+            source=str(details.get("provider") or self.settings.provider_code),
+            target_type="external_identity" if "identity" in action else "session" if "sign" in action else None,
+            target_id=str(details.get("subject") or details.get("session_id") or "") or None,
+            details=details,
+        )
 
 
 __all__ = [

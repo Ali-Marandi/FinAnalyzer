@@ -399,13 +399,38 @@ class AuthSession(Base):
 
 
 class AuditLog(Base):
-    """Enterprise audit trail for security and compliance."""
+    """Structured, append-only audit event with a signed integrity-chain link."""
     __tablename__ = "audit_logs"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    user_id: Mapped[Optional[int]] = mapped_column(ForeignKey("users.id"))
-    action: Mapped[str] = mapped_column(String(255), nullable=False)
+    event_id: Mapped[Optional[str]] = mapped_column(String(36), unique=True, index=True)
+    sequence: Mapped[Optional[int]] = mapped_column(Integer, unique=True, index=True)
+    user_id: Mapped[Optional[int]] = mapped_column(ForeignKey("users.id"), index=True)
+    company_id: Mapped[Optional[int]] = mapped_column(ForeignKey("companies.id"), index=True)
+    session_id: Mapped[Optional[str]] = mapped_column(String(64), index=True)
+    request_id: Mapped[Optional[str]] = mapped_column(String(128), index=True)
+    action: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
+    category: Mapped[Optional[str]] = mapped_column(String(64), index=True)
+    severity: Mapped[Optional[str]] = mapped_column(String(16), index=True)
+    outcome: Mapped[Optional[str]] = mapped_column(String(32), index=True)
+    source: Mapped[Optional[str]] = mapped_column(String(128))
+    target_type: Mapped[Optional[str]] = mapped_column(String(64))
+    target_id: Mapped[Optional[str]] = mapped_column(String(128))
     details: Mapped[Optional[str]] = mapped_column(Text)
-    timestamp: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    previous_hash: Mapped[Optional[str]] = mapped_column(String(64))
+    event_hash: Mapped[Optional[str]] = mapped_column(String(64), index=True)
+    key_id: Mapped[Optional[str]] = mapped_column(String(32))
+    timestamp: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, index=True)
 
     user: Mapped[Optional["User"]] = relationship("User", back_populates="audit_logs")
+
+
+class AuditChainState(Base):
+    """Single-writer chain checkpoint used to verify all v2.4+ audit events."""
+    __tablename__ = "audit_chain_state"
+
+    scope: Mapped[str] = mapped_column(String(64), primary_key=True, default="global")
+    last_sequence: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    last_hash: Mapped[str] = mapped_column(String(64), nullable=False, default="0" * 64)
+    key_id: Mapped[Optional[str]] = mapped_column(String(32))
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
