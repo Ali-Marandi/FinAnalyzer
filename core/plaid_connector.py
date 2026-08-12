@@ -19,6 +19,7 @@ from uuid import uuid4
 from sqlalchemy import select
 
 from core.accounting_engine import AccountingEngine
+from core.authorization import AuthorizationContext, AuthorizationService
 from core.database import DatabaseManager
 from core.models import (
     Account,
@@ -104,12 +105,14 @@ class PlaidConnector:
         database: DatabaseManager,
         settings: Optional[PlaidSettings] = None,
         secret_store: Optional[LocalSecretStore] = None,
+        authorization: Optional[AuthorizationService] = None,
     ) -> None:
         if not PLAID_SDK_AVAILABLE:
             raise PlaidConfigurationError("The Plaid SDK is missing. Install plaid-python first.")
         self.database = database
         self.settings = settings or PlaidSettings.from_environment()
         self.secret_store = secret_store or LocalSecretStore()
+        self.authorization = authorization or AuthorizationService()
         self.client = self._build_client()
 
     def _build_client(self):
@@ -132,12 +135,17 @@ class PlaidConnector:
             return {}
         return value.to_dict() if hasattr(value, "to_dict") else dict(value)
 
-    def create_link_token(self, company_id: int) -> Dict[str, Any]:
-        """Create a short-lived Link token; no PII is passed as client_user_id."""
+    def create_link_token(self, company_id: int, actor_id: int, *, mfa_verified: bool = False) -> Dict[str, Any]:
+        """Create a Link token only for an explicitly authorized company member."""
         with self.database.get_session() as session:
             company = session.get(Company, company_id)
             if company is None:
                 raise PlaidSyncError("The selected company does not exist.")
+            self.authorization.require(
+                session,
+                AuthorizationContext(actor_id=actor_id, company_id=company_id, mfa_verified=mfa_verified, reason="plaid_link"),
+                "bank.link",
+            )
         payload: Dict[str, Any] = {
             "products": [Products("transactions")],
             "client_name": self.settings.client_name[:30],
@@ -155,12 +163,21 @@ class PlaidConnector:
     def exchange_public_token(
         self,
         company_id: int,
+        actor_id: int,
         public_token: str,
         institution: Optional[Dict[str, Any]] = None,
+        *,
+        mfa_verified: bool = False,
     ) -> Dict[str, str]:
         """Exchange and locally encrypt the returned persistent Plaid access token."""
         if not public_token:
             raise PlaidSyncError("A Plaid public token is required to complete bank linking.")
+        with self.database.get_session() as session:
+            self.authorization.require(
+                session,
+                AuthorizationContext(actor_id=actor_id, company_id=company_id, mfa_verified=mfa_verified, reason="plaid_exchange"),
+                "bank.link",
+            )
         response = self.client.item_public_token_exchange(
             ItemPublicTokenExchangeRequest(public_token=public_token)
         )
@@ -191,17 +208,27 @@ class PlaidConnector:
             self._audit(session, "plaid_item_linked", f"Plaid item {item_id} linked to company {company_id}.")
         return {"item_id": item_id, "status": "linked"}
 
-    def sync_company(self, company_id: int) -> list[Dict[str, Any]]:
+    def sync_company(self, company_id: int, actor_id: int) -> list[Dict[str, Any]]:
         with self.database.get_session() as session:
+            self.authorization.require(
+                session,
+                AuthorizationContext(actor_id=actor_id, company_id=company_id, reason="plaid_sync_company"),
+                "bank.sync",
+            )
             item_ids = list(session.scalars(select(PlaidItem.item_id).where(PlaidItem.company_id == company_id)))
-        return [self.sync_item(item_id) for item_id in item_ids]
+        return [self.sync_item(item_id, actor_id) for item_id in item_ids]
 
-    def sync_item(self, item_id: str) -> Dict[str, Any]:
-        """Fetch, page, and apply added/modified/removed records from Transactions Sync."""
+    def sync_item(self, item_id: str, actor_id: int) -> Dict[str, Any]:
+        """Fetch and apply changes only after the actor is authorized in the Item company scope."""
         with self.database.get_session() as session:
             item = session.scalar(select(PlaidItem).where(PlaidItem.item_id == item_id))
             if item is None:
                 raise PlaidSyncError("The requested bank connection does not exist locally.")
+            self.authorization.require(
+                session,
+                AuthorizationContext(actor_id=actor_id, company_id=item.company_id, reason="plaid_sync_item"),
+                "bank.sync",
+            )
             access_token = self.secret_store.decrypt(item.encrypted_access_token)
             original_cursor = item.cursor
 
@@ -240,12 +267,17 @@ class PlaidConnector:
             self._audit(session, "plaid_item_synced", f"Item {item_id}: {counts}")
         return {"item_id": item_id, **counts, "cursor_advanced": bool(cursor and cursor != original_cursor)}
 
-    def remove_item(self, item_id: str) -> bool:
-        """Revoke remote access before erasing encrypted local access data."""
+    def remove_item(self, item_id: str, actor_id: int, *, mfa_verified: bool = False) -> bool:
+        """Revoke remote access only for an MFA-verified, authorized company member."""
         with self.database.get_session() as session:
             item = session.scalar(select(PlaidItem).where(PlaidItem.item_id == item_id))
             if item is None:
                 return False
+            self.authorization.require(
+                session,
+                AuthorizationContext(actor_id=actor_id, company_id=item.company_id, mfa_verified=mfa_verified, reason="plaid_unlink"),
+                "bank.unlink",
+            )
             access_token = self.secret_store.decrypt(item.encrypted_access_token)
         try:
             from plaid.model.item_remove_request import ItemRemoveRequest

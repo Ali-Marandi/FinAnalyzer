@@ -19,10 +19,12 @@ from core.plaid_connector import PlaidConnector
 
 
 class PlaidDesktopLinkBridge:
-    def __init__(self, connector: PlaidConnector, company_id: int):
+    def __init__(self, connector: PlaidConnector, company_id: int, actor_id: int, *, mfa_verified: bool = False):
         self.connector = connector
         self.company_id = company_id
-        self.link_token = connector.create_link_token(company_id)["link_token"]
+        self.actor_id = actor_id
+        self.mfa_verified = mfa_verified
+        self.link_token = connector.create_link_token(company_id, actor_id, mfa_verified=mfa_verified)["link_token"]
         self.result: Optional[Dict[str, Any]] = None
         self.error: Optional[str] = None
         self.completed = threading.Event()
@@ -74,8 +76,10 @@ handler.open();
                     payload = json.loads(self.rfile.read(length).decode("utf-8"))
                     bridge.result = bridge.connector.exchange_public_token(
                         bridge.company_id,
+                        bridge.actor_id,
                         payload["public_token"],
                         payload.get("institution") or {},
+                        mfa_verified=bridge.mfa_verified,
                     )
                     bridge.completed.set()
                     self._send(HTTPStatus.OK, "application/json", '{"ok":true}')

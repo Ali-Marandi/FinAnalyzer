@@ -20,13 +20,17 @@ from PySide6.QtWidgets import (
 from sqlalchemy import select
 
 from core.automated_reporting import AutomatedReportService, EnterpriseReportGenerator, ManagementReportBuilder, ReportingError
+from core.authorization import AuthorizationContext, AuthorizationDenied, AuthorizationService
 from core.database import DatabaseManager
 from core.models import Company
 
 
 class ReportsPage(QWidget):
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, *, actor_id: int | None = None, mfa_verified: bool = False):
         super().__init__(parent)
+        self.actor_id = actor_id
+        self.mfa_verified = mfa_verified
+        self.authorization = AuthorizationService()
         root = Path(__file__).resolve().parents[2]
         self.root = root
         self.database = DatabaseManager(str(root / "finanalyzer.db"))
@@ -40,7 +44,14 @@ class ReportsPage(QWidget):
             output_dir=str(root / "reports"),
         )
         self._init_ui()
-        self.generate_report()
+        if self.actor_id is None:
+            self.pdf_btn.setEnabled(False)
+            self.excel_btn.setEnabled(False)
+            self.schedule_btn.setEnabled(False)
+            self.generate_btn.setEnabled(False)
+            self.preview_pane.setPlainText("A signed-in, authorized user is required to view or export company reports.")
+        else:
+            self.generate_report()
 
     def _ensure_company(self) -> int:
         with self.database.get_session() as session:
@@ -97,6 +108,13 @@ class ReportsPage(QWidget):
         layout.addWidget(self.preview_pane)
 
     def _build_report(self):
+        actor_id = self._require_actor()
+        with self.database.get_session() as session:
+            self.authorization.require(
+                session,
+                AuthorizationContext(actor_id=actor_id, company_id=self.company_id, reason="report_preview"),
+                "report.generate",
+            )
         end = self.date_edit.date().toPython()
         start = end - timedelta(days=30)
         return self.builder.build(self.company_id, start, end)
@@ -130,10 +148,12 @@ class ReportsPage(QWidget):
         try:
             schedule = self.schedules.create_schedule(
                 company_id=self.company_id,
+                actor_id=self._require_actor(),
                 name="Monthly management pack",
                 cadence="monthly",
                 formats=("pdf", "xlsx"),
                 hour_utc=8,
+                mfa_verified=self.mfa_verified,
             )
             QMessageBox.information(
                 self,
@@ -142,8 +162,13 @@ class ReportsPage(QWidget):
                 f"Next run: {schedule.next_run_at}\n\n"
                 "To run it automatically, configure Windows Task Scheduler to execute scripts\\run_scheduled_reports.py under the intended Windows user.",
             )
-        except ReportingError as exc:
+        except (ReportingError, AuthorizationDenied) as exc:
             QMessageBox.warning(self, "Schedule not created", str(exc))
+
+    def _require_actor(self) -> int:
+        if self.actor_id is None:
+            raise AuthorizationDenied("A signed-in user is required for this operation.")
+        return self.actor_id
 
     @staticmethod
     def _money(value) -> str:

@@ -7,9 +7,10 @@ from decimal import Decimal
 from pathlib import Path
 
 from core.accounting_engine import AccountingEngine
+from core.authorization import AuthorizationService
 from core.automated_reporting import AutomatedReportService, EnterpriseReportGenerator, ManagementReportBuilder
 from core.database import DatabaseManager
-from core.models import Account, AccountType, Company
+from core.models import Account, AccountType, Company, User, UserRole
 
 
 class ReportingV2Tests(unittest.TestCase):
@@ -23,6 +24,11 @@ class ReportingV2Tests(unittest.TestCase):
             session.add(company)
             session.flush()
             self.company_id = company.id
+            user = User(username="report-manager", email="report-manager@example.test", password_hash="x", role=UserRole.ADMIN)
+            session.add(user)
+            session.flush()
+            self.actor_id = user.id
+            AuthorizationService().grant_role(session, self.actor_id, self.company_id, "finance_manager")
             cash = Account(company_id=company.id, code="1010", name="Cash", account_type=AccountType.ASSET)
             revenue = Account(company_id=company.id, code="4000", name="Service Revenue", account_type=AccountType.REVENUE)
             expense = Account(company_id=company.id, code="6000", name="Software Expense", account_type=AccountType.EXPENSE)
@@ -61,10 +67,17 @@ class ReportingV2Tests(unittest.TestCase):
             schedules_path=str(self.root / "data" / "schedules.json"),
             output_dir=str(self.root / "reports"),
         )
-        schedule = service.create_schedule(self.company_id, "Monthly management pack", "monthly", ("pdf", "xlsx"))
+        schedule = service.create_schedule(
+            self.company_id,
+            self.actor_id,
+            "Monthly management pack",
+            "monthly",
+            ("pdf", "xlsx"),
+            mfa_verified=True,
+        )
         schedule.next_run_at = (datetime.now(timezone.utc) - timedelta(minutes=1)).isoformat()
         service._write_schedules([schedule])
-        outcomes = service.run_due()
+        outcomes = service.run_due(self.actor_id)
         self.assertEqual(outcomes[0]["status"], "completed")
         self.assertTrue(Path(outcomes[0]["files"]["pdf"]).exists())
         self.assertTrue(Path(outcomes[0]["files"]["xlsx"]).exists())

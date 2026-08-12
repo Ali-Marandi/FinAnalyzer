@@ -48,8 +48,15 @@ class DatabaseManager:
         )
 
     def init_database(self) -> None:
-        """Create all tables defined in models."""
+        """Create schema objects and idempotently seed the authorization catalog."""
         Base.metadata.create_all(bind=self.engine)
+        self.bootstrap_enterprise_security()
+
+    def bootstrap_enterprise_security(self) -> None:
+        """Ensure canonical roles and permissions exist without granting any user access."""
+        from core.authorization import AuthorizationService
+        with self.get_session() as session:
+            AuthorizationService().bootstrap_defaults(session)
 
     @contextmanager
     def get_session(self) -> Generator[Session, None, None]:

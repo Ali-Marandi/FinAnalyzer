@@ -1,5 +1,5 @@
 """
-ui/main_window.py - Main Application Window for FinAnalyzer Enterprise v2.1.0
+ui/main_window.py - Main Application Window for FinAnalyzer Enterprise v2.2.0
 """
 
 from PySide6.QtWidgets import (
@@ -22,7 +22,7 @@ class MainWindow(QMainWindow):
     def __init__(self, app_instance=None):
         super().__init__()
         self.app_instance = app_instance
-        self.setWindowTitle("FinAnalyzer Enterprise v2.1.0")
+        self.setWindowTitle("FinAnalyzer Enterprise v2.2.0")
         self.resize(1400, 900)
 
         self.init_ui()
@@ -96,7 +96,7 @@ class MainWindow(QMainWindow):
         sidebar_layout.addStretch()
 
         # User Info Footer in Sidebar
-        user_label = QLabel("👤 Admin User\n🟢 Enterprise Online")
+        user_label = QLabel("Enterprise security controls active\nSign-in required for protected operations")
         user_label.setStyleSheet("font-size: 9pt; color: palette(text); opacity: 0.7; padding: 10px;")
         sidebar_layout.addWidget(user_label)
 

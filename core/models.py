@@ -9,7 +9,8 @@ from datetime import datetime, date
 from decimal import Decimal
 from typing import List, Optional
 from sqlalchemy import (
-    String, Numeric, DateTime, Date, ForeignKey, Text, Boolean, Integer, Enum as SQLEnum
+    String, Numeric, DateTime, Date, ForeignKey, Text, Boolean, Integer, Enum as SQLEnum,
+    UniqueConstraint
 )
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 import enum
@@ -22,6 +23,12 @@ class UserRole(str, enum.Enum):
     ADMIN = "admin"
     ACCOUNTANT = "accountant"
     VIEWER = "viewer"
+
+class MembershipStatus(str, enum.Enum):
+    ACTIVE = "active"
+    SUSPENDED = "suspended"
+    REVOKED = "revoked"
+
 
 class AccountType(str, enum.Enum):
     ASSET = "asset"
@@ -54,6 +61,7 @@ class Company(Base):
     assets: Mapped[List["Asset"]] = relationship("Asset", back_populates="company", cascade="all, delete-orphan")
     invoices: Mapped[List["Invoice"]] = relationship("Invoice", back_populates="company", cascade="all, delete-orphan")
     plaid_items: Mapped[List["PlaidItem"]] = relationship("PlaidItem", back_populates="company", cascade="all, delete-orphan")
+    memberships: Mapped[List["CompanyMembership"]] = relationship("CompanyMembership", back_populates="company", cascade="all, delete-orphan")
 
 
 class User(Base):
@@ -69,6 +77,7 @@ class User(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
     audit_logs: Mapped[List["AuditLog"]] = relationship("AuditLog", back_populates="user")
+    memberships: Mapped[List["CompanyMembership"]] = relationship("CompanyMembership", back_populates="user", cascade="all, delete-orphan")
 
 
 class Account(Base):
@@ -259,6 +268,78 @@ class PlaidTransactionMapping(Base):
 
     item: Mapped["PlaidItem"] = relationship("PlaidItem", back_populates="transaction_mappings")
     journal_entry: Mapped[Optional["JournalEntry"]] = relationship("JournalEntry")
+
+
+class Role(Base):
+    """Named, reusable enterprise role assigned within a company membership."""
+    __tablename__ = "roles"
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    code: Mapped[str] = mapped_column(String(100), unique=True, nullable=False, index=True)
+    name: Mapped[str] = mapped_column(String(150), nullable=False)
+    description: Mapped[Optional[str]] = mapped_column(Text)
+    is_system: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+    memberships: Mapped[List["MembershipRole"]] = relationship("MembershipRole", back_populates="role", cascade="all, delete-orphan")
+    permissions: Mapped[List["RolePermission"]] = relationship("RolePermission", back_populates="role", cascade="all, delete-orphan")
+
+
+class Permission(Base):
+    """A stable resource.action permission, independent of user-interface labels."""
+    __tablename__ = "permissions"
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    code: Mapped[str] = mapped_column(String(150), unique=True, nullable=False, index=True)
+    resource: Mapped[str] = mapped_column(String(80), nullable=False)
+    action: Mapped[str] = mapped_column(String(80), nullable=False)
+    description: Mapped[Optional[str]] = mapped_column(Text)
+    is_sensitive: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+
+    roles: Mapped[List["RolePermission"]] = relationship("RolePermission", back_populates="permission", cascade="all, delete-orphan")
+
+
+class CompanyMembership(Base):
+    """A user's active or revoked membership boundary for one company tenant."""
+    __tablename__ = "company_memberships"
+    __table_args__ = (UniqueConstraint("user_id", "company_id", name="uq_company_membership_user_company"),)
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False, index=True)
+    company_id: Mapped[int] = mapped_column(ForeignKey("companies.id"), nullable=False, index=True)
+    status: Mapped[MembershipStatus] = mapped_column(SQLEnum(MembershipStatus), default=MembershipStatus.ACTIVE, nullable=False)
+    joined_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    revoked_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
+
+    user: Mapped["User"] = relationship("User", back_populates="memberships")
+    company: Mapped["Company"] = relationship("Company", back_populates="memberships")
+    roles: Mapped[List["MembershipRole"]] = relationship("MembershipRole", back_populates="membership", cascade="all, delete-orphan")
+
+
+class MembershipRole(Base):
+    """Many-to-many membership-to-role mapping scoped to a single company."""
+    __tablename__ = "membership_roles"
+    __table_args__ = (UniqueConstraint("membership_id", "role_id", name="uq_membership_role"),)
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    membership_id: Mapped[int] = mapped_column(ForeignKey("company_memberships.id"), nullable=False, index=True)
+    role_id: Mapped[int] = mapped_column(ForeignKey("roles.id"), nullable=False, index=True)
+
+    membership: Mapped["CompanyMembership"] = relationship("CompanyMembership", back_populates="roles")
+    role: Mapped["Role"] = relationship("Role", back_populates="memberships")
+
+
+class RolePermission(Base):
+    """Many-to-many role-to-permission mapping used by the central policy service."""
+    __tablename__ = "role_permissions"
+    __table_args__ = (UniqueConstraint("role_id", "permission_id", name="uq_role_permission"),)
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    role_id: Mapped[int] = mapped_column(ForeignKey("roles.id"), nullable=False, index=True)
+    permission_id: Mapped[int] = mapped_column(ForeignKey("permissions.id"), nullable=False, index=True)
+
+    role: Mapped["Role"] = relationship("Role", back_populates="permissions")
+    permission: Mapped["Permission"] = relationship("Permission", back_populates="roles")
 
 
 class AuditLog(Base):

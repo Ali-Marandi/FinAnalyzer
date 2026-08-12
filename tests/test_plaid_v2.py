@@ -6,8 +6,9 @@ from pathlib import Path
 
 from sqlalchemy import select
 
+from core.authorization import AuthorizationService
 from core.database import DatabaseManager
-from core.models import Company, JournalEntry, PlaidItem, PlaidTransactionMapping
+from core.models import Company, JournalEntry, PlaidItem, PlaidTransactionMapping, User, UserRole
 from core.plaid_connector import PLAID_SDK_AVAILABLE, PlaidConnector, PlaidSettings
 from core.security import LocalSecretStore
 
@@ -59,7 +60,12 @@ class PlaidV2Tests(unittest.TestCase):
             company = Company(name="Test Company", legal_name="Test Company", currency_code="USD")
             session.add(company)
             session.flush()
+            user = User(username="bank-operator", email="bank-operator@example.test", password_hash="x", role=UserRole.ADMIN)
+            session.add(user)
+            session.flush()
             self.company_id = company.id
+            self.actor_id = user.id
+            AuthorizationService().grant_role(session, self.actor_id, self.company_id, "finance_manager")
         settings = PlaidSettings(client_id="test-client", secret="test-secret", environment="sandbox")
         self.connector = PlaidConnector(
             self.database,
@@ -72,13 +78,19 @@ class PlaidV2Tests(unittest.TestCase):
         self.temp_dir.cleanup()
 
     def test_exchange_encrypts_token_and_sync_posts_balanced_entry(self):
-        self.connector.exchange_public_token(self.company_id, "public-sandbox-test", {"name": "Test Bank"})
+        self.connector.exchange_public_token(
+            self.company_id,
+            self.actor_id,
+            "public-sandbox-test",
+            {"name": "Test Bank"},
+            mfa_verified=True,
+        )
         with self.database.get_session() as session:
             item = session.scalar(select(PlaidItem).where(PlaidItem.item_id == "item-test-001"))
             self.assertIsNotNone(item)
             self.assertNotIn("access-sandbox-test", item.encrypted_access_token)
 
-        result = self.connector.sync_item("item-test-001")
+        result = self.connector.sync_item("item-test-001", self.actor_id)
         self.assertEqual(result["added"], 1)
         with self.database.get_session() as session:
             mapping = session.scalar(select(PlaidTransactionMapping).where(PlaidTransactionMapping.provider_transaction_id == "tx-test-001"))

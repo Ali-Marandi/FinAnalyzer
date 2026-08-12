@@ -11,6 +11,7 @@ from pathlib import Path
 from PySide6.QtWidgets import QHBoxLayout, QLabel, QMessageBox, QPushButton, QVBoxLayout, QWidget
 from sqlalchemy import select
 
+from core.authorization import AuthorizationContext, AuthorizationDenied, AuthorizationService
 from core.database import DatabaseManager
 from core.models import Company, PlaidItem
 from core.plaid_connector import PlaidConfigurationError, PlaidConnector, PlaidSyncError
@@ -18,8 +19,11 @@ from core.plaid_link_desktop import PlaidDesktopLinkBridge
 
 
 class BankingPage(QWidget):
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, *, actor_id: int | None = None, mfa_verified: bool = False):
         super().__init__(parent)
+        self.actor_id = actor_id
+        self.mfa_verified = mfa_verified
+        self.authorization = AuthorizationService()
         root = Path(__file__).resolve().parents[2]
         self.database = DatabaseManager(str(root / "finanalyzer.db"))
         self.database.init_database()
@@ -27,7 +31,13 @@ class BankingPage(QWidget):
         self.connector = None
         self.bridge = None
         self._init_ui()
-        self.refresh_connections()
+        if self.actor_id is None:
+            self.connect_button.setEnabled(False)
+            self.sync_button.setEnabled(False)
+            self.refresh_button.setEnabled(False)
+            self.connection_summary.setText("A signed-in, authorized user is required to view or manage bank connections.")
+        else:
+            self.refresh_connections()
 
     def _ensure_company(self) -> int:
         with self.database.get_session() as session:
@@ -86,7 +96,8 @@ class BankingPage(QWidget):
 
     def connect_bank(self) -> None:
         try:
-            self.bridge = PlaidDesktopLinkBridge(self._connector(), self.company_id)
+            actor_id = self._require_actor()
+            self.bridge = PlaidDesktopLinkBridge(self._connector(), self.company_id, actor_id, mfa_verified=self.mfa_verified)
             self.bridge.open()
             self.connection_summary.setText(
                 "Plaid Link opened in the default browser. Complete the institution consent flow, then click Refresh or Synchronize."
@@ -98,7 +109,7 @@ class BankingPage(QWidget):
 
     def synchronize(self) -> None:
         try:
-            outcomes = self._connector().sync_company(self.company_id)
+            outcomes = self._connector().sync_company(self.company_id, self._require_actor())
             if not outcomes:
                 QMessageBox.information(self, "No connections", "No bank connection is currently linked for this company.")
                 return
@@ -113,12 +124,22 @@ class BankingPage(QWidget):
             QMessageBox.critical(self, "Sync not completed", "The transaction sync failed safely. No partial cursor was saved; retry after reviewing the connection.")
 
     def refresh_connections(self) -> None:
-        with self.database.get_session() as session:
-            records = list(
+        try:
+            actor_id = self._require_actor()
+            with self.database.get_session() as session:
+                self.authorization.require(
+                    session,
+                    AuthorizationContext(actor_id=actor_id, company_id=self.company_id, reason="bank_connections_view"),
+                    "company.read",
+                )
+                records = list(
                 session.scalars(
                     select(PlaidItem).where(PlaidItem.company_id == self.company_id).order_by(PlaidItem.institution_name)
+                    )
                 )
-            )
+        except AuthorizationDenied:
+            self.connection_summary.setText("You do not have permission to view bank connections for this company.")
+            return
         if not records:
             self.connection_summary.setText("No linked institutions. Select ‘Connect bank with Plaid’ to begin a consented connection.")
             return
@@ -128,3 +149,8 @@ class BankingPage(QWidget):
             synced = item.last_synced_at.isoformat(sep=" ", timespec="minutes") if item.last_synced_at else "Not yet synchronized"
             lines.append(f"• {label} — status: {item.status}; last sync: {synced}")
         self.connection_summary.setText("\n".join(lines))
+
+    def _require_actor(self) -> int:
+        if self.actor_id is None:
+            raise AuthorizationDenied("A signed-in user is required for this operation.")
+        return self.actor_id

@@ -8,6 +8,7 @@ explicitly configured through protected environment variables.
 from __future__ import annotations
 
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -26,7 +27,11 @@ def main() -> int:
         schedules_path=str(PROJECT_ROOT / "data" / "report_schedules.json"),
         output_dir=str(PROJECT_ROOT / "reports"),
     )
-    outcomes = service.run_due()
+    actor_id_text = os.getenv("FINANALYZER_SCHEDULER_ACTOR_ID", "").strip()
+    if not actor_id_text.isdigit():
+        raise RuntimeError("Set FINANALYZER_SCHEDULER_ACTOR_ID to an authorized service-account user ID.")
+    mfa_verified = os.getenv("FINANALYZER_SCHEDULER_MFA_VERIFIED", "false").strip().lower() == "true"
+    outcomes = service.run_due(int(actor_id_text), mfa_verified=mfa_verified)
     print(json.dumps(outcomes, ensure_ascii=False, indent=2))
     return 0 if all(outcome["status"] == "completed" for outcome in outcomes) else 1
 

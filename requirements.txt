@@ -16,3 +16,5 @@ plaid-python>=20.0.0
 ofxparse>=0.21
 qifparse>=0.9
 pyinstaller>=6.0.0
+# Windows-only: DPAPI integration for local encryption-key protection
+pywin32>=306; platform_system == "Windows"
