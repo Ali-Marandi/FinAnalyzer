@@ -41,3 +41,8 @@ backups/
 data/.finanalyzer.key
 data/report_schedules.json
 reports/
+
+# Enterprise OIDC/MSAL local session cache and security-validation artifacts
+data/.finanalyzer.msalcache.dpapi
+data/.finanalyzer.msalcache.dpapi.tmp
+security-reports/

@@ -15,16 +15,16 @@ from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from typing import Any, Dict, Optional
 
+from core.identity import AuthenticatedPrincipal
 from core.plaid_connector import PlaidConnector
 
 
 class PlaidDesktopLinkBridge:
-    def __init__(self, connector: PlaidConnector, company_id: int, actor_id: int, *, mfa_verified: bool = False):
+    def __init__(self, connector: PlaidConnector, company_id: int, principal: AuthenticatedPrincipal):
         self.connector = connector
         self.company_id = company_id
-        self.actor_id = actor_id
-        self.mfa_verified = mfa_verified
-        self.link_token = connector.create_link_token(company_id, actor_id, mfa_verified=mfa_verified)["link_token"]
+        self.principal = principal
+        self.link_token = connector.create_link_token(company_id, principal)["link_token"]
         self.result: Optional[Dict[str, Any]] = None
         self.error: Optional[str] = None
         self.completed = threading.Event()
@@ -76,10 +76,9 @@ handler.open();
                     payload = json.loads(self.rfile.read(length).decode("utf-8"))
                     bridge.result = bridge.connector.exchange_public_token(
                         bridge.company_id,
-                        bridge.actor_id,
+                        bridge.principal,
                         payload["public_token"],
                         payload.get("institution") or {},
-                        mfa_verified=bridge.mfa_verified,
                     )
                     bridge.completed.set()
                     self._send(HTTPStatus.OK, "application/json", '{"ok":true}')

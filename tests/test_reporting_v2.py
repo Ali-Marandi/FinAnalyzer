@@ -10,6 +10,7 @@ from core.accounting_engine import AccountingEngine
 from core.authorization import AuthorizationService
 from core.automated_reporting import AutomatedReportService, EnterpriseReportGenerator, ManagementReportBuilder
 from core.database import DatabaseManager
+from core.identity import AuthenticatedPrincipal
 from core.models import Account, AccountType, Company, User, UserRole
 
 
@@ -49,6 +50,17 @@ class ReportingV2Tests(unittest.TestCase):
                     {"account_id": cash.id, "debit": 0, "credit": Decimal("125.00")},
                 ],
             )
+        now = datetime.now(timezone.utc)
+        self.principal = AuthenticatedPrincipal(
+            user_id=self.actor_id,
+            session_id="test-report-session",
+            provider_code="test",
+            issuer="https://issuer.example.test",
+            subject="test-report-manager",
+            authenticated_at=now,
+            expires_at=now + timedelta(hours=1),
+            mfa_at=now,
+        )
 
     def tearDown(self):
         self.temp_dir.cleanup()
@@ -69,15 +81,14 @@ class ReportingV2Tests(unittest.TestCase):
         )
         schedule = service.create_schedule(
             self.company_id,
-            self.actor_id,
+            self.principal,
             "Monthly management pack",
             "monthly",
             ("pdf", "xlsx"),
-            mfa_verified=True,
         )
         schedule.next_run_at = (datetime.now(timezone.utc) - timedelta(minutes=1)).isoformat()
         service._write_schedules([schedule])
-        outcomes = service.run_due(self.actor_id)
+        outcomes = service.run_due(self.principal)
         self.assertEqual(outcomes[0]["status"], "completed")
         self.assertTrue(Path(outcomes[0]["files"]["pdf"]).exists())
         self.assertTrue(Path(outcomes[0]["files"]["xlsx"]).exists())

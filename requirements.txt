@@ -18,3 +18,6 @@ qifparse>=0.9
 pyinstaller>=6.0.0
 # Windows-only: DPAPI integration for local encryption-key protection
 pywin32>=306; platform_system == "Windows"
+# Enterprise SSO / OIDC public-client support (no client secret in desktop app)
+msal>=1.28.0
+PyJWT[crypto]>=2.8.0

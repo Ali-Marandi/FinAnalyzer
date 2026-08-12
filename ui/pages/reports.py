@@ -20,16 +20,16 @@ from PySide6.QtWidgets import (
 from sqlalchemy import select
 
 from core.automated_reporting import AutomatedReportService, EnterpriseReportGenerator, ManagementReportBuilder, ReportingError
-from core.authorization import AuthorizationContext, AuthorizationDenied, AuthorizationService
+from core.authorization import AuthorizationDenied, AuthorizationService
+from core.identity import AuthenticatedPrincipal
 from core.database import DatabaseManager
 from core.models import Company
 
 
 class ReportsPage(QWidget):
-    def __init__(self, parent=None, *, actor_id: int | None = None, mfa_verified: bool = False):
+    def __init__(self, parent=None, *, principal: AuthenticatedPrincipal | None = None):
         super().__init__(parent)
-        self.actor_id = actor_id
-        self.mfa_verified = mfa_verified
+        self.principal = principal
         self.authorization = AuthorizationService()
         root = Path(__file__).resolve().parents[2]
         self.root = root
@@ -44,14 +44,7 @@ class ReportsPage(QWidget):
             output_dir=str(root / "reports"),
         )
         self._init_ui()
-        if self.actor_id is None:
-            self.pdf_btn.setEnabled(False)
-            self.excel_btn.setEnabled(False)
-            self.schedule_btn.setEnabled(False)
-            self.generate_btn.setEnabled(False)
-            self.preview_pane.setPlainText("A signed-in, authorized user is required to view or export company reports.")
-        else:
-            self.generate_report()
+        self.set_principal(self.principal)
 
     def _ensure_company(self) -> int:
         with self.database.get_session() as session:
@@ -108,11 +101,15 @@ class ReportsPage(QWidget):
         layout.addWidget(self.preview_pane)
 
     def _build_report(self):
-        actor_id = self._require_actor()
+        principal = self._require_principal()
         with self.database.get_session() as session:
             self.authorization.require(
                 session,
-                AuthorizationContext(actor_id=actor_id, company_id=self.company_id, reason="report_preview"),
+                principal.authorization_context(
+                    self.company_id,
+                    "report_preview",
+                    mfa_max_age=self.schedules.mfa_max_age,
+                ),
                 "report.generate",
             )
         end = self.date_edit.date().toPython()
@@ -148,12 +145,11 @@ class ReportsPage(QWidget):
         try:
             schedule = self.schedules.create_schedule(
                 company_id=self.company_id,
-                actor_id=self._require_actor(),
+                principal=self._require_principal(),
                 name="Monthly management pack",
                 cadence="monthly",
                 formats=("pdf", "xlsx"),
                 hour_utc=8,
-                mfa_verified=self.mfa_verified,
             )
             QMessageBox.information(
                 self,
@@ -165,10 +161,22 @@ class ReportsPage(QWidget):
         except (ReportingError, AuthorizationDenied) as exc:
             QMessageBox.warning(self, "Schedule not created", str(exc))
 
-    def _require_actor(self) -> int:
-        if self.actor_id is None:
-            raise AuthorizationDenied("A signed-in user is required for this operation.")
-        return self.actor_id
+    def set_principal(self, principal: AuthenticatedPrincipal | None) -> None:
+        self.principal = principal
+        enabled = principal is not None
+        self.pdf_btn.setEnabled(enabled)
+        self.excel_btn.setEnabled(enabled)
+        self.schedule_btn.setEnabled(enabled)
+        self.generate_btn.setEnabled(enabled)
+        if enabled:
+            self.generate_report()
+        else:
+            self.preview_pane.setPlainText("A signed-in, authorized user is required to view or export company reports.")
+
+    def _require_principal(self) -> AuthenticatedPrincipal:
+        if self.principal is None:
+            raise AuthorizationDenied("A validated Enterprise session is required for this operation.")
+        return self.principal
 
     @staticmethod
     def _money(value) -> str:

@@ -1,4 +1,4 @@
-"""Build the FinAnalyzer Enterprise v2.2 desktop executable with security integrations."""
+"""Build the FinAnalyzer Enterprise v2.3 desktop executable with SSO and security integrations."""
 
 from __future__ import annotations
 
@@ -14,12 +14,12 @@ PROJECT_ROOT = Path(__file__).resolve().parent
 
 def build() -> None:
     print("=" * 60)
-    print("  FinAnalyzer Enterprise v2.2.0 — Enterprise Security Build")
+    print("  FinAnalyzer Enterprise v2.3.0 — Enterprise Identity & Security Build")
     print(f"  Platform: {platform.system()} {platform.machine()}")
     print(f"  Python: {sys.version}")
     print("=" * 60)
 
-    app_name = "FinAnalyzer_Enterprise_v2"
+    app_name = "FinAnalyzer_Enterprise_v2_3"
     separator = ";" if platform.system() == "Windows" else ":"
     args = [
         str(PROJECT_ROOT / "main.py"),
@@ -33,6 +33,9 @@ def build() -> None:
         "--hidden-import=core.automated_reporting",
         "--hidden-import=core.security",
         "--hidden-import=core.authorization",
+        "--hidden-import=core.identity",
+        "--hidden-import=msal",
+        "--hidden-import=jwt",
         "--hidden-import=plaid",
         "--collect-submodules=plaid",
         "--clean",

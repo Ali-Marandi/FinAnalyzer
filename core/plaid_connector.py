@@ -11,7 +11,8 @@ from __future__ import annotations
 import json
 import os
 from dataclasses import dataclass
-from datetime import date, datetime
+from datetime import datetime, date, timedelta
+import time
 from decimal import Decimal
 from typing import Any, Dict, Iterable, Optional
 from uuid import uuid4
@@ -19,7 +20,8 @@ from uuid import uuid4
 from sqlalchemy import select
 
 from core.accounting_engine import AccountingEngine
-from core.authorization import AuthorizationContext, AuthorizationService
+from core.authorization import AuthorizationService
+from core.identity import AuthenticatedPrincipal, IdentityValidationError
 from core.database import DatabaseManager
 from core.models import (
     Account,
@@ -135,15 +137,15 @@ class PlaidConnector:
             return {}
         return value.to_dict() if hasattr(value, "to_dict") else dict(value)
 
-    def create_link_token(self, company_id: int, actor_id: int, *, mfa_verified: bool = False) -> Dict[str, Any]:
-        """Create a Link token only for an explicitly authorized company member."""
+    def create_link_token(self, company_id: int, principal: AuthenticatedPrincipal) -> Dict[str, Any]:
+        """Create a Link token only for an authorized, MFA-backed Enterprise session."""
         with self.database.get_session() as session:
             company = session.get(Company, company_id)
             if company is None:
                 raise PlaidSyncError("The selected company does not exist.")
             self.authorization.require(
                 session,
-                AuthorizationContext(actor_id=actor_id, company_id=company_id, mfa_verified=mfa_verified, reason="plaid_link"),
+                self._context(principal, company_id, "plaid_link"),
                 "bank.link",
             )
         payload: Dict[str, Any] = {
@@ -163,11 +165,9 @@ class PlaidConnector:
     def exchange_public_token(
         self,
         company_id: int,
-        actor_id: int,
+        principal: AuthenticatedPrincipal,
         public_token: str,
         institution: Optional[Dict[str, Any]] = None,
-        *,
-        mfa_verified: bool = False,
     ) -> Dict[str, str]:
         """Exchange and locally encrypt the returned persistent Plaid access token."""
         if not public_token:
@@ -175,7 +175,7 @@ class PlaidConnector:
         with self.database.get_session() as session:
             self.authorization.require(
                 session,
-                AuthorizationContext(actor_id=actor_id, company_id=company_id, mfa_verified=mfa_verified, reason="plaid_exchange"),
+                self._context(principal, company_id, "plaid_exchange"),
                 "bank.link",
             )
         response = self.client.item_public_token_exchange(
@@ -208,17 +208,17 @@ class PlaidConnector:
             self._audit(session, "plaid_item_linked", f"Plaid item {item_id} linked to company {company_id}.")
         return {"item_id": item_id, "status": "linked"}
 
-    def sync_company(self, company_id: int, actor_id: int) -> list[Dict[str, Any]]:
+    def sync_company(self, company_id: int, principal: AuthenticatedPrincipal) -> list[Dict[str, Any]]:
         with self.database.get_session() as session:
             self.authorization.require(
                 session,
-                AuthorizationContext(actor_id=actor_id, company_id=company_id, reason="plaid_sync_company"),
+                self._context(principal, company_id, "plaid_sync_company"),
                 "bank.sync",
             )
             item_ids = list(session.scalars(select(PlaidItem.item_id).where(PlaidItem.company_id == company_id)))
-        return [self.sync_item(item_id, actor_id) for item_id in item_ids]
+        return [self.sync_item(item_id, principal) for item_id in item_ids]
 
-    def sync_item(self, item_id: str, actor_id: int) -> Dict[str, Any]:
+    def sync_item(self, item_id: str, principal: AuthenticatedPrincipal) -> Dict[str, Any]:
         """Fetch and apply changes only after the actor is authorized in the Item company scope."""
         with self.database.get_session() as session:
             item = session.scalar(select(PlaidItem).where(PlaidItem.item_id == item_id))
@@ -226,7 +226,7 @@ class PlaidConnector:
                 raise PlaidSyncError("The requested bank connection does not exist locally.")
             self.authorization.require(
                 session,
-                AuthorizationContext(actor_id=actor_id, company_id=item.company_id, reason="plaid_sync_item"),
+                self._context(principal, item.company_id, "plaid_sync_item"),
                 "bank.sync",
             )
             access_token = self.secret_store.decrypt(item.encrypted_access_token)
@@ -267,15 +267,15 @@ class PlaidConnector:
             self._audit(session, "plaid_item_synced", f"Item {item_id}: {counts}")
         return {"item_id": item_id, **counts, "cursor_advanced": bool(cursor and cursor != original_cursor)}
 
-    def remove_item(self, item_id: str, actor_id: int, *, mfa_verified: bool = False) -> bool:
-        """Revoke remote access only for an MFA-verified, authorized company member."""
+    def remove_item(self, item_id: str, principal: AuthenticatedPrincipal) -> bool:
+        """Revoke remote access only for an MFA-backed, authorized Enterprise session."""
         with self.database.get_session() as session:
             item = session.scalar(select(PlaidItem).where(PlaidItem.item_id == item_id))
             if item is None:
                 return False
             self.authorization.require(
                 session,
-                AuthorizationContext(actor_id=actor_id, company_id=item.company_id, mfa_verified=mfa_verified, reason="plaid_unlink"),
+                self._context(principal, item.company_id, "plaid_unlink"),
                 "bank.unlink",
             )
             access_token = self.secret_store.decrypt(item.encrypted_access_token)
@@ -290,6 +290,12 @@ class PlaidConnector:
                 self._audit(session, "plaid_item_removed", f"Item {item_id} revoked and removed.")
                 session.delete(item)
         return True
+
+    @staticmethod
+    def _context(principal: AuthenticatedPrincipal, company_id: int, reason: str):
+        if not isinstance(principal, AuthenticatedPrincipal):
+            raise IdentityValidationError("A validated Enterprise session principal is required for banking operations.")
+        return principal.authorization_context(company_id, reason, mfa_max_age=timedelta(minutes=15))
 
     def _upsert_accounts(self, session, item: PlaidItem, records: Iterable[Dict[str, Any]]) -> Dict[str, PlaidAccount]:
         local_accounts: Dict[str, PlaidAccount] = {}

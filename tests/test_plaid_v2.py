@@ -2,12 +2,14 @@ from __future__ import annotations
 
 import tempfile
 import unittest
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from sqlalchemy import select
 
 from core.authorization import AuthorizationService
 from core.database import DatabaseManager
+from core.identity import AuthenticatedPrincipal
 from core.models import Company, JournalEntry, PlaidItem, PlaidTransactionMapping, User, UserRole
 from core.plaid_connector import PLAID_SDK_AVAILABLE, PlaidConnector, PlaidSettings
 from core.security import LocalSecretStore
@@ -73,6 +75,17 @@ class PlaidV2Tests(unittest.TestCase):
             secret_store=LocalSecretStore(str(root / ".finanalyzer.key")),
         )
         self.connector.client = FakePlaidClient()
+        now = datetime.now(timezone.utc)
+        self.principal = AuthenticatedPrincipal(
+            user_id=self.actor_id,
+            session_id="test-plaid-session",
+            provider_code="test",
+            issuer="https://issuer.example.test",
+            subject="test-bank-operator",
+            authenticated_at=now,
+            expires_at=now + timedelta(hours=1),
+            mfa_at=now,
+        )
 
     def tearDown(self):
         self.temp_dir.cleanup()
@@ -80,17 +93,16 @@ class PlaidV2Tests(unittest.TestCase):
     def test_exchange_encrypts_token_and_sync_posts_balanced_entry(self):
         self.connector.exchange_public_token(
             self.company_id,
-            self.actor_id,
+            self.principal,
             "public-sandbox-test",
             {"name": "Test Bank"},
-            mfa_verified=True,
         )
         with self.database.get_session() as session:
             item = session.scalar(select(PlaidItem).where(PlaidItem.item_id == "item-test-001"))
             self.assertIsNotNone(item)
             self.assertNotIn("access-sandbox-test", item.encrypted_access_token)
 
-        result = self.connector.sync_item("item-test-001", self.actor_id)
+        result = self.connector.sync_item("item-test-001", self.principal)
         self.assertEqual(result["added"], 1)
         with self.database.get_session() as session:
             mapping = session.scalar(select(PlaidTransactionMapping).where(PlaidTransactionMapping.provider_transaction_id == "tx-test-001"))

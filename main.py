@@ -1,5 +1,5 @@
 """
-main.py - Entry Point for FinAnalyzer Enterprise v2.0.0
+main.py - Entry Point for FinAnalyzer Enterprise v2.3.0
 """
 
 import sys
@@ -29,7 +29,7 @@ logging.basicConfig(
 logger = logging.getLogger("FinAnalyzerApp")
 
 def main():
-    logger.info("Initializing FinAnalyzer Enterprise v2.0.0...")
+    logger.info("Initializing FinAnalyzer Enterprise v2.3.0...")
 
     # Initialize Database
     try:
@@ -54,7 +54,7 @@ def main():
     painter = QPainter(splash_pix)
     painter.setPen(QColor("#ffffff"))
     painter.setFont(QFont("Segoe UI", 16, QFont.Bold))
-    painter.drawText(splash_pix.rect(), Qt.AlignCenter, "FinAnalyzer Enterprise v2.0.0\n\nLoading Financial Engine & GUI...")
+    painter.drawText(splash_pix.rect(), Qt.AlignCenter, "FinAnalyzer Enterprise v2.3.0\n\nLoading Enterprise Identity & Financial Engine...")
     painter.end()
 
     splash = QSplashScreen(splash_pix, Qt.WindowStaysOnTopHint)

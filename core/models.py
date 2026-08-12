@@ -78,6 +78,8 @@ class User(Base):
 
     audit_logs: Mapped[List["AuditLog"]] = relationship("AuditLog", back_populates="user")
     memberships: Mapped[List["CompanyMembership"]] = relationship("CompanyMembership", back_populates="user", cascade="all, delete-orphan")
+    external_identities: Mapped[List["ExternalIdentity"]] = relationship("ExternalIdentity", back_populates="user", cascade="all, delete-orphan")
+    auth_sessions: Mapped[List["AuthSession"]] = relationship("AuthSession", back_populates="user", cascade="all, delete-orphan")
 
 
 class Account(Base):
@@ -340,6 +342,60 @@ class RolePermission(Base):
 
     role: Mapped["Role"] = relationship("Role", back_populates="permissions")
     permission: Mapped["Permission"] = relationship("Permission", back_populates="roles")
+
+
+class IdentityProvider(Base):
+    """Approved OIDC identity provider configuration; client secrets are never stored here."""
+    __tablename__ = "identity_providers"
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    code: Mapped[str] = mapped_column(String(100), unique=True, nullable=False, index=True)
+    issuer: Mapped[str] = mapped_column(String(512), unique=True, nullable=False)
+    tenant_id: Mapped[str] = mapped_column(String(128), nullable=False, index=True)
+    client_id: Mapped[str] = mapped_column(String(128), nullable=False)
+    enabled: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+    external_identities: Mapped[List["ExternalIdentity"]] = relationship("ExternalIdentity", back_populates="provider", cascade="all, delete-orphan")
+    auth_sessions: Mapped[List["AuthSession"]] = relationship("AuthSession", back_populates="provider", cascade="all, delete-orphan")
+
+
+class ExternalIdentity(Base):
+    """Immutable provider subject-to-local-user mapping for federated sign-in."""
+    __tablename__ = "external_identities"
+    __table_args__ = (UniqueConstraint("provider_id", "subject", name="uq_external_identity_provider_subject"),)
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False, index=True)
+    provider_id: Mapped[int] = mapped_column(ForeignKey("identity_providers.id"), nullable=False, index=True)
+    subject: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
+    object_id: Mapped[Optional[str]] = mapped_column(String(128), index=True)
+    preferred_username: Mapped[Optional[str]] = mapped_column(String(255))
+    last_seen_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+    user: Mapped["User"] = relationship("User", back_populates="external_identities")
+    provider: Mapped["IdentityProvider"] = relationship("IdentityProvider", back_populates="external_identities")
+
+
+class AuthSession(Base):
+    """Server-validated local session created only after successful federated authentication."""
+    __tablename__ = "auth_sessions"
+
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False, index=True)
+    provider_id: Mapped[int] = mapped_column(ForeignKey("identity_providers.id"), nullable=False, index=True)
+    issued_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.utcnow)
+    expires_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, index=True)
+    auth_time: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+    mfa_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    assurance_level: Mapped[Optional[str]] = mapped_column(String(64))
+    device_id: Mapped[Optional[str]] = mapped_column(String(128))
+    revoked_at: Mapped[Optional[datetime]] = mapped_column(DateTime, index=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+    user: Mapped["User"] = relationship("User", back_populates="auth_sessions")
+    provider: Mapped["IdentityProvider"] = relationship("IdentityProvider", back_populates="auth_sessions")
 
 
 class AuditLog(Base):

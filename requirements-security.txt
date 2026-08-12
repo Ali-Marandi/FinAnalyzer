@@ -1,0 +1,5 @@
+# Optional development-only tooling for authorized security validation.
+# These tools do not contact Plaid, banks, Entra tenants, or customer systems.
+bandit>=1.7.9
+pip-audit>=2.7.3
+gitleaks>=8.18.4

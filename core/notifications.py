@@ -13,11 +13,17 @@ from typing import List, Dict, Any, Optional
 class NotificationManager:
     """Manages email notifications, in-app alerts, threshold rules, and scheduled deliveries."""
 
-    def __init__(self, smtp_host: str = "smtp.mailtrap.io", smtp_port: int = 2525, smtp_user: str = "", smtp_pass: str = ""):
+    def __init__(
+        self,
+        smtp_host: str = "smtp.mailtrap.io",
+        smtp_port: int = 2525,
+        smtp_user: Optional[str] = None,
+        smtp_pass: Optional[str] = None,
+    ):
         self.smtp_host = smtp_host
         self.smtp_port = smtp_port
-        self.smtp_user = smtp_user
-        self.smtp_pass = smtp_pass
+        self.smtp_user = smtp_user or ""
+        self.smtp_pass = smtp_pass or ""
         self.in_app_notifications: List[Dict[str, Any]] = []
 
     def send_email(self, to_email: str, subject: str, body: str) -> bool:

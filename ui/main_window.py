@@ -7,6 +7,8 @@ from PySide6.QtWidgets import (
     QStackedWidget, QLabel, QLineEdit, QStatusBar, QFrame, QListWidget, QListWidgetItem, QMessageBox
 )
 from PySide6.QtCore import Qt, QSize
+from pathlib import Path
+
 from PySide6.QtGui import QIcon, QKeySequence, QShortcut
 
 from ui.pages.dashboard import DashboardPage
@@ -17,12 +19,16 @@ from ui.pages.reports import ReportsPage
 from ui.pages.forecasting import ForecastingPage
 from ui.pages.settings import SettingsPage
 from ui.theme import ThemeManager
+from core.database import DatabaseManager
+from core.identity import IdentityConfigurationError, IdentityProvisioningDenied, IdentityService, IdentityValidationError
 
 class MainWindow(QMainWindow):
     def __init__(self, app_instance=None):
         super().__init__()
         self.app_instance = app_instance
-        self.setWindowTitle("FinAnalyzer Enterprise v2.2.0")
+        self.identity_service = None
+        self.principal = None
+        self.setWindowTitle("FinAnalyzer Enterprise v2.3.0")
         self.resize(1400, 900)
 
         self.init_ui()
@@ -121,10 +127,19 @@ class MainWindow(QMainWindow):
 
         toolbar_layout.addStretch()
 
-        notif_btn = QPushButton("🔔")
-        notif_btn.setFixedSize(36, 36)
-        notif_btn.setObjectName("secondaryButton")
-        toolbar_layout.addWidget(notif_btn)
+        self.identity_label = QLabel("Enterprise session: not signed in")
+        self.identity_label.setStyleSheet("color: palette(mid); padding: 0 10px;")
+        toolbar_layout.addWidget(self.identity_label)
+
+        self.sign_in_button = QPushButton("Sign in with SSO")
+        self.sign_in_button.clicked.connect(self.sign_in_enterprise)
+        toolbar_layout.addWidget(self.sign_in_button)
+
+        self.sign_out_button = QPushButton("Sign out")
+        self.sign_out_button.setObjectName("secondaryButton")
+        self.sign_out_button.setEnabled(False)
+        self.sign_out_button.clicked.connect(self.sign_out_enterprise)
+        toolbar_layout.addWidget(self.sign_out_button)
 
         right_layout.addWidget(toolbar)
 
@@ -133,8 +148,8 @@ class MainWindow(QMainWindow):
         self.dashboard_page = DashboardPage()
         self.transactions_page = TransactionsPage()
         self.accounts_page = AccountsPage()
-        self.banking_page = BankingPage()
-        self.reports_page = ReportsPage()
+        self.banking_page = BankingPage(principal=self.principal)
+        self.reports_page = ReportsPage(principal=self.principal)
         self.forecasting_page = ForecastingPage()
         self.settings_page = SettingsPage(theme_toggle_callback=self.change_theme)
 
@@ -164,6 +179,42 @@ class MainWindow(QMainWindow):
     def focus_search(self):
         self.search_bar.setFocus()
         self.search_bar.selectAll()
+
+    def sign_in_enterprise(self):
+        """Run the configured MSAL public-client flow and update protected pages."""
+        try:
+            root = Path(__file__).resolve().parents[2]
+            database = DatabaseManager(str(root / "finanalyzer.db"))
+            database.init_database()
+            self.identity_service = IdentityService(database)
+            self.principal = self.identity_service.sign_in_interactive()
+            self.banking_page.set_principal(self.principal)
+            self.reports_page.set_principal(self.principal)
+            self.identity_label.setText(f"Enterprise session: user #{self.principal.user_id} | {self.principal.provider_code}")
+            self.sign_in_button.setEnabled(False)
+            self.sign_out_button.setEnabled(True)
+            self.status_bar.showMessage("Enterprise SSO sign-in completed. Sensitive actions require current MFA evidence.")
+        except IdentityProvisioningDenied as exc:
+            QMessageBox.warning(self, "Enterprise account not provisioned", str(exc))
+        except (IdentityConfigurationError, IdentityValidationError) as exc:
+            QMessageBox.warning(self, "Enterprise SSO unavailable", str(exc))
+        except Exception:
+            QMessageBox.critical(self, "Sign-in failed", "Enterprise sign-in could not be completed safely. Review the local configuration and audit log.")
+
+    def sign_out_enterprise(self):
+        if self.identity_service and self.principal:
+            try:
+                self.identity_service.sign_out(self.principal)
+            except Exception:
+                QMessageBox.warning(self, "Sign-out incomplete", "The local session could not be fully revoked. Close the application and review the audit log.")
+                return
+        self.principal = None
+        self.banking_page.set_principal(None)
+        self.reports_page.set_principal(None)
+        self.identity_label.setText("Enterprise session: not signed in")
+        self.sign_in_button.setEnabled(True)
+        self.sign_out_button.setEnabled(False)
+        self.status_bar.showMessage("Enterprise session ended.")
 
     def change_theme(self, theme_name):
         if self.app_instance:

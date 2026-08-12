@@ -45,6 +45,9 @@ class AuthorizationContext:
     mfa_verified: bool = False
     reason: Optional[str] = None
     request_id: Optional[str] = None
+    session_id: Optional[str] = None
+    mfa_at: Optional[datetime] = None
+    auth_source: Optional[str] = None
 
 
 PERMISSION_CATALOG: dict[str, dict[str, Any]] = {
@@ -204,6 +207,9 @@ class AuthorizationService:
             "permission": permission_code,
             "request_id": context.request_id,
             "reason": context.reason,
+            "session_id": context.session_id,
+            "mfa_at": context.mfa_at,
+            "auth_source": context.auth_source,
         }
         if not allowed:
             self._audit(session, context.actor_id, "authorization.denied", details)

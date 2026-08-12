@@ -23,7 +23,8 @@ import requests
 from sqlalchemy import select
 
 from core.accounting_engine import AccountingEngine
-from core.authorization import AuthorizationContext, AuthorizationService
+from core.authorization import AuthorizationService
+from core.identity import AuthenticatedPrincipal, IdentityValidationError
 from core.database import DatabaseManager
 from core.import_export import DataImportExport
 from core.models import Company, JournalEntry
@@ -172,7 +173,7 @@ class AutomatedReportService:
     def create_schedule(
         self,
         company_id: int,
-        actor_id: int,
+        principal: AuthenticatedPrincipal,
         name: str,
         cadence: str = "monthly",
         formats: Iterable[str] = ("pdf", "xlsx"),
@@ -180,19 +181,17 @@ class AutomatedReportService:
         weekday: int = 0,
         recipients: Optional[Iterable[str]] = None,
         telegram_chat_id: Optional[str] = None,
-        *,
-        mfa_verified: bool = False,
     ) -> ReportSchedule:
         with self.database.get_session() as session:
             self.authorization.require(
                 session,
-                AuthorizationContext(actor_id=actor_id, company_id=company_id, mfa_verified=mfa_verified, reason="report_schedule_create"),
+                self._context(principal, company_id, "report_schedule_create"),
                 "report.schedule.manage",
             )
             if recipients or telegram_chat_id:
                 self.authorization.require(
                     session,
-                    AuthorizationContext(actor_id=actor_id, company_id=company_id, mfa_verified=mfa_verified, reason="report_external_delivery"),
+                    self._context(principal, company_id, "report_external_delivery"),
                     "report.deliver.external",
                 )
         schedule = ReportSchedule(
@@ -218,8 +217,8 @@ class AutomatedReportService:
             return []
         return [ReportSchedule(**record) for record in json.loads(self.schedules_path.read_text(encoding="utf-8"))]
 
-    def run_due(self, actor_id: int, *, mfa_verified: bool = False, now: Optional[datetime] = None) -> List[Dict[str, Any]]:
-        """Run due reports under an explicitly scoped scheduler/service identity."""
+    def run_due(self, principal: AuthenticatedPrincipal, *, now: Optional[datetime] = None) -> List[Dict[str, Any]]:
+        """Run due reports under a validated Enterprise session or service principal."""
         now = now or datetime.now(timezone.utc)
         schedules = self.list_schedules()
         outcomes: List[Dict[str, Any]] = []
@@ -231,7 +230,7 @@ class AutomatedReportService:
             if due and due > now:
                 continue
             try:
-                files = self.run_schedule(schedule, actor_id, mfa_verified=mfa_verified)
+                files = self.run_schedule(schedule, principal)
                 schedule.last_run_at = now.isoformat()
                 outcomes.append({"schedule_id": schedule.id, "status": "completed", "files": files})
             except Exception as exc:
@@ -242,9 +241,9 @@ class AutomatedReportService:
             self._write_schedules(schedules)
         return outcomes
 
-    def run_schedule(self, schedule: ReportSchedule, actor_id: int, *, mfa_verified: bool = False) -> Dict[str, str]:
+    def run_schedule(self, schedule: ReportSchedule, principal: AuthenticatedPrincipal) -> Dict[str, str]:
         with self.database.get_session() as session:
-            context = AuthorizationContext(actor_id=actor_id, company_id=schedule.company_id, mfa_verified=mfa_verified, reason="report_run")
+            context = self._context(principal, schedule.company_id, "report_run")
             self.authorization.require(session, context, "report.generate")
             if schedule.recipients or schedule.telegram_chat_id:
                 self.authorization.require(session, context, "report.deliver.external")
@@ -254,6 +253,12 @@ class AutomatedReportService:
         files = self.generator.generate_all(report, schedule.formats, prefix=self._safe_name(schedule.name))
         self._deliver(files, schedule)
         return files
+
+    @staticmethod
+    def _context(principal: AuthenticatedPrincipal, company_id: int, reason: str):
+        if not isinstance(principal, AuthenticatedPrincipal):
+            raise IdentityValidationError("A validated Enterprise session principal is required for report operations.")
+        return principal.authorization_context(company_id, reason, mfa_max_age=timedelta(minutes=15))
 
     def _deliver(self, files: Dict[str, str], schedule: ReportSchedule) -> None:
         if schedule.recipients:
