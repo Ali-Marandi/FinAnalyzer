@@ -42,6 +42,13 @@ class TransactionStatus(str, enum.Enum):
     POSTED = "posted"
     VOIDED = "voided"
 
+
+class PeriodCloseRequestStatus(str, enum.Enum):
+    PENDING = "pending"
+    APPROVED = "approved"
+    REJECTED = "rejected"
+    EXECUTED = "executed"
+
 class Company(Base):
     """Multi-entity support for corporate groups."""
     __tablename__ = "companies"
@@ -178,6 +185,30 @@ class FiscalYear(Base):
     start_date: Mapped[date] = mapped_column(Date, nullable=False)
     end_date: Mapped[date] = mapped_column(Date, nullable=False)
     is_closed: Mapped[bool] = mapped_column(Boolean, default=False)
+
+
+class PeriodCloseRequest(Base):
+    """Dual-control request to close one company fiscal year."""
+    __tablename__ = "period_close_requests"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    company_id: Mapped[int] = mapped_column(ForeignKey("companies.id"), nullable=False, index=True)
+    fiscal_year_id: Mapped[int] = mapped_column(ForeignKey("fiscal_years.id"), nullable=False, index=True)
+    closing_account_id: Mapped[int] = mapped_column(ForeignKey("accounts.id"), nullable=False)
+    status: Mapped[PeriodCloseRequestStatus] = mapped_column(
+        SQLEnum(PeriodCloseRequestStatus), default=PeriodCloseRequestStatus.PENDING, nullable=False, index=True
+    )
+    requested_by_user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False, index=True)
+    approved_by_user_id: Mapped[Optional[int]] = mapped_column(ForeignKey("users.id"), index=True)
+    requested_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
+    approved_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    executed_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    rejection_reason: Mapped[Optional[str]] = mapped_column(String(500))
+
+    fiscal_year: Mapped["FiscalYear"] = relationship("FiscalYear")
+    closing_account: Mapped["Account"] = relationship("Account")
+    requested_by: Mapped["User"] = relationship("User", foreign_keys=[requested_by_user_id])
+    approved_by: Mapped[Optional["User"]] = relationship("User", foreign_keys=[approved_by_user_id])
 
 
 class Invoice(Base):

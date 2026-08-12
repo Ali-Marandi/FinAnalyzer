@@ -28,7 +28,8 @@ class AccountingEngine:
         entry_date: date,
         description: str,
         lines: List[Dict[str, Any]], # [{'account_id': int, 'debit': Decimal, 'credit': Decimal, 'description': str}]
-        created_by: Optional[str] = None
+        created_by: Optional[str] = None,
+        commit: bool = True,
     ) -> JournalEntry:
         """
         Post a balanced double-entry journal entry.
@@ -66,7 +67,8 @@ class AccountingEngine:
             )
             self.session.add(tx)
 
-        self.session.commit()
+        if commit:
+            self.session.commit()
         return entry
 
     def _is_period_locked(self, target_date: date) -> bool:
@@ -204,7 +206,7 @@ class AccountingEngine:
             "net_income": net_income
         }
 
-    def close_fiscal_year(self, year: int, closing_account_id: int) -> FiscalYear:
+    def close_fiscal_year(self, year: int, closing_account_id: int, commit: bool = True) -> FiscalYear:
         """Lock fiscal year and post year-end closing entries for retained earnings."""
         # Find fiscal year
         fy = self.session.execute(
@@ -244,11 +246,13 @@ class AccountingEngine:
                 entry_date=fy.end_date,
                 description=f"Fiscal Year {year} Closing Entry",
                 lines=closing_lines,
-                created_by="System"
+                created_by="System",
+                commit=False,
             )
 
         fy.is_closed = True
-        self.session.commit()
+        if commit:
+            self.session.commit()
         return fy
 
     def convert_currency(self, amount: Decimal, from_currency: str, to_currency: str) -> Decimal:

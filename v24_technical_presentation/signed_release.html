@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <style>
+    /* remove default body margin to avoid 8px overflow */
+    body{margin:0}
+  </style>
+</head>
+<body>
+  <div class="slide-container" style="width:1280px;min-height:719px;box-sizing:border-box;background:#071625;color:#eef6fa;font-family:Tahoma,Arial,sans-serif;position:relative;padding-top:48px;padding-right:70px;padding-left:70px;">
+      <div style="color:#41d7ca;font-size:15px;letter-spacing:1.5px;">06 / WINDOWS RELEASE SUPPLY CHAIN</div>
+      <h2 style="font-size:36px;line-height:1.3;margin:10px 0 0 0;">زنجیره تأمین: build فقط زمانی release است که قابل‌راستی‌آزمایی باشد</h2>
+      <div style="width:108px;height:4px;background:#41d7ca;margin-top:10px;"></div>
+
+      <div style="display:flex;direction:rtl;align-items:stretch;justify-content:space-between;margin-top:12px;">
+        <div style="width:190px;min-height:150px;background:#0b2335;box-sizing:border-box;padding-top:8px;text-align:center;">
+          <i class="fas fa-cube" style="font-size:40px;color:#41d7ca;"></i>
+          <div style="font-size:20px;font-weight:bold;margin-top:10px;">۱. VM پاک</div>
+          <div style="font-size:15px;line-height:1.7;color:#adc4d0;margin-top:8px;">Python 3.12<br>محیط ایزوله release</div>
+        </div>
+        <div style="width:28px;display:flex;align-items:center;justify-content:center;color:#41d7ca;font-size:24px;">←</div>
+        <div style="width:190px;min-height:150px;background:#0b2335;box-sizing:border-box;padding-top:8px;text-align:center;">
+          <i class="fas fa-shield-halved" style="font-size:40px;color:#41d7ca;"></i>
+          <div style="font-size:20px;font-weight:bold;margin-top:10px;">۲. Gate</div>
+          <div style="font-size:15px;line-height:1.7;color:#adc4d0;margin-top:8px;">constraints<br>pip-audit · fail-closed</div>
+        </div>
+        <div style="width:28px;display:flex;align-items:center;justify-content:center;color:#41d7ca;font-size:24px;">←</div>
+        <div style="width:190px;min-height:150px;background:#0b2335;box-sizing:border-box;padding-top:8px;text-align:center;">
+          <i class="fas fa-gears" style="font-size:40px;color:#41d7ca;"></i>
+          <div style="font-size:20px;font-weight:bold;margin-top:10px;">۳. Build</div>
+          <div style="font-size:15px;line-height:1.7;color:#adc4d0;margin-top:8px;">PyInstaller<br>EXE قابل‌توزیع</div>
+        </div>
+        <div style="width:28px;display:flex;align-items:center;justify-content:center;color:#41d7ca;font-size:24px;">←</div>
+        <div style="width:190px;min-height:150px;background:#0b2335;box-sizing:border-box;padding-top:8px;text-align:center;">
+          <i class="fas fa-certificate" style="font-size:40px;color:#41d7ca;"></i>
+          <div style="font-size:20px;font-weight:bold;margin-top:10px;">۴. Sign</div>
+          <div style="font-size:15px;line-height:1.7;color:#adc4d0;margin-top:8px;">Authenticode<br>SHA-256 · RFC 3161</div>
+        </div>
+        <div style="width:28px;display:flex;align-items:center;justify-content:center;color:#41d7ca;font-size:24px;">←</div>
+        <div style="width:190px;min-height:150px;background:#0b2335;box-sizing:border-box;padding-top:8px;text-align:center;">
+          <i class="fas fa-check-double" style="font-size:40px;color:#41d7ca;"></i>
+          <div style="font-size:20px;font-weight:bold;margin-top:10px;">۵. Verify</div>
+          <div style="font-size:15px;line-height:1.7;color:#adc4d0;margin-top:8px;">SignTool verify<br>SHA-256 · evidence</div>
+        </div>
+      </div>
+
+      <div style="margin-top:12px;border-top:1px solid #315062;box-sizing:border-box;padding-top:12px;display:flex;direction:rtl;justify-content:space-between;align-items:center;">
+        <div style="font-size:20px;color:#f0f8fb;"><span style="color:#41d7ca;font-weight:bold;">قاعده انتشار:</span> خطا در هر مرحله = توقف انتشار artifact</div>
+        <div style="font-size:15px;color:#91adba;text-align:left;direction:ltr;">windows-build-dependencies.json · pip-audit.json · signed-release-evidence.json</div>
+      </div>
+    <div style="position:absolute;right:70px;bottom:18px;color:#7896a5;font-size:13px;">مرجع: Microsoft SignTool و Authenticode timestamp guidance</div>
+  </div>
+</body>
+</html>

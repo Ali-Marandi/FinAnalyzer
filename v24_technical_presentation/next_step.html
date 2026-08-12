@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <style>
+    /* reset default body margin to avoid extra 8px gap */
+    body{margin:0;background:#04111f;color:#f2f8fb;font-family:Tahoma,Arial,sans-serif}
+    .slide-container{width:1280px;min-height:720px;box-sizing:border-box;position:relative;background:#04111f}
+    .inner{box-sizing:border-box;padding-top:78px;padding-right:88px;padding-left:88px;display:flex;direction:rtl;justify-content:space-between}
+    .left{width:600px}
+    .eyebrow{color:#41d7ca;font-size:16px;letter-spacing:1.6px}
+    h2{font-size:49px;line-height:1.28;margin:20px 0 0 0}
+    .accent-bar{width:118px;height:5px;background:#41d7ca;margin-top:26px}
+    p.lead{font-size:23px;line-height:1.7;color:#adc4d0;margin:10px 0 0 0}
+    .tagline{margin-top:16px;font-size:20px;color:#e3eef2}
+    .right{width:420px;margin-left:32px}
+    .step{border-top:1px solid #41d7ca;box-sizing:border-box;padding-top:8px;display:flex;align-items:flex-start}
+    .step + .step{margin-top:6px}
+    .step .num{width:54px;font-size:30px;color:#41d7ca}
+    .step .title{font-size:22px;font-weight:700}
+    .step .desc{font-size:16px;color:#a9c1cc;margin-top:8px}
+    .footer{position:absolute;right:88px;left:88px;bottom:28px;border-top:1px solid #234353;padding-top:8px;display:flex;justify-content:space-between;align-items:center}
+    .footer span{font-size:17px}
+    .muted{color:#7f9eac}
+    .accent{color:#41d7ca}
+  </style>
+</head>
+<body>
+  <div class="slide-container">
+    <div class="inner">
+      <div class="left">
+        <div class="eyebrow">NEXT STEP / CONTROLLED DEPLOYMENT</div>
+        <h2>اعتماد، زمانی کامل می‌شود<br>که artifact هم قابل‌راستی‌آزمایی باشد.</h2>
+        <div class="accent-bar"></div>
+        <p class="lead">FinAnalyzer v2.4.0 مسیر security controls را از رخداد کاربردی تا فایل اجرایی قابل‌انتشار به هم متصل می‌کند.</p>
+        <div class="tagline"><i class="fas fa-shield-halved" style="color:#41d7ca;margin-left:12px;"></i>استقرار را با شواهد انجام دهید، نه با فرض اعتماد.</div>
+      </div>
+
+      <div class="right">
+        <div class="step">
+          <div class="num">۱</div>
+          <div>
+            <div class="title">Build در VM ایزوله</div>
+            <div class="desc">محیط تازه، dependency gate و تست موفق</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="num">۲</div>
+          <div>
+            <div class="title">امضای سازمانی</div>
+            <div class="desc">Authenticode با SHA-256 و timestamp RFC 3161</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="num">۳</div>
+          <div>
+            <div class="title">Verification مستقل</div>
+            <div class="desc">SignTool، SHA-256 و evidence پیش از publish</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <span class="muted">FinAnalyzer Enterprise v2.4.0 · audit chain · DPAPI · MFA/RBAC · controlled close</span>
+      <span class="accent">BUILD → SIGN → VERIFY → PUBLISH</span>
+    </div>
+  </div>
+</body>
+</html>

@@ -51,6 +51,7 @@ class DatabaseManager:
         """Create schema objects, apply additive local migrations, and seed security defaults."""
         Base.metadata.create_all(bind=self.engine)
         self._migrate_v24_audit_schema()
+        self._migrate_v25_period_close_schema()
         self.bootstrap_enterprise_security()
 
     def _migrate_v24_audit_schema(self) -> None:
@@ -89,6 +90,18 @@ class DatabaseManager:
             ))
             for name in ("company_id", "session_id", "request_id", "category", "severity", "outcome", "event_hash"):
                 connection.execute(text(f"CREATE INDEX IF NOT EXISTS ix_audit_logs_{name}_v24 ON audit_logs({name})"))
+
+    def _migrate_v25_period_close_schema(self) -> None:
+        """Prevent more than one pending/approved close request for the same fiscal year."""
+        inspector = inspect(self.engine)
+        if "period_close_requests" not in inspector.get_table_names():
+            return
+        with self.engine.begin() as connection:
+            connection.execute(text(
+                "CREATE UNIQUE INDEX IF NOT EXISTS uq_period_close_requests_active_v25 "
+                "ON period_close_requests(company_id, fiscal_year_id) "
+                "WHERE status IN ('PENDING', 'APPROVED')"
+            ))
 
     def bootstrap_enterprise_security(self) -> None:
         """Ensure canonical roles and permissions exist without granting any user access."""

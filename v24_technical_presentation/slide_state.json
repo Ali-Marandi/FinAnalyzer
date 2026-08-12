@@ -1,0 +1,122 @@
+{
+  "project_info": {
+    "title": "FinAnalyzer Enterprise v2.4.0",
+    "created": 1786571959.024,
+    "last_updated": 1786573575.971,
+    "total_slides": 10
+  },
+  "slides": [
+    {
+      "id": "cover",
+      "state": "edited",
+      "pageNum": 1
+    },
+    {
+      "id": "audit_evidence",
+      "state": "edited",
+      "pageNum": 2
+    },
+    {
+      "id": "hmac_chain",
+      "state": "edited",
+      "pageNum": 3
+    },
+    {
+      "id": "dpapi_redaction",
+      "state": "edited",
+      "pageNum": 4
+    },
+    {
+      "id": "security_coverage",
+      "state": "edited",
+      "pageNum": 5
+    },
+    {
+      "id": "signed_release",
+      "state": "edited",
+      "pageNum": 6
+    },
+    {
+      "id": "validation",
+      "state": "edited",
+      "pageNum": 7
+    },
+    {
+      "id": "period_close",
+      "state": "edited",
+      "pageNum": 8
+    },
+    {
+      "id": "commercial_roadmap",
+      "state": "edited",
+      "pageNum": 9
+    },
+    {
+      "id": "next_step",
+      "state": "edited",
+      "pageNum": 10
+    }
+  ],
+  "outline": [
+    {
+      "id": "cover",
+      "title": "FinAnalyzer Enterprise v2.4.0",
+      "summary": "اسلاید جلد با تمرکز بر امنیت قابل‌راستی‌آزمایی، انتشار Windows امضاشده و کنترل بستن دوره.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "audit_evidence",
+      "title": "امنیت از لاگ به شواهد",
+      "summary": "مرور گذار از رخدادهای متنی به metadata ساختاریافته و قابل پیگیری.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "hmac_chain",
+      "title": "زنجیره HMAC-SHA256",
+      "summary": "نمایش اتصال هش رخدادها، شماره توالی و فرآیند verify_chain برای آشکارسازی دست‌کاری.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "dpapi_redaction",
+      "title": "DPAPI و حداقل‌سازی داده حساس",
+      "summary": "توضیح حفاظت کلید محلی Windows و حذف token و secret از جزئیات audit.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "security_coverage",
+      "title": "ثبت کنترل‌ها در جریان واقعی محصول",
+      "summary": "پوشش authorization، SSO/MFA، بانکداری Plaid و گزارش‌دهی با رویداد ساختاریافته.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "signed_release",
+      "title": "زنجیره تأمین و انتشار Windows",
+      "summary": "دروازه وابستگی، ساخت ایزوله، امضای Authenticode و timestamp/verification.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "validation",
+      "title": "اعتبارسنجی قابل‌اندازه‌گیری",
+      "summary": "نتایج ۲۰ تست و کنترل‌های redaction، tamper detection و dependency gate.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "period_close",
+      "title": "قفل دوره با کنترل دو نفره",
+      "summary": "قابلیت جدید بستن دوره با MFA، RBAC، تفکیک وظایف و audit atomic.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "commercial_roadmap",
+      "title": "نقشه‌راه تجاری",
+      "summary": "اولویت‌های توسعه شامل reconciliation، AP approvals، cash forecast و consolidation.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "next_step",
+      "title": "گام بعدی",
+      "summary": "جمع‌بندی مسیر ساخت EXE امضاشده و استقرار کنترل‌شده در سازمان.",
+      "image_plan": "Use a suitable image if needed"
+    }
+  ]
+}

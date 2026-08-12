@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <style>
+    /* remove default body margin (was causing 8px overflow) */
+    body{margin:0;background:#071625;color:#eef6fa;font-family:Tahoma,Arial,sans-serif}
+    .slide-container{width:1280px;min-height:720px;box-sizing:border-box;position:relative}
+    .wrap{box-sizing:border-box;padding-top:48px;padding-right:76px;padding-left:76px}
+    .muted{font-size:20px;line-height:1.55;color:#a9c0cb;margin:0}
+    .tag{color:#41d7ca;font-size:16px;letter-spacing:1.5px}
+    .h2{font-size:38px;line-height:1.3;margin:10px 0 0 0}
+    .accent-bar{width:104px;height:4px;background:#41d7ca;margin-top:16px}
+    /* reduce vertical gaps and inner padding to shave height (without changing fonts) */
+    .steps{display:flex;direction:rtl;align-items:center;justify-content:space-between;margin-top:30px}
+    .step-box{width:300px;min-height:240px;box-sizing:border-box;background:#0b2435;border-top:4px solid #41d7ca;padding-top:18px;padding-right:24px;padding-left:24px}
+    .step-title{font-size:16px;color:#41d7ca}
+    .step-head{font-size:25px;font-weight:700;margin-top:18px}
+    .step-desc{font-size:17px;line-height:1.75;color:#b7cbd5;margin-top:12px}
+    .arrow{width:78px;text-align:center;color:#41d7ca;font-size:31px}
+    .bottom-bar{margin-top:24px;min-height:80px;background:#102930;border-top:2px solid #e1a84b;box-sizing:border-box;padding-top:14px;padding-right:22px;padding-left:22px;display:flex;align-items:center;justify-content:space-between}
+    .bottom-strong{font-size:21px;color:#ecf5f7}
+    .bottom-text{width:440px;font-size:16px;line-height:1.5;color:#b7cad2}
+  </style>
+</head>
+<body>
+  <div class="slide-container" style="background:#071625;">
+    <div class="wrap">
+      <div class="tag">08 / NEW COMMERCIAL CONTROL</div>
+      <h2 class="h2">قفل دوره با کنترل دو نفره</h2>
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-top:8px;">
+        <p class="muted">بستن سال مالی یک تغییر عادی نیست؛ یک workflow مستقل، MFA-backed و قابل‌ممیزی است.</p>
+        <div style="color:#41d7ca;font-size:16px;white-space:nowrap;">MFA + RBAC + SoD + ATOMIC CLOSE</div>
+      </div>
+      <div class="accent-bar"></div>
+
+      <div class="steps">
+        <div class="step-box">
+          <div style="display:flex;justify-content:space-between;align-items:center;"><span class="step-title">مرحله ۱</span><i class="fas fa-file-circle-plus" style="font-size:35px;color:#41d7ca;"></i></div>
+          <div class="step-head">درخواست close</div>
+          <div class="step-desc">کاربر مالی با مجوز<br><span style="color:#e7f1f5;">ledger.period.close.request</span><br>و MFA تازه، درخواست می‌سازد.</div>
+        </div>
+
+        <div class="arrow"><i class="fas fa-arrow-left-long"></i></div>
+
+        <div class="step-box">
+          <div style="display:flex;justify-content:space-between;align-items:center;"><span class="step-title">مرحله ۲</span><i class="fas fa-user-check" style="font-size:35px;color:#41d7ca;"></i></div>
+          <div class="step-head">تأیید مستقل</div>
+          <div class="step-desc">Financial Controller با مجوز<br><span style="color:#e7f1f5;">ledger.period.close.approve</span><br>و MFA تازه بررسی می‌کند.</div>
+        </div>
+
+        <div class="arrow"><i class="fas fa-arrow-left-long"></i></div>
+
+        <div class="step-box">
+          <div style="display:flex;justify-content:space-between;align-items:center;"><span class="step-title">مرحله ۳</span><i class="fas fa-lock" style="font-size:35px;color:#41d7ca;"></i></div>
+          <div class="step-head">اجرای اتمی</div>
+          <div class="step-desc">closing entry، قفل سال مالی،<br>workflow update و audit event<br>در یک تراکنش هماهنگ می‌شوند.</div>
+        </div>
+      </div>
+
+      <div class="bottom-bar">
+        <div class="bottom-strong"><i class="fas fa-user-xmark" style="color:#e1a84b;margin-left:12px;"></i><strong>Self-approval و self-rejection مسدود است.</strong></div>
+        <div class="bottom-text">تلاش برای نقض SoD با outcome=denied در زنجیره HMAC audit ثبت می‌شود.</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
