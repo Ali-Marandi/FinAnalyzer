@@ -274,19 +274,35 @@ class PlaidConnector:
                 )
             raise PlaidSyncError("Transaction sync failed before completion. No partial cursor was saved; retry the sync.") from exc
 
-        with self.database.get_session() as session:
-            item = session.scalar(select(PlaidItem).where(PlaidItem.item_id == item_id))
-            if item is None:
-                raise PlaidSyncError("The bank connection was removed during synchronization.")
-            local_accounts = self._upsert_accounts(session, item, accounts.values())
-            counts = self._apply_changes(session, item, added, modified, removed, local_accounts)
-            item.cursor = cursor
-            item.last_synced_at = datetime.now(timezone.utc)
-            item.status = "synced"
-            self._audit(
-                session, principal, "bank.item_synced", item.company_id, item_id,
-                outcome="success", severity="info", details=counts,
-            )
+        try:
+            with self.database.get_session() as session:
+                item = session.scalar(select(PlaidItem).where(PlaidItem.item_id == item_id))
+                if item is None:
+                    raise PlaidSyncError("The bank connection was removed during synchronization.")
+                local_accounts = self._upsert_accounts(session, item, accounts.values())
+                counts = self._apply_changes(session, item, added, modified, removed, local_accounts)
+                item.cursor = cursor
+                item.last_synced_at = datetime.now(timezone.utc)
+                item.status = "synced"
+                self._audit(
+                    session, principal, "bank.item_synced", item.company_id, item_id,
+                    outcome="success", severity="info", details=counts,
+                )
+        except PlaidSyncError:
+            raise
+        except Exception as exc:
+            # The apply transaction has rolled back. Record only safe error metadata in a new transaction.
+            with self.database.get_session() as session:
+                failed_item = session.scalar(select(PlaidItem).where(PlaidItem.item_id == item_id))
+                if failed_item is not None:
+                    self._audit(
+                        session, principal, "bank.sync_apply_failed", failed_item.company_id, item_id,
+                        outcome="failure", severity="warning",
+                        details={"error_type": type(exc).__name__, "phase": "ledger_apply", "cursor_preserved": True},
+                    )
+            raise PlaidSyncError(
+                "Transaction changes could not be applied safely. No transaction, mapping, or cursor change was saved; review the audit log."
+            ) from exc
         return {"item_id": item_id, **counts, "cursor_advanced": bool(cursor and cursor != original_cursor)}
 
     def remove_item(self, item_id: str, principal: AuthenticatedPrincipal) -> bool:
@@ -383,6 +399,7 @@ class PlaidConnector:
             mapping = session.scalar(select(PlaidTransactionMapping).where(PlaidTransactionMapping.provider_transaction_id == provider_id))
             if mapping:
                 if mapping.journal_entry:
+                    self._assert_entry_not_locked(session, item.company_id, mapping.journal_entry)
                     mapping.journal_entry.status = TransactionStatus.VOIDED
                 mapping.pending = False
                 mapping.raw_payload = json.dumps({"removed": True, "transaction_id": provider_id})
@@ -413,7 +430,8 @@ class PlaidConnector:
             session.add(mapping)
             session.flush()
         elif mapping.journal_entry:
-            # Preserve the original audit record; create a revised balanced entry.
+            # A bank correction must not void or replace an entry in a locked fiscal period.
+            self._assert_entry_not_locked(session, item.company_id, mapping.journal_entry)
             mapping.journal_entry.status = TransactionStatus.VOIDED
 
         bank_account_id = local_accounts[provider_account_id].local_account_id
@@ -442,12 +460,20 @@ class PlaidConnector:
             ]
         )
         engine = AccountingEngine(session, item.company_id)
-        entry = engine.post_journal_entry(entry_number, record_date, description, lines, created_by="Plaid Sync")
+        entry = engine.post_journal_entry(
+            entry_number, record_date, description, lines, created_by="Plaid Sync", commit=False
+        )
         mapping.journal_entry_id = entry.id
         mapping.provider_account_id = provider_account_id
         mapping.pending = bool(record.get("pending"))
         mapping.raw_payload = json.dumps(record, default=str, ensure_ascii=False)
         return True
+
+    @staticmethod
+    def _assert_entry_not_locked(session, company_id: int, entry: JournalEntry) -> None:
+        """Reject bank-feed voids or revisions that would alter a locked fiscal period."""
+        if AccountingEngine(session, company_id)._is_period_locked(entry.date):
+            raise ValueError("A bank-feed transaction in a locked fiscal period cannot be voided or revised.")
 
     def _ensure_uncategorized_account(self, session, company_id: int, account_type: AccountType) -> int:
         code = "6999" if account_type == AccountType.EXPENSE else "4999"

@@ -1,0 +1,145 @@
+name: Signed Windows Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'Existing Git tag to build and sign, for example v2.5.0'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  id-token: write
+
+concurrency:
+  group: signed-windows-release-${{ github.ref_name || inputs.release_tag }}
+  cancel-in-progress: false
+
+jobs:
+  build-sign-and-publish:
+    name: Build, sign, verify and publish Windows EXE
+    runs-on: windows-2022
+    environment: production-signing
+    timeout-minutes: 45
+    env:
+      RELEASE_TAG: ${{ inputs.release_tag || github.ref_name }}
+
+    steps:
+      - name: Check out the approved release ref
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          ref: ${{ inputs.release_tag || github.ref_name }}
+
+      - name: Ensure execution originates from an annotated release tag
+        shell: pwsh
+        run: |
+          $tag = $env:RELEASE_TAG
+          if ($tag -notmatch '^v\d+\.\d+\.\d+$') {
+            throw "Only semantic release tags are eligible for signing. Received: $tag"
+          }
+          git fetch --tags --force
+          git rev-parse "$tag^{commit}" | Out-Null
+          $head = git rev-parse HEAD
+          $tagCommit = git rev-parse "$tag^{commit}"
+          if ($head -ne $tagCommit) {
+            throw "Checked-out commit does not match the requested release tag."
+          }
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: |
+            requirements-windows-build.txt
+            constraints-windows.txt
+
+      - name: Install pinned Windows build dependencies
+        shell: pwsh
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-windows-build.txt
+
+      - name: Validate dependencies and run the complete test suite
+        shell: pwsh
+        run: |
+          python scripts/verify_windows_release.py
+          python -m unittest discover -s tests -v
+
+      - name: Build the release artifact
+        shell: pwsh
+        run: |
+          python build_exe.py
+          $exe = 'dist\FinAnalyzer_Enterprise_v2_5.exe'
+          if (-not (Test-Path $exe)) { throw "Expected artifact not found: $exe" }
+
+      - name: Authenticate to Azure by GitHub OIDC
+        uses: azure/login@v3
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Sign EXE and request RFC 3161 timestamp
+        uses: azure/artifact-signing-action@v2
+        with:
+          endpoint: ${{ vars.AZURE_ARTIFACT_SIGNING_ENDPOINT }}
+          signing-account-name: ${{ vars.AZURE_ARTIFACT_SIGNING_ACCOUNT }}
+          certificate-profile-name: ${{ vars.AZURE_ARTIFACT_SIGNING_PROFILE }}
+          files: ${{ github.workspace }}\dist\FinAnalyzer_Enterprise_v2_5.exe
+          file-digest: SHA256
+          timestamp-rfc3161: ${{ vars.RFC3161_TIMESTAMP_URL }}
+          timestamp-digest: SHA256
+          description: FinAnalyzer Enterprise
+          description-url: https://github.com/Ali-Marandi/FinAnalyzer
+          correlation-id: ${{ github.run_id }}-${{ github.run_attempt }}
+          trace: false
+
+      - name: Verify Authenticode signature, RFC 3161 timestamp and SHA-256
+        shell: pwsh
+        run: |
+          $exe = 'dist\FinAnalyzer_Enterprise_v2_5.exe'
+          $signTool = Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kits\10\bin" -Recurse -Filter signtool.exe |
+            Where-Object { $_.FullName -match '\\x64\\signtool\.exe$' } |
+            Sort-Object FullName -Descending |
+            Select-Object -First 1 -ExpandProperty FullName
+          if (-not $signTool) { throw 'signtool.exe x64 was not found.' }
+          & $signTool verify /pa /all /v /tw $exe
+          if ($LASTEXITCODE -ne 0) { throw "Authenticode verification failed with exit code $LASTEXITCODE." }
+          $signature = Get-AuthenticodeSignature $exe
+          if ($signature.Status -ne 'Valid') { throw "Invalid Authenticode status: $($signature.Status)" }
+          if ($null -eq $signature.TimeStamperCertificate) { throw 'RFC 3161 timestamp certificate is missing.' }
+          $hash = (Get-FileHash $exe -Algorithm SHA256).Hash.ToLowerInvariant()
+          Set-Content -Path 'dist\FinAnalyzer_Enterprise_v2_5.exe.sha256' -Value "$hash  FinAnalyzer_Enterprise_v2_5.exe" -NoNewline
+          $evidence = [ordered]@{
+            release_tag = $env:RELEASE_TAG
+            commit = (git rev-parse HEAD)
+            artifact = 'FinAnalyzer_Enterprise_v2_5.exe'
+            sha256 = $hash
+            signer_subject = $signature.SignerCertificate.Subject
+            signer_thumbprint = $signature.SignerCertificate.Thumbprint
+            timestamp_subject = $signature.TimeStamperCertificate.Subject
+            timestamp_thumbprint = $signature.TimeStamperCertificate.Thumbprint
+            workflow_run = '${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}'
+          }
+          $evidence | ConvertTo-Json | Set-Content -Path 'dist\signed-release-evidence.json' -Encoding utf8
+
+      - name: Publish signed artifact and evidence to the matching GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: pwsh
+        run: |
+          $tag = $env:RELEASE_TAG
+          gh release view $tag 2>$null
+          if ($LASTEXITCODE -ne 0) {
+            gh release create $tag --title "FinAnalyzer Enterprise $tag" --verify-tag --generate-notes
+          }
+          gh release upload $tag `
+            'dist\FinAnalyzer_Enterprise_v2_5.exe' `
+            'dist\FinAnalyzer_Enterprise_v2_5.exe.sha256' `
+            'dist\signed-release-evidence.json' --clobber

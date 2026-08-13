@@ -38,10 +38,11 @@ class PeriodCloseV25Tests(unittest.TestCase):
         self.authorization = AuthorizationService(audit_logger=self.logger)
         with self.database.get_session() as session:
             company = Company(name="Close Control Co", legal_name="Close Control Co", currency_code="USD")
+            foreign_company = Company(name="Foreign Scope Co", legal_name="Foreign Scope Co", currency_code="USD")
             requester = User(username="close.preparer", email="preparer@example.test", password_hash="x", role=UserRole.ACCOUNTANT)
             controller = User(username="close.controller", email="controller@example.test", password_hash="x", role=UserRole.ADMIN)
             admin = User(username="close.admin", email="admin@example.test", password_hash="x", role=UserRole.ADMIN)
-            session.add_all([company, requester, controller, admin])
+            session.add_all([company, foreign_company, requester, controller, admin])
             session.flush()
             self.company_id = company.id
             self.requester_id = requester.id
@@ -49,9 +50,11 @@ class PeriodCloseV25Tests(unittest.TestCase):
             self.admin_id = admin.id
             session.add(FiscalYear(company_id=company.id, year=2025, start_date=date(2025, 1, 1), end_date=date(2025, 12, 31)))
             account = Account(company_id=company.id, code="3000", name="Retained earnings", account_type=AccountType.EQUITY)
-            session.add(account)
+            foreign_account = Account(company_id=foreign_company.id, code="3000", name="Foreign retained earnings", account_type=AccountType.EQUITY)
+            session.add_all([account, foreign_account])
             session.flush()
             self.closing_account_id = account.id
+            self.foreign_closing_account_id = foreign_account.id
             self.authorization.grant_role(session, requester.id, company.id, "finance_manager")
             self.authorization.grant_role(session, controller.id, company.id, "financial_controller")
             self.authorization.grant_role(session, admin.id, company.id, "company_admin")
@@ -105,6 +108,33 @@ class PeriodCloseV25Tests(unittest.TestCase):
             event = session.scalar(select(AuditLog).where(AuditLog.action == "period_close.sod_violation"))
             self.assertEqual(request.status, PeriodCloseRequestStatus.PENDING)
             self.assertEqual(event.outcome, "denied")
+            self.assertTrue(self.logger.verify_chain(session).valid)
+
+    def test_requester_without_approval_permission_is_denied_before_sod_check(self):
+        request_id = self.service.request_close(
+            self.company_id, 2025, self.closing_account_id, self._principal(self.requester_id)
+        )
+        with self.assertRaises(AuthorizationDenied):
+            self.service.approve_and_execute(request_id, self._principal(self.requester_id))
+        with self.database.get_session() as session:
+            request = session.get(PeriodCloseRequest, request_id)
+            denied = session.scalar(select(AuditLog).where(AuditLog.action == "authorization.denied"))
+            sod_event = session.scalar(select(AuditLog).where(AuditLog.action == "period_close.sod_violation"))
+            self.assertEqual(request.status, PeriodCloseRequestStatus.PENDING)
+            self.assertEqual(denied.outcome, "denied")
+            self.assertIsNone(sod_event)
+            self.assertTrue(self.logger.verify_chain(session).valid)
+
+    def test_request_rejects_closing_account_outside_company_scope(self):
+        with self.assertRaises(PeriodCloseError):
+            self.service.request_close(
+                self.company_id, 2025, self.foreign_closing_account_id, self._principal(self.requester_id)
+            )
+        with self.database.get_session() as session:
+            requests = list(session.scalars(select(PeriodCloseRequest).where(
+                PeriodCloseRequest.company_id == self.company_id
+            )))
+            self.assertEqual(requests, [])
             self.assertTrue(self.logger.verify_chain(session).valid)
 
     def test_requester_cannot_reject_own_close_and_event_is_chained(self):
