@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<style>
+html,body{margin:0;height:100%}
+.slide-container{width:1280px;min-height:720px;box-sizing:border-box;background:#081c36;color:#f5fbff;font-family:Tahoma,Arial,sans-serif;overflow:hidden}
+.inner{min-height:720px;box-sizing:border-box;padding:48px 72px 0;position:relative;background-image:linear-gradient(rgba(85,230,220,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(85,230,220,.04) 1px,transparent 1px);background-size:46px 46px}
+.eyebrow{font-size:15px;color:#55e6dc}.title{font-size:35px;font-weight:700;margin-top:10px}.lead{font-size:18px;line-height:1.65;color:#b7ccdc;margin-top:12px}.rule{width:205px;height:2px;background:#55e6dc;margin-top:16px}
+.chain{display:flex;direction:rtl;align-items:center;justify-content:center;gap:9px;margin-top:47px}.event{width:205px;min-height:172px;box-sizing:border-box;background:#0e2b4a;border:1px solid rgba(85,230,220,.46);padding:19px 16px 0}.event.warn{border-color:rgba(255,185,84,.62);background:rgba(255,185,84,.08)}.seq{font-family:Arial,sans-serif;font-size:14px;color:#6bece2}.warn .seq{color:#ffd28f}.event h3{font-size:19px;margin:13px 0 10px;color:#eefaff}.event p{font-size:14px;line-height:1.7;color:#bed2e2;margin:0}.hash{font-family:Arial,sans-serif;direction:ltr;font-size:12px;color:#71e6dd;margin-top:14px}.warn .hash{color:#ffcf87}.link{width:42px;height:2px;background:linear-gradient(90deg,rgba(85,230,220,.15),#55e6dc,rgba(85,230,220,.15));position:relative}.link:after{content:'‹';position:absolute;left:-2px;top:-17px;color:#55e6dc;font-size:30px}
+.evidence{margin-top:43px;display:flex;direction:rtl;gap:28px;align-items:stretch}.manifest{width:44%;min-height:142px;box-sizing:border-box;border-top:2px solid #55e6dc;background:rgba(85,230,220,.09);padding:20px 23px 0}.manifest h3{font-size:21px;color:#aef8f1;margin:0 0 12px}.manifest p{font-size:16px;line-height:1.65;color:#d4f8f4;margin:0}.verify{width:56%;min-height:142px;box-sizing:border-box;border-top:2px solid #7ca5ff;background:#102b4a;padding:20px 23px 0}.verify h3{font-size:21px;color:#b9cbff;margin:0 0 12px}.verify p{font-size:16px;line-height:1.65;color:#d3deef;margin:0}.footer{position:absolute;bottom:30px;left:72px;color:#7f9ab4;font-size:14px}
+</style>
+</head>
+<body><div class="slide-container"><div class="inner">
+<div class="eyebrow">۷ · AUDIT & EVIDENCE</div><div class="title">هر تصمیم، Evidence قابل‌راستی‌آزمایی است</div><div class="lead">تصمیم‌های reconciliation فقط state تغییر نمی‌دهند؛ آن‌ها رخدادهای ساختاریافته، قابل‌ردگیری و HMAC-linked هستند.</div><div class="rule"></div>
+<div class="chain">
+<section class="event"><div class="seq">SEQUENCE 0241</div><h3>Match</h3><p>actor، company، session، target mapping و contra account ثبت می‌شوند.</p><div class="hash">previous_hash → event_hash</div></section><div class="link"></div>
+<section class="event warn"><div class="seq">SEQUENCE 0242</div><h3>SoD Denial</h3><p>self-resolution رد می‌شود و علت انکار، بدون mutation، ثبت می‌گردد.</p><div class="hash">previous_hash → event_hash</div></section><div class="link"></div>
+<section class="event"><div class="seq">SEQUENCE 0243</div><h3>Exception Resolve</h3><p>reviewer مستقل، تصمیم، note و مسیر مجوز را ثبت می‌کند.</p><div class="hash">previous_hash → event_hash</div></section><div class="link"></div>
+<section class="event"><div class="seq">SEQUENCE 0244</div><h3>Close Readiness</h3><p>blockerها یا عبور کنترل پیش از درخواست و execution ثبت می‌شوند.</p><div class="hash">previous_hash → event_hash</div></section>
+</div>
+<div class="evidence"><section class="manifest"><h3>Compliance Evidence Pack</h3><p>رویدادهای verify‌شده، history دوره مالی و manifest هش‌شده برای تحویل کنترل‌شده export می‌شوند.</p></section><section class="verify"><h3>قابلیت راستی‌آزمایی محلی</h3><p>`previous_hash` و `event_hash`، تغییر محتوا یا گسست ترتیب رخدادها را در `verify_chain()` آشکار می‌کنند.</p></section></div>
+<div class="footer">STRUCTURED AUDIT · HMAC-SHA256 CHAIN · HASHED MANIFEST</div>
+</div></div></body></html>

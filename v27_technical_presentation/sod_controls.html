@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<style>
+html,body{margin:0;height:100%}
+.slide-container{width:1280px;min-height:720px;box-sizing:border-box;background:#081c36;color:#f5fbff;font-family:Tahoma,Arial,sans-serif;overflow:hidden}
+.inner{min-height:720px;box-sizing:border-box;padding:50px 76px 0;position:relative}
+.eyebrow{color:#55e6dc;font-size:15px;letter-spacing:.4px}.title{font-size:35px;font-weight:700;margin-top:10px}.lead{margin-top:15px;color:#b8cfdf;font-size:18px;line-height:1.7}.line{width:190px;height:2px;background:#55e6dc;margin-top:16px}
+.flow{display:flex;direction:rtl;align-items:center;justify-content:space-between;margin-top:48px}.stage{width:300px;min-height:252px;box-sizing:border-box;border-top:2px solid #55e6dc;background:#0e2a49;padding:27px 24px 0}.stage.exception{border-top-color:#ffbe63}.stage.resolve{border-top-color:#78a9ff}.num{color:#55e6dc;font-size:15px;font-weight:bold}.exception .num{color:#ffbe63}.resolve .num{color:#78a9ff}.stage h3{font-size:25px;margin:17px 0 14px}.stage p{font-size:17px;line-height:1.75;color:#d6e3ee;margin:0}.permission{margin-top:18px;color:#9ef3eb;font-size:15px}.exception .permission{color:#ffe0aa}.resolve .permission{color:#c6d8ff}.connector{width:60px;height:2px;background:linear-gradient(90deg,#55e6dc,rgba(85,230,220,.22));position:relative}.connector:after{content:'‹';position:absolute;left:-1px;top:-17px;color:#55e6dc;font-size:31px}.rulebox{margin-top:43px;min-height:112px;box-sizing:border-box;background:rgba(255,190,99,.10);border:1px solid rgba(255,190,99,.55);padding:20px 26px 0;display:flex;align-items:flex-start;gap:21px}.rulemark{color:#ffca76;font-size:32px;line-height:1}.ruletext{font-size:20px;line-height:1.65;color:#fff0d5}.ruletext strong{color:#ffca76}.footer{position:absolute;bottom:30px;left:76px;color:#7f9cb8;font-size:14px}
+</style>
+</head>
+<body><div class="slide-container"><div class="inner">
+<div class="eyebrow">۴ · تفکیک وظایف</div><div class="title">SoD در سطح actor اجرا می‌شود</div><div class="lead">permission لازم است، اما برای تصمیم حساس کافی نیست؛ هویت شخص تصمیم‌گیرنده نیز کنترل می‌شود.</div><div class="line"></div>
+<div class="flow">
+<section class="stage"><div class="num">۱ · طبقه‌بندی اولیه</div><h3>Match</h3><p>کاربر مجاز، فقط contra account هم‌شرکت و فعال را انتخاب می‌کند.</p><div class="permission">bank.reconcile.match + MFA تازه</div></section>
+<div class="connector"></div>
+<section class="stage exception"><div class="num">۲ · توقف و شرح</div><h3>Flag Exception</h3><p>اگر evidence کافی نیست، entry تغییر نمی‌کند و exception ثبت می‌شود.</p><div class="permission">actor ثبت‌کننده در mapping نگهداری می‌شود</div></section>
+<div class="connector"></div>
+<section class="stage resolve"><div class="num">۳ · بررسی مستقل</div><h3>Resolve Exception</h3><p>یک reviewer دیگر، با مجوز جداگانه، account و note را تأیید می‌کند.</p><div class="permission">bank.reconcile.exception.resolve + MFA تازه</div></section>
+</div>
+<div class="rulebox"><div class="rulemark">×</div><div class="ruletext"><strong>قانون اجرایی:</strong> ثبت‌کننده exception نمی‌تواند همان مورد را resolve کند؛ `bank.reconciliation.sod_denied` با actor، company، session و target در زنجیره HMAC ثبت می‌شود.</div></div>
+<div class="footer">کنترل در service layer اعمال می‌شود؛ UI جایگزین authorization نیست.</div>
+</div></div></body></html>

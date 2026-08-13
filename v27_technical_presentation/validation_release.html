@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<style>
+html,body{margin:0;height:100%}
+.slide-container{width:1280px;min-height:720px;box-sizing:border-box;background:#081c36;color:#f5fbff;font-family:Tahoma,Arial,sans-serif;overflow:hidden}
+.inner{min-height:720px;box-sizing:border-box;padding:48px 68px 0;position:relative;background-image:linear-gradient(90deg,rgba(85,230,220,.035) 1px,transparent 1px);background-size:64px 64px}
+.eyebrow{font-size:15px;color:#55e6dc;letter-spacing:.5px}.title{font-size:34px;font-weight:700;margin-top:10px}.lead{font-size:18px;color:#b7cde0;margin-top:13px}.rule{height:2px;width:220px;background:linear-gradient(90deg,#55e6dc,transparent);margin-top:16px}
+.chain{display:flex;direction:rtl;align-items:center;justify-content:space-between;margin-top:51px}.node{width:190px;min-height:208px;box-sizing:border-box;border:1px solid rgba(121,170,208,.35);background:#102b4a;padding:20px 16px 0;position:relative}.node .step{font-family:Arial,sans-serif;color:#55e6dc;font-size:14px}.node h3{font-size:19px;line-height:1.4;margin:14px 0 10px}.node p{font-size:15px;line-height:1.6;color:#c7d9e8;margin:0}.node.identity{border-color:rgba(122,164,255,.62);background:rgba(122,164,255,.08)}.node.identity .step{color:#9dbbff}.node.sign{border-color:rgba(85,230,220,.64);background:rgba(85,230,220,.08)}.node.sign .step{color:#6df0e6}.link{width:24px;color:#55e6dc;font-size:25px;text-align:center}.evidence{margin-top:41px;min-height:102px;box-sizing:border-box;border-top:1px solid rgba(85,230,220,.52);display:flex;align-items:center;gap:22px}.evidence-title{font-size:18px;color:#cde0ef;white-space:nowrap}.asset{font-family:Arial,sans-serif;font-size:14px;color:#c8fcf7;background:rgba(85,230,220,.09);border:1px solid rgba(85,230,220,.42);padding:12px 14px}.notice{position:absolute;bottom:27px;right:68px;color:#93aabe;font-size:14px}.notice strong{color:#ffce82}
+</style>
+</head>
+<body><div class="slide-container"><div class="inner">
+<div class="eyebrow">۹ · VALIDATION & RELEASE SECURITY</div><div class="title">از تست تا امضای Windows، یک زنجیره کنترل</div><div class="lead">Artifact فقط زمانی منتشر می‌شود که کنترل‌های کد، وابستگی، هویت، امضا و verification پشت سر هم عبور کنند.</div><div class="rule"></div>
+<div class="chain">
+<section class="node"><div class="step">01</div><h3>Regression Tests</h3><p>۴۰ تست release، شامل reconciliation، SoD، Plaid rollback و Period Close.</p></section><div class="link">←</div>
+<section class="node"><div class="step">02</div><h3>Dependency Gate</h3><p>baseline وابستگی‌های Windows و خروجی audit پیش از build کنترل می‌شوند.</p></section><div class="link">←</div>
+<section class="node identity"><div class="step">03</div><h3>GitHub OIDC</h3><p>token کوتاه‌عمر فقط در محیط محافظت‌شده production-signing دریافت می‌شود.</p></section><div class="link">←</div>
+<section class="node sign"><div class="step">04</div><h3>Artifact Signing</h3><p>SHA-256 و RFC 3161 timestamp، بدون PFX یا private key در repository.</p></section><div class="link">←</div>
+<section class="node sign"><div class="step">05</div><h3>Independent Verify</h3><p>Authenticode، timestamp و hash پیش از upload به Release بررسی می‌شوند.</p></section>
+</div>
+<div class="evidence"><div class="evidence-title">Release Evidence</div><div class="asset">FinAnalyzer_Enterprise_v2_7_0.exe</div><div class="asset">.exe.sha256</div><div class="asset">signed-release-evidence.json</div></div>
+<div class="notice"><strong>وضعیت:</strong> workflow آماده است؛ امضای واقعی پس از تکمیل Azure Artifact Signing و approval محیط سازمانی اجرا می‌شود.</div>
+</div></div></body></html>

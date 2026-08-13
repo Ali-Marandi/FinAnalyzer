@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<style>
+html,body{margin:0;height:100%}
+.slide-container{width:1280px;min-height:720px;box-sizing:border-box;background:#081c36;color:#f4fbff;font-family:Tahoma,Arial,sans-serif;overflow:hidden}
+.inner{min-height:720px;box-sizing:border-box;padding:50px 70px 0;position:relative}
+.eyebrow{font-size:15px;color:#55e6dc}.title{font-size:34px;font-weight:700;margin-top:10px}.sub{font-size:18px;color:#b7cbe0;margin-top:12px}.line{width:205px;height:2px;background:linear-gradient(90deg,#55e6dc,transparent);margin-top:18px}
+.flow{display:flex;direction:rtl;align-items:center;justify-content:center;gap:10px;margin-top:52px}.stage{width:238px;min-height:236px;box-sizing:border-box;border:1px solid rgba(107,170,211,.32);background:#102b4a;padding:24px 20px;text-align:center}.stage .num{color:#55e6dc;font-size:15px}.stage h3{font-size:21px;margin:14px 0;color:#f7fcff}.stage p{font-size:16px;line-height:1.65;color:#c6d7e6;margin:0}.arrow{color:#55e6dc;font-size:29px;width:36px;text-align:center}.stage.success{border-color:rgba(85,230,220,.65);background:rgba(85,230,220,.08)}.stage.success h3{color:#aef7f0}
+.outcomes{display:flex;gap:18px;margin-top:47px}.outcome{width:50%;box-sizing:border-box;padding:15px 20px;font-size:17px;line-height:1.55}.ok{background:rgba(85,230,220,.11);border-top:2px solid #55e6dc;color:#d8fffb}.fail{background:rgba(255,185,84,.10);border-top:2px solid #ffb954;color:#ffe6bc}.label{font-weight:bold;margin-left:8px}.footer{position:absolute;bottom:28px;left:70px;color:#7895b1;font-size:14px}
+</style>
+</head>
+<body><div class="slide-container"><div class="inner">
+<div class="eyebrow">۲ · معماری عملیاتی</div><div class="title">Sync اتمیک، Review مستقل</div><div class="sub">cursor تنها پس از apply کامل تغییر می‌کند؛ هر posting جدید یا اصلاح‌شده دوباره نیازمند review است.</div><div class="line"></div>
+<div class="flow">
+<section class="stage"><div class="num">۱</div><h3>دریافت update</h3><p>added، modified و removed از همه صفحه‌های provider جمع‌آوری می‌شوند.</p></section><div class="arrow">←</div>
+<section class="stage"><div class="num">۲</div><h3>Apply واحد</h3><p>حساب‌ها، mappingها و journal entryها در یک transaction محلی اعمال می‌شوند.</p></section><div class="arrow">←</div>
+<section class="stage"><div class="num">۳</div><h3>کنترل close</h3><p>revision یا removal در دوره قفل‌شده، کل apply را متوقف می‌کند.</p></section><div class="arrow">←</div>
+<section class="stage success"><div class="num">۴</div><h3>Review queue</h3><p>success: cursor جلو می‌رود و هر مورد به <b>needs_review</b> بازمی‌گردد.</p></section>
+</div>
+<div class="outcomes"><div class="outcome ok"><span class="label">مسیر موفق:</span> entry و mapping ثبت می‌شوند، audit success ایجاد می‌شود و cursor پس از همه mutationها ذخیره می‌گردد.</div><div class="outcome fail"><span class="label">مسیر خطا:</span> entry، mapping و cursor همگی rollback می‌شوند؛ فقط failure ساختاریافته برای بررسی ثبت می‌شود.</div></div>
+<div class="footer">ATOMIC APPLY · CURSOR SAFETY · REVIEW RESET</div>
+</div></div></body></html>

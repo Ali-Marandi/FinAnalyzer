@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<style>
+html,body{margin:0;height:100%}
+.slide-container{width:1280px;min-height:720px;box-sizing:border-box;background:#081c36;color:#f5fbff;font-family:Tahoma,Arial,sans-serif;overflow:hidden}
+.inner{min-height:720px;box-sizing:border-box;padding:50px 72px 0;position:relative}
+.eyebrow{font-size:15px;color:#55e6dc;letter-spacing:.5px}.title{font-size:35px;font-weight:700;margin-top:11px}.lead{font-size:18px;color:#b8cede;margin-top:15px;line-height:1.6}.rule{width:190px;height:2px;background:#55e6dc;margin-top:15px}
+.flow{display:flex;align-items:center;justify-content:space-between;direction:rtl;margin-top:45px;position:relative}.flow:before{content:"";position:absolute;right:95px;left:95px;top:72px;height:2px;background:rgba(85,230,220,.45)}
+.stage{width:265px;min-height:154px;box-sizing:border-box;background:#102b4a;border:1px solid rgba(123,171,209,.32);padding:23px 21px;position:relative;z-index:1}.stage .number{font-size:13px;color:#55e6dc}.stage h3{font-size:22px;margin:10px 0;color:#ffffff}.stage p{font-size:16px;line-height:1.65;color:#c8d9e7;margin:0}
+.gate{width:126px;min-height:144px;box-sizing:border-box;border:2px solid #55e6dc;background:#0b2945;text-align:center;padding:22px 12px;position:relative;z-index:2}.gate strong{display:block;font-size:20px;color:#55e6dc}.gate span{display:block;font-size:14px;line-height:1.55;color:#d6f7f4;margin-top:9px}
+.recheck{border-color:#7ca5ff}.recheck strong{color:#9ab8ff}.recheck span{color:#d6e1ff}
+.blockers{margin-top:62px;border-top:1px solid rgba(85,230,220,.35);padding-top:23px;display:flex;align-items:center;gap:18px}.blockers h4{font-size:18px;color:#cfe1ed;white-space:nowrap}.block{font-size:16px;color:#ffe3ae;background:rgba(255,185,84,.10);border:1px solid rgba(255,185,84,.52);padding:12px 18px}.note{position:absolute;bottom:34px;right:72px;color:#819cb5;font-size:14px}
+</style>
+</head>
+<body>
+<div class="slide-container"><div class="inner">
+<div class="eyebrow">۶ · PERIOD CLOSE CONTROL</div><div class="title">Close در دو نقطه دوباره کنترل می‌شود</div><div class="lead">Readiness یک گزارش نمایشی نیست؛ پیش از تغییر وضعیت دوره و درست پیش از اجرای آن، gate واقعی workflow است.</div><div class="rule"></div>
+<div class="flow">
+<section class="stage"><div class="number">مرحله ۱</div><h3>درخواست Close</h3><p>کاربر مجاز، سال مالی و حساب closing را انتخاب می‌کند.</p></section>
+<div class="gate"><strong>Gate ①</strong><span>Readiness پیش از ایجاد درخواست</span></div>
+<section class="stage"><div class="number">مرحله ۲</div><h3>Approval مستقل</h3><p>Controller جدا از درخواست‌کننده، پرونده را بررسی می‌کند.</p></section>
+<div class="gate recheck"><strong>Gate ②</strong><span>Readiness مجدد پیش از execution</span></div>
+<section class="stage"><div class="number">مرحله ۳</div><h3>Execute & Lock</h3><p>فقط پس از عبور هر دو کنترل، دوره قفل می‌شود.</p></section>
+</div>
+<div class="blockers"><h4>Blockerهای بانکی:</h4><span class="block">pending_bank_transactions</span><span class="block">unreconciled_bank_transactions</span></div>
+<div class="note">کنترل دوم، تغییرات بانک یا دفتر در فاصله request تا approval را آشکار می‌کند.</div>
+</div></div>
+</body>
+</html>

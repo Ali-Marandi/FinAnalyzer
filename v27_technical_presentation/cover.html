@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <style>
+    body{margin:0}
+    .slide-container{width:1280px;min-height:720px;box-sizing:border-box;background:#071a33;color:#f5fbff;font-family:Tahoma,Arial,sans-serif;position:relative;overflow:hidden;top:-1px}
+    .grid{position:absolute;inset:0;background-image:linear-gradient(rgba(37,200,205,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(37,200,205,.07) 1px,transparent 1px);background-size:48px 48px}
+    .content{min-height:720px;box-sizing:border-box;padding:76px 82px;display:flex;direction:rtl;align-items:center;gap:66px;position:relative}
+    .copy{width:58%;text-align:right}
+    .eyebrow{color:#55e6dc;font-size:19px;letter-spacing:1px;margin-bottom:24px}
+    h1{font-size:55px;line-height:1.23;margin:0 0 24px;font-weight:700;max-width:670px}
+    .subtitle{font-size:25px;line-height:1.7;color:#c7d9e9;max-width:690px}
+    .tags{display:flex;gap:12px;margin-top:39px;flex-wrap:wrap}
+    .tag{border:1px solid rgba(85,230,220,.5);color:#bdf7f1;background:rgba(85,230,220,.08);padding:10px 16px;font-size:15px}
+    .visual{width:42%;min-height:390px;position:relative}
+    .ring{position:absolute;border-radius:50%;border:1px solid rgba(85,230,220,.45)}
+    .ring.one{width:322px;height:322px;right:30px;top:40px}.ring.two{width:230px;height:230px;right:76px;top:86px;border-color:rgba(106,160,255,.6)}.ring.three{width:130px;height:130px;right:126px;top:136px;border-color:#55e6dc}
+    .node{position:absolute;width:74px;height:74px;border-radius:50%;background:#102d50;border:2px solid #55e6dc;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:bold;box-shadow:0 0 25px rgba(85,230,220,.18)}
+    .n1{right:154px;top:164px}.n2{right:305px;top:74px}.n3{right:12px;top:279px}.n4{right:302px;top:317px}
+    .line{position:absolute;height:1px;background:linear-gradient(90deg,transparent,#55e6dc,transparent);transform-origin:right center;opacity:.85}.l1{width:175px;right:195px;top:169px;transform:rotate(-31deg)}.l2{width:176px;right:79px;top:239px;transform:rotate(-149deg)}.l3{width:142px;right:197px;top:244px;transform:rotate(43deg)}
+    .footer{position:absolute;bottom:34px;right:82px;color:#7f9cb8;font-size:14px;letter-spacing:.4px}
+  </style>
+</head>
+<body>
+  <div class="slide-container">
+    <div class="grid"></div>
+    <div class="content">
+      <section class="copy">
+        <div class="eyebrow">ارائه فنی سازمانی · نسخه ۲.۷.۰</div>
+        <h1>FinAnalyzer Enterprise</h1>
+        <div class="subtitle">تطبیق بانکی کنترل‌شده، بستن دوره قابل‌راستی‌آزمایی و مسیر هوشمند برای نسخه بعدی</div>
+        <div class="tags"><span class="tag">RBAC + MFA</span><span class="tag">HMAC Audit Chain</span><span class="tag">Controlled Reconciliation</span></div>
+      </section>
+      <section class="visual" aria-label="جریان کنترل مالی">
+        <div class="ring one"></div><div class="ring two"></div><div class="ring three"></div>
+        <div class="line l1"></div><div class="line l2"></div><div class="line l3"></div>
+        <div class="node n1">دفتر</div><div class="node n2">بانک</div><div class="node n3">ممیزی</div><div class="node n4">Close</div>
+      </section>
+    </div>
+    <div class="footer">SECURE FINANCIAL CONTROL PLATFORM</div>
+  </div>
+</body>
+</html>

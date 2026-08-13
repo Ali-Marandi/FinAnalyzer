@@ -1,0 +1,18 @@
+<!DOCTYPE html><html lang="fa" dir="rtl"><head><meta charset="UTF-8"><style>
+/* Removed body default margin to avoid extra 8px causing overflow */
+html,body{height:100%;margin:0}
+.slide-container{width:1280px;min-height:720px;box-sizing:border-box;background:#081c36;color:#f5fbff;font-family:Tahoma,Arial,sans-serif;overflow:hidden}
+.inner{min-height:720px;box-sizing:border-box;padding:48px 56px 0;position:relative}
+.eyebrow{color:#55e6dc;font-size:15px}
+.title{font-size:33px;font-weight:bold;margin-top:10px}
+.rule{height:2px;background:linear-gradient(90deg,#55e6dc,transparent);width:180px;margin-top:14px}
+.flow{display:flex;gap:16px;margin-top:34px;align-items:stretch}
+.side{width:31%;min-height:320px;background:#102b4a;border:1px solid rgba(120,167,205,.26);box-sizing:border-box;padding:18px}
+.core{width:38%;min-height:320px;display:flex;flex-direction:column;justify-content:center;gap:12px}
+.side h3{font-size:22px;color:#8cbcff;margin:0 0 12px}
+.side p{font-size:17px;line-height:1.65;color:#d2e0ec;margin:0 0 8px}
+.pill{padding:12px 14px;background:rgba(85,230,220,.10);border:1px solid rgba(85,230,220,.42);font-size:17px;line-height:1.55;color:#dffefd}
+.pill.warn{background:rgba(255,185,84,.10);border-color:rgba(255,185,84,.5);color:#ffe4b0}
+.arrow{text-align:center;color:#55e6dc;font-size:23px}
+.bottom{margin-top:16px;color:#8da5bb;font-size:15px}
+</style></head><body><div class="slide-container"><div class="inner"><div class="eyebrow">۱ · مسئله کسب‌وکار</div><div class="title">ورود بانکی بدون review، ریسک close است</div><div class="rule"></div><div class="flow"><section class="side"><h3>Bank Feed</h3><p>سرعت، visibility و داده عملیاتی را فراهم می‌کند؛ اما وضعیت تراکنش می‌تواند تغییر کند.</p><p>Pending، revision و removal بخشی از چرخه واقعی داده هستند.</p></section><section class="core"><div class="pill">اگر همه تراکنش‌ها نهایی فرض شوند، طبقه‌بندی اشتباه وارد close می‌شود.</div><div class="arrow">↓</div><div class="pill warn">اگر همه تراکنش‌ها تا review متوقف شوند، عملیات مالی visibility خود را از دست می‌دهد.</div><div class="arrow">↓</div><div class="pill">پاسخ v2.7.0: ورود متوازن اولیه + تصمیم انسانی کنترل‌شده</div></section><section class="side"><h3>Period Close</h3><p>نبود تراکنش pending کافی نیست.</p><p>تراکنش posted اما بررسی‌نشده نیز باید blocker باشد تا close قابل اتکا بماند.</p></section></div><div class="bottom">سرعت عملیاتی و قطعیت حسابداری، هر دو باید برقرار باشند.</div></div></div></body></html>

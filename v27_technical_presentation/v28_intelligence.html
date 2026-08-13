@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<style>
+html,body{margin:0;height:100%}
+.slide-container{width:1280px;min-height:720px;box-sizing:border-box;background:#081c36;color:#f5fbff;font-family:Tahoma,Arial,sans-serif;overflow:hidden}
+.inner{min-height:720px;box-sizing:border-box;padding:50px 74px 0;position:relative;background-image:radial-gradient(circle at 18% 20%,rgba(85,230,220,.10),transparent 25%),radial-gradient(circle at 82% 74%,rgba(124,165,255,.10),transparent 29%)}
+.eyebrow{font-size:15px;color:#55e6dc;letter-spacing:.5px}.title{font-size:35px;font-weight:700;margin-top:10px}.lead{font-size:18px;color:#b8cede;margin-top:14px;line-height:1.65}.line{width:200px;height:2px;background:linear-gradient(90deg,#55e6dc,transparent);margin-top:15px}
+.pipeline{display:flex;direction:rtl;align-items:stretch;justify-content:center;gap:18px;margin-top:45px}.node{width:312px;min-height:272px;box-sizing:border-box;background:#0e2a49;border:1px solid rgba(123,171,209,.35);padding:26px 22px 0;position:relative}.node.ai{border-color:rgba(85,230,220,.64);background:rgba(85,230,220,.07)}.node.approval{border-color:rgba(255,190,99,.62);background:rgba(255,190,99,.08)}.step{font-size:14px;color:#8db1d0}.ai .step{color:#55e6dc}.approval .step{color:#ffd188}.node h3{font-size:23px;margin:17px 0 14px}.node p{font-size:16px;line-height:1.7;color:#d3e1ed;margin:0}.bullets{margin-top:17px;color:#aeece7;font-size:15px;line-height:1.85}.approval .bullets{color:#ffe1af}.arrow{align-self:center;color:#55e6dc;font-size:30px;width:26px;text-align:center}.principle{margin-top:42px;min-height:102px;box-sizing:border-box;border-top:2px solid #55e6dc;background:rgba(85,230,220,.09);padding:20px 25px 0;display:flex;align-items:flex-start;gap:16px}.badge{font-size:24px;color:#55e6dc}.principle div{font-size:20px;line-height:1.65;color:#d9fffb}.principle strong{color:#55e6dc}.footer{position:absolute;bottom:30px;left:74px;color:#819cb5;font-size:14px}
+</style>
+</head>
+<body><div class="slide-container"><div class="inner">
+<div class="eyebrow">۱۰ · نقشه‌راه v2.8.0</div><div class="title">هوش مالی با Human Approval</div><div class="lead">هدف نسخه بعدی، سریع‌تر کردن review است؛ نه واگذاری تصمیم حسابداری به یک مدل.</div><div class="line"></div>
+<div class="pipeline">
+<section class="node"><div class="step">۱ · داده کنترل‌شده</div><h3>Statement Import</h3><p>CSV/OFX با schema validation، hash و provenance وارد می‌شود.</p><div class="bullets">• تراکنش‌های statement<br>• ledger entryهای موجود<br>• وضعیت bank-feed mapping</div></section><div class="arrow">←</div>
+<section class="node ai"><div class="step">۲ · پیشنهاد قابل‌توضیح</div><h3>Reconciliation Intelligence</h3><p>سیستم candidate می‌سازد و دلیل پیشنهاد را شفاف نمایش می‌دهد.</p><div class="bullets">• شناسه reference و مبلغ<br>• تاریخ، merchant و account<br>• confidence به‌همراه featureهای اثرگذار</div></section><div class="arrow">←</div>
+<section class="node approval"><div class="step">۳ · تصمیم تحت policy</div><h3>Human Approval</h3><p>policy تعیین می‌کند کدام match با review عادی و کدام با dual approval پیش می‌رود.</p><div class="bullets">• مبلغ بالا و split matching<br>• ارز یا vendor پرریسک<br>• evidence و actor مستقل</div></section>
+</div>
+<div class="principle"><div class="badge">◈</div><div><strong>اصل حاکمیتی:</strong> مدل فقط پیشنهاد و explanation تولید می‌کند. هیچ mutation دفتر، پیش از permission، MFA تازه و approval انسانی انجام نمی‌شود.</div></div>
+<div class="footer">DETERMINISTIC MATCHING → EXPLAINABLE SUGGESTION → POLICY-GOVERNED DECISION</div>
+</div></div></body></html>

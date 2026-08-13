@@ -1,0 +1,144 @@
+{
+  "project_info": {
+    "title": "FinAnalyzer Enterprise v2.7.0",
+    "created": 1786658329.915,
+    "last_updated": 1786658558.788,
+    "total_slides": 12
+  },
+  "slides": [
+    {
+      "id": "cover",
+      "state": "edited",
+      "pageNum": 1
+    },
+    {
+      "id": "control_problem",
+      "state": "edited",
+      "pageNum": 2
+    },
+    {
+      "id": "atomic_sync",
+      "state": "edited",
+      "pageNum": 3
+    },
+    {
+      "id": "state_machine",
+      "state": "edited",
+      "pageNum": 4
+    },
+    {
+      "id": "sod_controls",
+      "state": "edited",
+      "pageNum": 5
+    },
+    {
+      "id": "ledger_integrity",
+      "state": "edited",
+      "pageNum": 6
+    },
+    {
+      "id": "close_readiness",
+      "state": "edited",
+      "pageNum": 7
+    },
+    {
+      "id": "audit_evidence",
+      "state": "edited",
+      "pageNum": 8
+    },
+    {
+      "id": "desktop_workspace",
+      "state": "edited",
+      "pageNum": 9
+    },
+    {
+      "id": "validation_release",
+      "state": "edited",
+      "pageNum": 10
+    },
+    {
+      "id": "v28_intelligence",
+      "state": "edited",
+      "pageNum": 11
+    },
+    {
+      "id": "decision",
+      "state": "edited",
+      "pageNum": 12
+    }
+  ],
+  "outline": [
+    {
+      "id": "cover",
+      "title": "FinAnalyzer Enterprise v2.7.0",
+      "summary": "جلد مینیمال برای معرفی تطبیق بانکی کنترل‌شده، Close قابل‌راستی‌آزمایی و مسیر هوشمند v2.8.0.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "control_problem",
+      "title": "ورود بانکی بدون review، ریسک close است",
+      "summary": "چرایی نیاز به review انسانی برای تراکنش‌های بانکی و تعریف مسئله کنترلی.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "atomic_sync",
+      "title": "Sync اتمیک، Review مستقل",
+      "summary": "جریان Plaid sync، rollback cursor/mapping/entry و بازگشت وضعیت به needs_review.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "state_machine",
+      "title": "چهار وضعیت، یک سیاست روشن",
+      "summary": "نمایش lifecycle needs_review، exception، matched و removed و اثر هرکدام بر close.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "sod_controls",
+      "title": "SoD در سطح actor اجرا می‌شود",
+      "summary": "مجوزهای match/resolve، MFA تازه و جلوگیری از self-resolution exception.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "ledger_integrity",
+      "title": "تمامیت دفتر در هر Match حفظ می‌شود",
+      "summary": "تغییر محدود contra line، منع حساب بانکی به‌عنوان contra و حفاظت از دوره قفل‌شده.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "close_readiness",
+      "title": "Close در دو نقطه دوباره کنترل می‌شود",
+      "summary": "Readiness پیش از request و پیش از approval/execution، با blockerهای بانکی.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "audit_evidence",
+      "title": "هر تصمیم، Evidence قابل‌راستی‌آزمایی است",
+      "summary": "HMAC audit chain، رخدادهای reconciliation و Compliance Evidence Pack.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "desktop_workspace",
+      "title": "صف امن برای تصمیم انسانی",
+      "summary": "تجربه دسکتاپ، داده‌های کمینه و عملیات Match/Exception/Resolve.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "validation_release",
+      "title": "از تست تا امضای Windows، یک زنجیره کنترل",
+      "summary": "پوشش تست‌ها، dependency gate، OIDC، Artifact Signing و RFC 3161 timestamp.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "v28_intelligence",
+      "title": "v2.8: هوش مالی با Human Approval",
+      "summary": "Statement Reconciliation Intelligence، policy-driven approval و AI explainability.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "decision",
+      "title": "تصمیم پیشنهادی برای گام بعد",
+      "summary": "جمع‌بندی v2.7.0 و پیشنهاد شروع discovery برای v2.8.0-a.",
+      "image_plan": "Use a suitable image if needed"
+    }
+  ]
+}
