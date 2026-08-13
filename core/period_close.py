@@ -230,7 +230,7 @@ class PeriodCloseService:
             actor_id=principal.user_id,
             company_id=company_id,
             session_id=principal.session_id,
-            request_id=principal.session_id,
+            request_id=request_id,
             source="period_close_service",
             target_type="period_close_request",
             target_id=request_id,

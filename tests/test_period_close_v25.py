@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import tempfile
 import unittest
+from unittest.mock import patch
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
@@ -24,7 +25,7 @@ from core.models import (
     User,
     UserRole,
 )
-from core.period_close import PeriodCloseService, SegregationOfDutiesViolation
+from core.period_close import PeriodCloseError, PeriodCloseService, SegregationOfDutiesViolation
 
 
 class PeriodCloseV25Tests(unittest.TestCase):
@@ -88,6 +89,9 @@ class PeriodCloseV25Tests(unittest.TestCase):
             self.assertEqual(request.status, PeriodCloseRequestStatus.EXECUTED)
             self.assertEqual(request.approved_by_user_id, self.controller_id)
             self.assertEqual(actions, {"period_close.requested", "period_close.executed"})
+            close_event = session.scalar(select(AuditLog).where(AuditLog.action == "period_close.executed"))
+            self.assertEqual(close_event.request_id, request_id)
+            self.assertEqual(close_event.target_id, request_id)
             self.assertTrue(self.logger.verify_chain(session).valid)
 
     def test_self_approval_is_blocked_and_audited(self):
@@ -103,6 +107,43 @@ class PeriodCloseV25Tests(unittest.TestCase):
             self.assertEqual(event.outcome, "denied")
             self.assertTrue(self.logger.verify_chain(session).valid)
 
+    def test_requester_cannot_reject_own_close_and_event_is_chained(self):
+        request_id = self.service.request_close(
+            self.company_id, 2025, self.closing_account_id, self._principal(self.admin_id)
+        )
+        with self.assertRaises(SegregationOfDutiesViolation):
+            self.service.reject(request_id, "Requester cannot provide independent control.", self._principal(self.admin_id))
+        with self.database.get_session() as session:
+            request = session.get(PeriodCloseRequest, request_id)
+            event = session.scalar(select(AuditLog).where(AuditLog.action == "period_close.sod_violation"))
+            self.assertEqual(request.status, PeriodCloseRequestStatus.PENDING)
+            self.assertEqual(event.outcome, "denied")
+            self.assertEqual(event.target_id, request_id)
+            self.assertTrue(self.logger.verify_chain(session).valid)
+
+    def test_execution_failure_rolls_back_approval_close_and_success_audit(self):
+        request_id = self.service.request_close(
+            self.company_id, 2025, self.closing_account_id, self._principal(self.requester_id)
+        )
+        with patch("core.period_close.AccountingEngine.close_fiscal_year", side_effect=RuntimeError("simulated close failure")):
+            with self.assertRaisesRegex(RuntimeError, "simulated close failure"):
+                self.service.approve_and_execute(request_id, self._principal(self.controller_id))
+        with self.database.get_session() as session:
+            request = session.get(PeriodCloseRequest, request_id)
+            fiscal_year = session.scalar(select(FiscalYear).where(FiscalYear.id == request.fiscal_year_id))
+            executed_event = session.scalar(select(AuditLog).where(AuditLog.action == "period_close.executed"))
+            self.assertEqual(request.status, PeriodCloseRequestStatus.PENDING)
+            self.assertIsNone(request.approved_by_user_id)
+            self.assertIsNone(request.executed_at)
+            self.assertFalse(fiscal_year.is_closed)
+            self.assertIsNone(executed_event)
+            self.assertTrue(self.logger.verify_chain(session).valid)
+
+    def test_duplicate_active_close_request_is_rejected(self):
+        self.service.request_close(self.company_id, 2025, self.closing_account_id, self._principal(self.requester_id))
+        with self.assertRaises(PeriodCloseError):
+            self.service.request_close(self.company_id, 2025, self.closing_account_id, self._principal(self.requester_id))
+
     def test_stale_mfa_cannot_create_close_request(self):
         with self.assertRaises(AuthorizationDenied):
             self.service.request_close(
@@ -112,6 +153,7 @@ class PeriodCloseV25Tests(unittest.TestCase):
             event = session.scalar(select(AuditLog).where(AuditLog.action == "authorization.denied"))
             self.assertEqual(event.company_id, self.company_id)
             self.assertEqual(event.outcome, "denied")
+            self.assertTrue(self.logger.verify_chain(session).valid)
 
 
 if __name__ == "__main__":
