@@ -6,6 +6,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 from datetime import date, datetime, timedelta, timezone
+from decimal import Decimal
 from pathlib import Path
 
 from sqlalchemy import select
@@ -20,8 +21,12 @@ from core.models import (
     AuditLog,
     Company,
     FiscalYear,
+    JournalEntry,
     PeriodCloseRequest,
     PeriodCloseRequestStatus,
+    PlaidItem,
+    PlaidTransactionMapping,
+    Transaction,
     User,
     UserRole,
 )
@@ -91,7 +96,9 @@ class PeriodCloseV25Tests(unittest.TestCase):
             self.assertTrue(fiscal_year.is_closed)
             self.assertEqual(request.status, PeriodCloseRequestStatus.EXECUTED)
             self.assertEqual(request.approved_by_user_id, self.controller_id)
-            self.assertEqual(actions, {"period_close.requested", "period_close.executed"})
+            self.assertEqual(actions, {
+                "period_close.readiness_assessed", "period_close.requested", "period_close.executed"
+            })
             close_event = session.scalar(select(AuditLog).where(AuditLog.action == "period_close.executed"))
             self.assertEqual(close_event.request_id, request_id)
             self.assertEqual(close_event.target_id, request_id)
@@ -167,6 +174,102 @@ class PeriodCloseV25Tests(unittest.TestCase):
             self.assertIsNone(request.executed_at)
             self.assertFalse(fiscal_year.is_closed)
             self.assertIsNone(executed_event)
+            self.assertTrue(self.logger.verify_chain(session).valid)
+
+    def test_readiness_assessment_is_audited_and_allows_clean_period(self):
+        report = self.service.assess_readiness(
+            self.company_id, 2025, self.closing_account_id, self._principal(self.requester_id)
+        )
+        self.assertTrue(report.ready)
+        self.assertEqual(report.blocker_codes, ())
+        with self.database.get_session() as session:
+            event = session.scalar(select(AuditLog).where(AuditLog.action == "period_close.readiness_assessed"))
+            self.assertEqual(event.outcome, "success")
+            self.assertEqual(event.company_id, self.company_id)
+            self.assertTrue(self.logger.verify_chain(session).valid)
+
+    def test_pending_bank_transaction_blocks_request_and_is_audited(self):
+        with self.database.get_session() as session:
+            item = PlaidItem(
+                company_id=self.company_id,
+                item_id="item-pending-close",
+                encrypted_access_token="encrypted",
+                status="linked",
+            )
+            session.add(item)
+            session.flush()
+            session.add(PlaidTransactionMapping(
+                plaid_item_id=item.id,
+                provider_transaction_id="pending-bank-transaction",
+                pending=True,
+            ))
+        with self.assertRaisesRegex(PeriodCloseError, "pending_bank_transactions"):
+            self.service.request_close(
+                self.company_id, 2025, self.closing_account_id, self._principal(self.requester_id)
+            )
+        with self.database.get_session() as session:
+            request = session.scalar(select(PeriodCloseRequest).where(PeriodCloseRequest.company_id == self.company_id))
+            event = session.scalar(select(AuditLog).where(AuditLog.action == "period_close.readiness_assessed"))
+            self.assertIsNone(request)
+            self.assertEqual(event.outcome, "denied")
+            self.assertIn("pending_bank_transactions", event.details)
+            self.assertTrue(self.logger.verify_chain(session).valid)
+
+    def test_unbalanced_legacy_entry_blocks_request(self):
+        with self.database.get_session() as session:
+            entry = JournalEntry(
+                company_id=self.company_id,
+                entry_number="LEGACY-UNBALANCED",
+                date=date(2025, 6, 30),
+                description="Injected legacy reconciliation defect",
+            )
+            session.add(entry)
+            session.flush()
+            session.add(Transaction(
+                journal_entry_id=entry.id,
+                account_id=self.closing_account_id,
+                debit=Decimal("10.00"),
+                credit=Decimal("0"),
+            ))
+        report = self.service.assess_readiness(
+            self.company_id, 2025, self.closing_account_id, self._principal(self.requester_id)
+        )
+        self.assertFalse(report.ready)
+        self.assertIn("unbalanced_journal_entry", report.blocker_codes)
+        with self.assertRaisesRegex(PeriodCloseError, "unbalanced_journal_entry"):
+            self.service.request_close(
+                self.company_id, 2025, self.closing_account_id, self._principal(self.requester_id)
+            )
+
+    def test_approval_rechecks_readiness_before_locking(self):
+        request_id = self.service.request_close(
+            self.company_id, 2025, self.closing_account_id, self._principal(self.requester_id)
+        )
+        with self.database.get_session() as session:
+            item = PlaidItem(
+                company_id=self.company_id,
+                item_id="item-created-after-request",
+                encrypted_access_token="encrypted",
+                status="linked",
+            )
+            session.add(item)
+            session.flush()
+            session.add(PlaidTransactionMapping(
+                plaid_item_id=item.id,
+                provider_transaction_id="pending-before-approval",
+                pending=True,
+            ))
+        with self.assertRaisesRegex(PeriodCloseError, "pending_bank_transactions"):
+            self.service.approve_and_execute(request_id, self._principal(self.controller_id))
+        with self.database.get_session() as session:
+            request = session.get(PeriodCloseRequest, request_id)
+            fiscal_year = session.scalar(select(FiscalYear).where(FiscalYear.id == request.fiscal_year_id))
+            event = session.scalar(select(AuditLog).where(
+                AuditLog.action == "period_close.readiness_assessed", AuditLog.target_id == request_id
+            ))
+            self.assertEqual(request.status, PeriodCloseRequestStatus.PENDING)
+            self.assertFalse(fiscal_year.is_closed)
+            self.assertEqual(event.outcome, "denied")
             self.assertTrue(self.logger.verify_chain(session).valid)
 
     def test_duplicate_active_close_request_is_rejected(self):

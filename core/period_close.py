@@ -4,17 +4,28 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
+from decimal import Decimal
 from typing import Optional
 from uuid import uuid4
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 
 from core.accounting_engine import AccountingEngine
 from core.audit import AuditLogger
 from core.authorization import AuthorizationDenied, AuthorizationService
 from core.database import DatabaseManager
 from core.identity import AuthenticatedPrincipal, IdentityValidationError
-from core.models import Account, AccountType, FiscalYear, PeriodCloseRequest, PeriodCloseRequestStatus
+from core.models import (
+    Account,
+    AccountType,
+    FiscalYear,
+    JournalEntry,
+    PeriodCloseRequest,
+    PeriodCloseRequestStatus,
+    PlaidItem,
+    PlaidTransactionMapping,
+    Transaction,
+)
 
 
 class PeriodCloseError(RuntimeError):
@@ -23,6 +34,38 @@ class PeriodCloseError(RuntimeError):
 
 class SegregationOfDutiesViolation(PermissionError):
     """Raised when a requester attempts to approve their own close request."""
+
+
+@dataclass(frozen=True)
+class CloseReadinessFinding:
+    """One explainable blocker or warning discovered before a fiscal-period close."""
+
+    code: str
+    severity: str
+    message: str
+    reference: Optional[str] = None
+
+    @property
+    def is_blocker(self) -> bool:
+        return self.severity == "blocker"
+
+
+@dataclass(frozen=True)
+class CloseReadinessReport:
+    """Deterministic readiness result used before requesting or executing a close."""
+
+    company_id: int
+    fiscal_year: int
+    ready: bool
+    findings: tuple[CloseReadinessFinding, ...]
+
+    @property
+    def blocker_codes(self) -> tuple[str, ...]:
+        return tuple(finding.code for finding in self.findings if finding.is_blocker)
+
+    @property
+    def warning_codes(self) -> tuple[str, ...]:
+        return tuple(finding.code for finding in self.findings if not finding.is_blocker)
 
 
 @dataclass(frozen=True)
@@ -58,6 +101,21 @@ class PeriodCloseService:
         self.audit_logger = audit_logger or AuditLogger()
         self.authorization = authorization or AuthorizationService(audit_logger=self.audit_logger)
 
+    def assess_readiness(
+        self,
+        company_id: int,
+        fiscal_year: int,
+        closing_account_id: int,
+        principal: AuthenticatedPrincipal,
+    ) -> CloseReadinessReport:
+        """Return auditable, explainable blockers before a user requests a close."""
+        with self.database.get_session() as session:
+            context = self._context(principal, company_id, "period_close_readiness")
+            self._require(session, context, "ledger.period.close.request")
+            report = self._evaluate_readiness(session, company_id, fiscal_year, closing_account_id)
+            self._record_readiness(session, principal, report, phase="assessment")
+            return report
+
     def request_close(
         self,
         company_id: int,
@@ -69,19 +127,12 @@ class PeriodCloseService:
         with self.database.get_session() as session:
             context = self._context(principal, company_id, "period_close_request")
             self._require(session, context, "ledger.period.close.request")
+            report = self._evaluate_readiness(session, company_id, fiscal_year, closing_account_id)
+            self._record_readiness(session, principal, report, phase="request")
+            if not report.ready:
+                session.commit()
+                raise PeriodCloseError(self._readiness_error(report))
             year = self._fiscal_year(session, company_id, fiscal_year)
-            if year.is_closed:
-                raise PeriodCloseError(f"Fiscal year {fiscal_year} is already closed.")
-            self._validate_closing_account(session, company_id, closing_account_id)
-            existing = session.scalar(
-                select(PeriodCloseRequest).where(
-                    PeriodCloseRequest.company_id == company_id,
-                    PeriodCloseRequest.fiscal_year_id == year.id,
-                    PeriodCloseRequest.status.in_((PeriodCloseRequestStatus.PENDING, PeriodCloseRequestStatus.APPROVED)),
-                )
-            )
-            if existing is not None:
-                raise PeriodCloseError("An active close request already exists for this fiscal year.")
             request = PeriodCloseRequest(
                 id=str(uuid4()),
                 company_id=company_id,
@@ -119,7 +170,13 @@ class PeriodCloseService:
                 raise PeriodCloseError("The requested fiscal year no longer exists in this company scope.")
             if year.is_closed:
                 raise PeriodCloseError("The fiscal year has already been closed.")
-            self._validate_closing_account(session, request.company_id, request.closing_account_id)
+            report = self._evaluate_readiness(
+                session, request.company_id, year.year, request.closing_account_id, exclude_request_id=request.id
+            )
+            self._record_readiness(session, principal, report, phase="approval", request_id=request.id)
+            if not report.ready:
+                session.commit()
+                raise PeriodCloseError(self._readiness_error(report))
             request.status = PeriodCloseRequestStatus.APPROVED
             request.approved_by_user_id = principal.user_id
             request.approved_at = datetime.now(timezone.utc)
@@ -178,6 +235,133 @@ class PeriodCloseService:
         except AuthorizationDenied:
             session.commit()
             raise
+
+    def _evaluate_readiness(
+        self,
+        session,
+        company_id: int,
+        fiscal_year: int,
+        closing_account_id: int,
+        *,
+        exclude_request_id: Optional[str] = None,
+    ) -> CloseReadinessReport:
+        """Evaluate close blockers without mutating accounting or bank records."""
+        findings: list[CloseReadinessFinding] = []
+        year = session.scalar(
+            select(FiscalYear).where(FiscalYear.company_id == company_id, FiscalYear.year == fiscal_year)
+        )
+        if year is None:
+            findings.append(CloseReadinessFinding(
+                "fiscal_year_missing", "blocker", "The selected fiscal year does not exist in this company scope."
+            ))
+            return CloseReadinessReport(company_id, fiscal_year, False, tuple(findings))
+        if year.is_closed:
+            findings.append(CloseReadinessFinding(
+                "fiscal_year_already_closed", "blocker", "The selected fiscal year is already locked.", str(year.id)
+            ))
+
+        account = session.get(Account, closing_account_id)
+        if account is None or account.company_id != company_id:
+            findings.append(CloseReadinessFinding(
+                "closing_account_out_of_scope", "blocker", "The retained-earnings account is outside the selected company scope."
+            ))
+        elif not account.is_active or account.account_type != AccountType.EQUITY:
+            findings.append(CloseReadinessFinding(
+                "closing_account_ineligible", "blocker", "The close account must be an active equity account.", str(account.id)
+            ))
+
+        active_requests = list(session.scalars(
+            select(PeriodCloseRequest).where(
+                PeriodCloseRequest.company_id == company_id,
+                PeriodCloseRequest.fiscal_year_id == year.id,
+                PeriodCloseRequest.status.in_((PeriodCloseRequestStatus.PENDING, PeriodCloseRequestStatus.APPROVED)),
+            )
+        ))
+        if any(record.id != exclude_request_id for record in active_requests):
+            findings.append(CloseReadinessFinding(
+                "active_close_request", "blocker", "An active fiscal-period close request already exists.", str(year.id)
+            ))
+
+        totals = list(session.execute(
+            select(
+                JournalEntry.id,
+                func.coalesce(func.sum(Transaction.debit), 0).label("debit_total"),
+                func.coalesce(func.sum(Transaction.credit), 0).label("credit_total"),
+            )
+            .outerjoin(Transaction, Transaction.journal_entry_id == JournalEntry.id)
+            .where(
+                JournalEntry.company_id == company_id,
+                JournalEntry.date >= year.start_date,
+                JournalEntry.date <= year.end_date,
+            )
+            .group_by(JournalEntry.id)
+            .order_by(JournalEntry.id)
+        ))
+        for entry_id, debit_total, credit_total in totals:
+            if abs(Decimal(str(debit_total)) - Decimal(str(credit_total))) > Decimal("0.0001"):
+                findings.append(CloseReadinessFinding(
+                    "unbalanced_journal_entry", "blocker", "A journal entry in the close period is not balanced.", str(entry_id)
+                ))
+
+        pending_bank_ids = list(session.scalars(
+            select(PlaidTransactionMapping.provider_transaction_id)
+            .join(PlaidItem, PlaidTransactionMapping.plaid_item_id == PlaidItem.id)
+            .where(PlaidItem.company_id == company_id, PlaidTransactionMapping.pending.is_(True))
+            .order_by(PlaidTransactionMapping.id)
+            .limit(5)
+        ))
+        if pending_bank_ids:
+            findings.append(CloseReadinessFinding(
+                "pending_bank_transactions", "blocker",
+                "Pending bank transactions must be resolved before closing the fiscal period.",
+                ",".join(pending_bank_ids),
+            ))
+
+        verification = self.audit_logger.verify_chain(session)
+        if not verification.valid:
+            findings.append(CloseReadinessFinding(
+                "audit_chain_invalid", "blocker", "The security audit chain failed verification; close is blocked.",
+                str(verification.first_invalid_sequence or "checkpoint"),
+            ))
+
+        return CloseReadinessReport(
+            company_id=company_id,
+            fiscal_year=fiscal_year,
+            ready=not any(finding.is_blocker for finding in findings),
+            findings=tuple(findings),
+        )
+
+    @staticmethod
+    def _readiness_error(report: CloseReadinessReport) -> str:
+        codes = ", ".join(report.blocker_codes) or "unknown_readiness_failure"
+        return f"Fiscal-period close is not ready: {codes}. Resolve the readiness blockers and retry."
+
+    def _record_readiness(
+        self,
+        session,
+        principal: AuthenticatedPrincipal,
+        report: CloseReadinessReport,
+        *,
+        phase: str,
+        request_id: Optional[str] = None,
+    ) -> None:
+        reference = request_id or f"readiness:{report.company_id}:{report.fiscal_year}"
+        self._audit(
+            session,
+            principal,
+            "period_close.readiness_assessed",
+            report.company_id,
+            reference,
+            outcome="success" if report.ready else "denied",
+            severity="notice" if report.ready else "warning",
+            details={
+                "phase": phase,
+                "fiscal_year": report.fiscal_year,
+                "ready": report.ready,
+                "blocker_codes": list(report.blocker_codes),
+                "warning_codes": list(report.warning_codes),
+            },
+        )
 
     @staticmethod
     def _fiscal_year(session, company_id: int, fiscal_year: int) -> FiscalYear:
@@ -239,5 +423,6 @@ class PeriodCloseService:
 
 
 __all__ = [
-    "PeriodCloseService", "PeriodCloseError", "SegregationOfDutiesViolation", "PeriodCloseResult",
+    "CloseReadinessFinding", "CloseReadinessReport", "PeriodCloseService", "PeriodCloseError",
+    "SegregationOfDutiesViolation", "PeriodCloseResult",
 ]

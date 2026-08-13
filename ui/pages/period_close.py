@@ -62,6 +62,22 @@ class PeriodClosePage(QWidget):
         self.session_label.setStyleSheet("padding: 10px; background: palette(alternate-base); border-radius: 6px;")
         layout.addWidget(self.session_label)
 
+        readiness_box = QGroupBox("0. Validate close readiness before requesting approval")
+        readiness_layout = QVBoxLayout(readiness_box)
+        readiness_actions = QHBoxLayout()
+        self.readiness_button = QPushButton("Run close readiness checks")
+        self.readiness_button.clicked.connect(self.check_readiness)
+        readiness_actions.addWidget(self.readiness_button)
+        readiness_actions.addStretch()
+        readiness_layout.addLayout(readiness_actions)
+        self.readiness_label = QLabel(
+            "Run the assessment to verify the fiscal period, close account, journal balance, pending bank work and audit-chain integrity."
+        )
+        self.readiness_label.setWordWrap(True)
+        self.readiness_label.setStyleSheet("padding: 10px; background: palette(alternate-base); border-radius: 6px;")
+        readiness_layout.addWidget(self.readiness_label)
+        layout.addWidget(readiness_box)
+
         request_box = QGroupBox("1. Request a fiscal-period close")
         request_form = QFormLayout(request_box)
         self.company_input = QSpinBox()
@@ -116,6 +132,7 @@ class PeriodClosePage(QWidget):
 
     def _set_session_state(self) -> None:
         active = isinstance(self.principal, AuthenticatedPrincipal)
+        self.readiness_button.setEnabled(active)
         self.request_button.setEnabled(active)
         self.approve_button.setEnabled(active)
         self.reject_button.setEnabled(active)
@@ -123,6 +140,31 @@ class PeriodClosePage(QWidget):
             self.session_label.setText(f"Enterprise session active for user #{self.principal.user_id}. Sensitive actions require MFA evidence from the last 15 minutes.")
         else:
             self.session_label.setText("Sign in with Enterprise SSO before requesting or approving a fiscal-period close.")
+
+    def check_readiness(self) -> None:
+        if not self._require_principal():
+            return
+        try:
+            report = self.service.assess_readiness(
+                self.company_input.value(), self.year_input.value(), self.closing_account_input.value(), self.principal
+            )
+            if report.ready:
+                self.readiness_label.setText(
+                    "READY: no close blockers were found. Request and approval will run the checks again before accounting is locked."
+                )
+                self.readiness_label.setStyleSheet("padding: 10px; color: #0b6e4f; background: #e8f5ee; border-radius: 6px;")
+            else:
+                details = "\n".join(
+                    f"• {finding.code}: {finding.message}" for finding in report.findings if finding.is_blocker
+                )
+                self.readiness_label.setText(f"BLOCKED: resolve the following before close:\n{details}")
+                self.readiness_label.setStyleSheet("padding: 10px; color: #a01818; background: #fff0f0; border-radius: 6px;")
+        except (PermissionError, PeriodCloseError) as exc:
+            self.readiness_label.setText(f"Readiness check denied: {exc}")
+            self.readiness_label.setStyleSheet("padding: 10px; color: #a01818; background: #fff0f0; border-radius: 6px;")
+        except Exception:
+            self.readiness_label.setText("Readiness check could not be completed safely. Review the audit log.")
+            self.readiness_label.setStyleSheet("padding: 10px; color: #a01818; background: #fff0f0; border-radius: 6px;")
 
     def create_request(self) -> None:
         if not self._require_principal():

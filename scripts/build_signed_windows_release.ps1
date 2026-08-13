@@ -23,7 +23,7 @@ param(
     [string]$PythonLauncher = 'py',
 
     [Parameter()]
-    [string]$ReleaseUrl = 'https://github.com/Ali-Marandi/FinAnalyzer/releases/tag/v2.5.0'
+    [string]$ReleaseUrl = 'https://github.com/Ali-Marandi/FinAnalyzer/releases/tag/v2.6.0'
 )
 
 Set-StrictMode -Version Latest
@@ -38,7 +38,7 @@ $ProjectRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 Set-Location $ProjectRoot
 $VenvPath = Join-Path $ProjectRoot '.venv-build'
 $ReportPath = Join-Path $ProjectRoot 'security-reports'
-$ExpectedExe = Join-Path $ProjectRoot 'dist\\FinAnalyzer_Enterprise_v2_5.exe'
+$ExpectedExe = Join-Path $ProjectRoot 'dist\\FinAnalyzer_Enterprise_v2_6.exe'
 New-Item -ItemType Directory -Force -Path $ReportPath | Out-Null
 
 function Find-SignTool {
@@ -107,7 +107,7 @@ if ($LASTEXITCODE -ne 0) {
 $hash = Get-FileHash -Path $ExpectedExe -Algorithm SHA256
 $evidence = [ordered]@{
     product = 'FinAnalyzer Enterprise'
-    version = '2.5.0'
+    version = '2.6.0'
     executable = (Resolve-Path $ExpectedExe).Path
     sha256 = $hash.Hash
     certificate_subject = $certificate.Subject

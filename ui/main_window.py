@@ -29,7 +29,7 @@ class MainWindow(QMainWindow):
         self.app_instance = app_instance
         self.identity_service = None
         self.principal = None
-        self.setWindowTitle("FinAnalyzer Enterprise v2.5.0")
+        self.setWindowTitle("FinAnalyzer Enterprise v2.6.0")
         self.resize(1400, 900)
 
         self.init_ui()
