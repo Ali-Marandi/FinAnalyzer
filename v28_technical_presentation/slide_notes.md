@@ -1,0 +1,35 @@
+# 1 - از Feed Review تا Statement Certification
+
+در نسخه قبلی، تمرکز اصلی روی بررسی فیدهای بانکی و مدیریت مواردی بود که به عنوان مانع بسته شدن حساب‌ها شناخته می‌شدند. اما اکنون در نسخه جدید، این روند فراتر رفته و به گواهی رسمی صورت‌های مالی تبدیل می‌شود. ما نیازمند تطبیق دقیق میان حرکات صورت‌حساب، دفاتر کل و مانده‌های پایانی هستیم. خروجی نهایی این است که بسته مالی تنها زمانی آماده تایید نهایی می‌شود که کاملاً قابل توضیح و ممیزی باشد.
+
+# 2 - FinAnalyzer Enterprise v2.8.0
+
+خوش آمدید. در نسخه دو نقطه هشت از فین‌آنلایزر، تمرکز ما روی ایجاد یک زیرساخت مالی قابل دفاع و مبتنی بر شواهد است. در این جلسه بررسی می‌کنیم که چگونه هوش مصنوعی، زنجیره‌های رمزنگاری و کنترل‌های تفکیک وظایف در کنار هم قرار می‌گیرند تا بسته‌ای کاملاً قابل ممیزی برای مدیران ارشد مالی و فنی فراهم کنند. این نسخه فراتر از بررسی ساده فیدها حرکت می‌کند و استانداردهای جدیدی در گواهی صورت‌های مالی ایجاد می‌کند.
+
+# 3 - هر تصمیم به زنجیره HMAC متصل است
+
+هر تصمیمی که در سیستم گرفته می‌شود به یک زنجیره امن از رویدادها متصل می‌گردد تا هیچ تغییری پنهان نماند. داده‌ها پاکسازی شده و با الگوریتم‌های استاندارد امضا می‌شوند تاپارامترهای کلیدی مانند کلیدهای محرمانه افشا نشوند. این ساختار تضمین می‌کند که هرگونه دستکاری، حذف یا جابه‌جایی در رویدادها بلافاصله قابل شناسایی باشد و حتی تلاش‌های ناموفق برای دور زدن قوانین نیز ثبت می‌شوند.
+
+# 4 - AI پیشنهاد می‌دهد؛ انسان تصمیم می‌گیرد
+
+هوش مصنوعی در این سیستم تنها پیشنهاددهنده است و هرگز حق تغییر مستقیم دفاتر کل را ندارد. موتور تحلیل ما کاندیداها را با امتیازدهی دقیق آماده می‌کند، اما عبور از گیت‌های کنترلی نیازمند سیاست‌های سخت‌گیرانه، احراز هویت چندمرحله‌ای و تایید انسانی است. اصل اساسی طراحی ما این است که حتی بالاترین ضریب اطمینان هوش مصنوعی به تنهایی مجوزی برای تغییر داده‌های حسابداری نخواهد بود.
+
+# 5 - v2.8.0-a: پایه قابل‌اعتماد
+
+Moving into our rollout plan, version two point eight zero a establishes the reliable foundation we need before introducing any automated intelligence. We start with controlled imports featuring strict schema validation and provenances, routing invalid entries straight to quarantine. Exact matching enforces precise reference IDs and amounts without automatic ledger mutations. Every decision records its actor, timestamp, evidence hash, and policy version in an immutable history. Optimistic locking with compare and swap prevents reviewers from overwriting one another. Our exit gates require tested fixture imports, valid HMAC verification, and formal controller sign off during financial UAT.
+
+# 6 - v2.8.0-b: هوش توضیح‌پذیر
+
+With our foundation secured, version two point eight zero b introduces explainable intelligence that remains fully accountable. Every non-deterministic candidate proposal arrives with transparent scores and versioned rules, ensuring confidence scores never bypass ledger controls. Split matching links single statements to multiple valid ledger entries while strictly prohibiting over allocation. Our governance matrix routes high risk splits or currency variances to independent approvers, strictly preventing maker checker overlap. The exit gates demand complete test coverage of all invariants and active audit trails in the service layer. Artificial intelligence merely proposes options, while final acceptance remains firmly bound to strict permissions and human approval.
+
+# 7 - SoD در service layer اجرا می‌شود
+
+کنترل دسترسی و تفکیک وظایف مستقیماً در لایه سرویس اعمال می‌شود و به رابط کاربری واگذار نمی‌گردد. سیستم به دقت بررسی می‌کند که کاربر ثبت‌کننده خطا نمی‌تواند همان کسی باشد که آن را حل می‌کند. در صورت تلاش برای نقض این قوانین، درخواست بلافاصله رد شده و رویداد امنیتی مربوطه در زنجیره ممیزی ثبت می‌شود تا حاکمیت شرکتی به شکل کاملاً ساختاریافته حفظ گردد.
+
+# 8 - Split Matching: رابطه، نه سند جدید
+
+As we move from service layer enforcement, let us look at how Split Matching handles complex reconciliation without creating new records. We are establishing a clear relation between a single bank statement line and multiple existing ledger entries. Notice that the candidate allocation is strictly a proposal. It requires policy checks and human approval before any registration. We create no new entries, and we never alter original amounts or dates. Every single decision maintains idempotency and immutable evidence hashes. When discrepancies happen outside policy bounds, they trigger exceptions rather than forced matching. This keeps our ledger clean and fully auditable as we transition into robust validation policies.
+
+# 9 - Policy اختلاف را پنهان نمی‌کند
+
+Building on our strict split matching rules, we ensure that policy verification never conceals underlying discrepancies. Acceptance requires passing rigorous gates across amounts, currencies, policies, and actor independence. The sum of all allocations must match the statement line down to the exact minor currency unit. Versioned tolerances link directly to the decision evidence and policy history. Idempotency and optimistic concurrency completely prevent duplicate decisions or silent overrides. Any high risk split or FX variance routes directly to independent approvals. So when a discrepancy falls outside policy, we reject forced matching and route it to an exception workflow with an assigned owner.

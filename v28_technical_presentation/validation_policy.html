@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<style>
+body{margin:0}
+.slide-container{width:1280px;min-height:720px;box-sizing:border-box;background:#101f39;color:#f5f9ff;font-family:Tahoma,Arial,sans-serif}
+.inner{min-height:720px;box-sizing:border-box;padding:48px 72px 0;position:relative}
+.kicker{font-size:16px;color:#58d3c8;letter-spacing:.4px}
+.title{font-size:35px;font-weight:700;margin-top:12px}
+.sub{font-size:18px;color:#bbcfdd;margin-top:14px;line-height:1.65}
+.rule{width:212px;height:2px;background:#58d3c8;margin-top:16px}
+.gates{display:flex;direction:rtl;gap:12px;margin-top:52px;align-items:stretch}
+.gate{width:213px;min-height:260px;box-sizing:border-box;background:#152c4a;border-top:3px solid #84aefe;padding:22px 17px 0;position:relative}
+.gate.primary{border-top-color:#58d3c8;background:#153450}
+.index{font-size:15px;color:#58d3c8}
+.gate h3{font-size:20px;margin:17px 0 15px;color:#f5f9ff}
+.gate p{font-size:15.5px;line-height:1.75;color:#cfdeea;margin:0}
+.check{position:absolute;top:18px;left:16px;color:#58d3c8;font-size:22px}
+.bar{display:flex;gap:8px;direction:ltr;margin-top:28px}.bar span{height:5px;display:block;background:#294963;flex:1}.bar span.on{background:#58d3c8}
+.risk{margin-top:38px;min-height:92px;box-sizing:border-box;border:1px solid rgba(88,211,200,.48);background:rgba(88,211,200,.06);padding:18px 22px 0;display:flex;align-items:center;gap:28px}
+.risk strong{font-size:21px;color:#58d3c8;min-width:250px}.risk p{font-size:17px;line-height:1.6;color:#d4e6ed;margin:0}.risk b{color:#ffe0a3;font-weight:normal}
+</style>
+</head>
+<body>
+<div class="slide-container">
+  <div class="inner">
+    <div class="kicker">۶ · اعتبارسنجی و policy</div>
+    <div class="title">Policy اختلاف را پنهان نمی‌کند</div>
+    <div class="sub">پذیرش Split Match فقط زمانی ممکن است که گیت‌های مقدار، زمینه و استقلال تصمیم همگی پاس شوند.</div>
+    <div class="rule"></div>
+    <div class="gates">
+      <section class="gate primary"><div class="check">✓</div><div class="index">01 · مبلغ</div><h3>Allocation دقیق</h3><p>جمع allocationها باید دقیقاً با statement line برابر باشد؛ سهم منفی، صفر یا بیش‌ازظرفیت پذیرفته نیست.</p><div class="bar"><span class="on"></span><span class="on"></span><span></span></div></section>
+      <section class="gate"><div class="check">✓</div><div class="index">02 · ارز</div><h3>جهت و دقت</h3><p>sign جریان و currency باید سازگار باشند؛ دقت هر سهم بر اساس minor unit همان ارز کنترل می‌شود.</p><div class="bar"><span class="on"></span><span class="on"></span><span></span></div></section>
+      <section class="gate primary"><div class="check">✓</div><div class="index">03 · Policy</div><h3>Tolerance نسخه‌دار</h3><p>هر tolerance از policy فعال خوانده و همراه نسخه policy و دلیل تصمیم به evidence متصل می‌شود.</p><div class="bar"><span class="on"></span><span class="on"></span><span></span></div></section>
+      <section class="gate"><div class="check">✓</div><div class="index">04 · یکتایی</div><h3>Retry و Conflict</h3><p>idempotency مانع تصمیم تکراری است؛ optimistic concurrency اجازه overwrite reviewer دیگر را نمی‌دهد.</p><div class="bar"><span class="on"></span><span class="on"></span><span></span></div></section>
+      <section class="gate primary"><div class="check">✓</div><div class="index">05 · ریسک</div><h3>Approval مستقل</h3><p>split، FX، مبلغ بالا یا vendor پرریسک به approval مستقل و evidence بیشتر هدایت می‌شود.</p><div class="bar"><span class="on"></span><span class="on"></span><span></span></div></section>
+    </div>
+    <div class="risk"><strong>نتیجه کنترل</strong><p>اختلافی که policy آن را پوشش نمی‌دهد، <b>match اجباری</b> نیست؛ به exception با owner، SLA و مسیر approval تبدیل می‌شود.</p></div>
+  </div>
+</div>
+</body>
+</html>

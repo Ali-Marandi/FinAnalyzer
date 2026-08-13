@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<style>
+body{margin:0}
+.slide-container{width:1280px;min-height:720px;box-sizing:border-box;background:#101f39;color:#f5f9ff;font-family:Tahoma,Arial,sans-serif}
+.inner{min-height:720px;box-sizing:border-box;padding:48px 70px 0;position:relative}
+.kicker{font-size:16px;color:#58d3c8;letter-spacing:.4px}
+.title{font-size:35px;font-weight:700;margin-top:12px}
+.sub{font-size:18px;line-height:1.65;color:#bed1df;margin-top:14px}
+.rule{width:220px;height:2px;background:#58d3c8;margin-top:16px}
+.matrix{display:flex;direction:rtl;gap:10px;margin-top:40px;align-items:stretch}
+.lane{width:220px;min-height:294px;box-sizing:border-box;background:#152c4a;border-top:3px solid #58d3c8;padding:20px 16px 0;position:relative}
+.lane.blue{border-top-color:#87b1ff;background:#152e4d}
+.lane .num{font-size:14px;color:#58d3c8}.lane h3{font-size:19px;margin:15px 0 13px}.lane p{font-size:15px;line-height:1.62;color:#cdddea;margin:0}.evidence{position:absolute;right:16px;left:16px;bottom:18px;border-top:1px solid rgba(88,211,200,.34);padding-top:10px;color:#9fded8;font-size:13px;line-height:1.5}.blue .evidence{color:#b5ccff}
+.go{margin-top:32px;min-height:94px;box-sizing:border-box;border:1px solid rgba(88,211,200,.48);background:rgba(88,211,200,.06);display:flex;align-items:center;gap:25px;padding:16px 21px 0}.go-title{font-size:21px;font-weight:bold;color:#58d3c8;min-width:210px}.go p{font-size:16.5px;line-height:1.65;color:#d5e7ef;margin:0}.go b{color:#ffe1a6;font-weight:normal}
+</style>
+</head>
+<body>
+<div class="slide-container">
+  <div class="inner">
+    <div class="kicker">۱۰ · حاکمیت کیفیت انتشار</div>
+    <div class="title">کیفیت با Evidence سنجیده می‌شود</div>
+    <div class="sub">هر موج v2.8.0 فقط پس از عبور از گیت‌های مشترک طراحی، امنیت، ممیزی و درستی مالی آماده تصمیم انتشار است.</div>
+    <div class="rule"></div>
+    <div class="matrix">
+      <section class="lane"><div class="num">01 · Design</div><h3>Policy مصوب</h3><p>Scope، طبقه‌بندی داده، approval matrix، retention و threat model پیش از ساخت مشخص می‌شوند.</p><div class="evidence">ADR · policy version · threat-model review</div></section>
+      <section class="lane blue"><div class="num">02 · Migration</div><h3>داده قابل بازیابی</h3><p>Migration روی کپی production-like اجرا می‌شود؛ rollback و restore باید تمرین‌شده باشند.</p><div class="evidence">Migration log · restore record · idempotency test</div></section>
+      <section class="lane"><div class="num">03 · Security</div><h3>Supply Chain امن</h3><p>Dependency و secret gate، build integrity و findingهای مسدودکننده پیش از release بررسی می‌شوند.</p><div class="evidence">CI result · lockfile/SBOM · approved exception</div></section>
+      <section class="lane blue"><div class="num">04 · Audit</div><h3>زنجیره معتبر</h3><p>سناریوهای success، denial و failure باید HMAC chain معتبر و redaction کامل تولید کنند.</p><div class="evidence">Verification result · negative test · audit sample</div></section>
+      <section class="lane"><div class="num">05 · Finance</div><h3>درستی مالی</h3><p>Invariantهای amount و balance پاس می‌شوند و controller روی fixture کنترل‌شده UAT انجام می‌دهد.</p><div class="evidence">Reconciliation evidence · finance sign-off · rollback runbook</div></section>
+    </div>
+    <div class="go"><div class="go-title">تصمیم Go / No-Go</div><p><b>Go</b> فقط با evidence کامل، UAT مالی و مالک rollback مشخص صادر می‌شود. هر گیت مسدودکننده یا خطای تمامیت audit، تصمیم را به <b>No-Go</b> بازمی‌گرداند؛ سرعت انتشار جایگزین evidence نیست.</p></div>
+  </div>
+</div>
+</body>
+</html>

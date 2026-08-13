@@ -1,0 +1,144 @@
+{
+  "project_info": {
+    "title": "FinAnalyzer Enterprise v2.8.0",
+    "created": 1786663182.821,
+    "last_updated": 1786663259.124,
+    "total_slides": 12
+  },
+  "slides": [
+    {
+      "id": "cover",
+      "state": "edited",
+      "pageNum": 1
+    },
+    {
+      "id": "business_shift",
+      "state": "edited",
+      "pageNum": 2
+    },
+    {
+      "id": "human_governance",
+      "state": "edited",
+      "pageNum": 3
+    },
+    {
+      "id": "hmac_chain",
+      "state": "edited",
+      "pageNum": 4
+    },
+    {
+      "id": "sod_enforcement",
+      "state": "edited",
+      "pageNum": 5
+    },
+    {
+      "id": "split_matching",
+      "state": "edited",
+      "pageNum": 6
+    },
+    {
+      "id": "validation_policy",
+      "state": "edited",
+      "pageNum": 7
+    },
+    {
+      "id": "release_a",
+      "state": "edited",
+      "pageNum": 8
+    },
+    {
+      "id": "release_b",
+      "state": "edited",
+      "pageNum": 9
+    },
+    {
+      "id": "release_c",
+      "state": "edited",
+      "pageNum": 10
+    },
+    {
+      "id": "quality_evidence",
+      "state": "edited",
+      "pageNum": 11
+    },
+    {
+      "id": "decision",
+      "state": "edited",
+      "pageNum": 12
+    }
+  ],
+  "outline": [
+    {
+      "id": "cover",
+      "title": "FinAnalyzer Enterprise v2.8.0",
+      "summary": "جلد ارائه فنی: هوش تطبیق با کنترل انسانی، HMAC audit و Close مبتنی بر evidence.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "business_shift",
+      "title": "از Feed Review تا Statement Certification",
+      "summary": "چرا v2.8.0 شکاف میان bank feed کنترل‌شده و statement-certified close را هدف می‌گیرد.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "human_governance",
+      "title": "AI پیشنهاد می‌دهد؛ انسان تصمیم می‌گیرد",
+      "summary": "مرز روشن میان candidate explanation و mutation مجاز دفتر کل.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "hmac_chain",
+      "title": "هر تصمیم به زنجیره HMAC متصل است",
+      "summary": "HMAC-SHA256، canonical payload، previous hash، DPAPI key و verification.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "sod_enforcement",
+      "title": "SoD در service layer اجرا می‌شود",
+      "summary": "RBAC، MFA تازه، company scope و ثبت auditable denial برای self-resolution.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "split_matching",
+      "title": "Split Matching: رابطه، نه سند جدید",
+      "summary": "یک statement line در برابر چند ledger entry با allocationهای کنترل‌شده و بدون mutation خودکار.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "validation_policy",
+      "title": "Policy اختلاف را پنهان نمی‌کند",
+      "summary": "کنترل مبلغ، ارز، tolerance نسخه‌دار، idempotency، concurrency و approval براساس ریسک.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "release_a",
+      "title": "v2.8.0-a: پایه قابل‌اعتماد",
+      "summary": "Import، deterministic match، immutable history، optimistic locking و گیت‌های خروج.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "release_b",
+      "title": "v2.8.0-b: هوش توضیح‌پذیر",
+      "summary": "Candidate explanation، split matching، approval matrix و گیت‌های کیفیت SoD.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "release_c",
+      "title": "v2.8.0-c: Close قابل دفاع",
+      "summary": "Certification، exception SLA، evidence export، close race protection و گیت‌های خروج.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "quality_evidence",
+      "title": "کیفیت با Evidence سنجیده می‌شود",
+      "summary": "گیت‌های مشترک طراحی، امنیت، ممیزی، درستی مالی و release governance.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "decision",
+      "title": "تصمیم پیشنهادی: کنترل، سپس مقیاس",
+      "summary": "شروع discovery و policy workshop با rollout سه‌مرحله‌ای مبتنی بر UAT و evidence.",
+      "image_plan": "Use a suitable image if needed"
+    }
+  ]
+}

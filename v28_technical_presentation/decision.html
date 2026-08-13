@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<style>
+body{margin:0}
+.slide-container{width:1280px;min-height:720px;box-sizing:border-box;background:#101f39;color:#f5f9ff;font-family:Tahoma,Arial,sans-serif;position:relative}
+.grid{position:absolute;inset:0;background-image:linear-gradient(rgba(88,211,200,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(88,211,200,.045) 1px,transparent 1px);background-size:48px 48px}
+.inner{min-height:720px;box-sizing:border-box;padding:56px 76px 0;position:relative}
+.kicker{font-size:16px;color:#58d3c8;letter-spacing:.4px}
+.title{font-size:38px;font-weight:700;margin-top:13px;line-height:1.35}
+.lead{font-size:21px;line-height:1.75;color:#c9d9e6;margin-top:19px;width:545px}
+.lead b{color:#58d3c8}
+.content{display:flex;gap:58px;margin-top:43px;direction:rtl;align-items:flex-start}
+.message{width:370px;min-height:236px;box-sizing:border-box;border-top:3px solid #58d3c8;background:rgba(88,211,200,.07);padding:24px 23px 0}
+.message h3{font-size:22px;color:#d8fffa;margin:0 0 17px}.message p{font-size:17px;line-height:1.75;color:#d0e1ea;margin:0}.message .accent{color:#58d3c8;font-weight:bold}
+.timeline{width:660px;min-height:250px;display:flex;direction:rtl;gap:0;align-items:flex-start;padding-top:6px}
+.wave{width:210px;min-height:218px;box-sizing:border-box;position:relative;padding:0 18px 0 12px;border-right:1px solid rgba(133,174,254,.5)}
+.wave.first{border-right:3px solid #58d3c8}.wave:last-child{border-left:1px solid rgba(133,174,254,.5)}
+.dot{width:18px;height:18px;background:#58d3c8;border:4px solid #101f39;box-sizing:border-box;position:absolute;right:-10px;top:0}.wave:nth-child(2) .dot{background:#85adff}.wave:nth-child(3) .dot{background:#58d3c8}
+.wave .ver{font-size:16px;color:#58d3c8;margin-top:32px}.wave:nth-child(2) .ver{color:#9bbdff}.wave h3{font-size:20px;margin:12px 0;color:#f5f9ff}.wave p{font-size:15px;line-height:1.65;color:#c5d7e4;margin:0}
+.decision{position:absolute;right:76px;left:76px;bottom:44px;min-height:89px;box-sizing:border-box;border-top:1px solid rgba(88,211,200,.55);background:#152f4d;padding:17px 22px 0;display:flex;align-items:flex-start;gap:28px}.decision strong{font-size:20px;color:#58d3c8;min-width:205px}.decision span{font-size:17px;line-height:1.65;color:#d8e5ed}.decision b{color:#ffe0a3;font-weight:normal}
+</style>
+</head>
+<body>
+<div class="slide-container">
+  <div class="grid"></div>
+  <div class="inner">
+    <div class="kicker">۱۱ · تصمیم و گام بعدی</div>
+    <div class="title">تصمیم پیشنهادی: کنترل، سپس مقیاس</div>
+    <div class="lead">هوش مالی زمانی ارزش پایدار می‌سازد که <b>policy، evidence و تأیید انسان</b> پیش از اتوماسیون گسترده برقرار باشند.</div>
+    <div class="content">
+      <section class="message">
+        <h3>اکنون چه تصویب شود؟</h3>
+        <p>شروع discovery برای import statement و matching قطعی، هم‌زمان با policy workshop میان Finance، Security و Product.</p>
+        <p class="accent">هدف: تصمیم قابل دفاع، نه صرفاً match بیشتر.</p>
+      </section>
+      <section class="timeline">
+        <div class="wave first"><div class="dot"></div><div class="ver">v2.8.0-a</div><h3>پایه داده</h3><p>Import کنترل‌شده، deterministic match، immutable history و optimistic lock.</p></div>
+        <div class="wave"><div class="dot"></div><div class="ver">v2.8.0-b</div><h3>هوش توضیح‌پذیر</h3><p>Candidate explanation، Split Matching و approval matrix متناسب با ریسک.</p></div>
+        <div class="wave"><div class="dot"></div><div class="ver">v2.8.0-c</div><h3>Close قابل دفاع</h3><p>Certification، exception SLA، evidence export و re-check در Close Readiness.</p></div>
+      </section>
+    </div>
+    <div class="decision"><strong>معیار Go / No-Go</strong><span>عبور هر موج فقط پس از <b>UAT مالی، گیت امنیت و ممیزی، آزمون rollback و evidence قابل‌راستی‌آزمایی</b> انجام می‌شود؛ confidence مدل به‌تنهایی معیار انتشار نیست.</span></div>
+  </div>
+</div>
+</body>
+</html>
