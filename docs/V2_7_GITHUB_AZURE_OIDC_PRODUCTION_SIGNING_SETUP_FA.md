@@ -1,4 +1,4 @@
-# راه‌اندازی گام‌به‌گام GitHub OIDC و محیط `production-signing` — FinAnalyzer v2.6.1
+# راه‌اندازی گام‌به‌گام GitHub OIDC و محیط `production-signing` — FinAnalyzer v2.7.0
 
 این راهنما workflow موجود در `.github/workflows/release-sign.yml` را به Azure Artifact Signing و Microsoft Entra متصل می‌کند. پس از تکمیل، اجرای release از یک tag نسخه‌دار، EXE را روی Windows hosted runner می‌سازد، با SHA-256 امضا می‌کند، timestamp RFC 3161 می‌گیرد، signature را verify می‌کند و artifact، hash و evidence را به GitHub Release اضافه می‌کند.
 
@@ -115,7 +115,7 @@ jobs:
 
 ۱. ابتدا یک profile و environment جداگانه مانند `staging-signing` با certificate profile آزمایشی بسازید؛ environment production را برای آزمون‌های تکراری استفاده نکنید.
 
-۲. پس از عبور تست staging، یک tag immutable واقعی ایجاد کنید؛ مانند `v2.6.1`. این کار باید پس از review تغییرات و build evidence انجام شود.
+۲. پس از عبور تست staging، یک tag immutable واقعی ایجاد کنید؛ مانند `v2.7.0`. این کار باید پس از review تغییرات و build evidence انجام شود.
 
 ۳. در repository به **Actions → Signed Windows Release → Run workflow** بروید، tag واقعی را وارد کنید و اجرا را شروع کنید. job در انتظار approval محیط `production-signing` می‌ماند.
 
@@ -124,8 +124,8 @@ jobs:
 ۵. یک verifier مستقل، فایل را در Windows clean دانلود می‌کند و دستورهای زیر را اجرا می‌کند.
 
 ```powershell
-Get-FileHash .\FinAnalyzer_Enterprise_v2_6_1.exe -Algorithm SHA256
-Get-AuthenticodeSignature .\FinAnalyzer_Enterprise_v2_6_1.exe |
+Get-FileHash .\FinAnalyzer_Enterprise_v2_7_0.exe -Algorithm SHA256
+Get-AuthenticodeSignature .\FinAnalyzer_Enterprise_v2_7_0.exe |
   Format-List Status, SignerCertificate, TimeStamperCertificate
 ```
 

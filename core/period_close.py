@@ -18,6 +18,7 @@ from core.identity import AuthenticatedPrincipal, IdentityValidationError
 from core.models import (
     Account,
     AccountType,
+    BankReconciliationStatus,
     FiscalYear,
     JournalEntry,
     PeriodCloseRequest,
@@ -315,6 +316,25 @@ class PeriodCloseService:
                 "pending_bank_transactions", "blocker",
                 "Pending bank transactions must be resolved before closing the fiscal period.",
                 ",".join(pending_bank_ids),
+            ))
+
+        unresolved_bank_ids = list(session.scalars(
+            select(PlaidTransactionMapping.provider_transaction_id)
+            .join(PlaidItem, PlaidTransactionMapping.plaid_item_id == PlaidItem.id)
+            .where(
+                PlaidItem.company_id == company_id,
+                PlaidTransactionMapping.reconciliation_status.in_(
+                    (BankReconciliationStatus.NEEDS_REVIEW, BankReconciliationStatus.EXCEPTION)
+                ),
+            )
+            .order_by(PlaidTransactionMapping.id)
+            .limit(5)
+        ))
+        if unresolved_bank_ids:
+            findings.append(CloseReadinessFinding(
+                "unreconciled_bank_transactions", "blocker",
+                "Bank-feed transactions that need review or have an open exception must be reconciled before closing the fiscal period.",
+                ",".join(unresolved_bank_ids),
             ))
 
         verification = self.audit_logger.verify_chain(session)

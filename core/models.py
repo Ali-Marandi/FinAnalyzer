@@ -43,6 +43,14 @@ class TransactionStatus(str, enum.Enum):
     VOIDED = "voided"
 
 
+class BankReconciliationStatus(str, enum.Enum):
+    """Lifecycle of a bank-feed mapping before fiscal close may proceed."""
+    NEEDS_REVIEW = "needs_review"
+    MATCHED = "matched"
+    EXCEPTION = "exception"
+    REMOVED = "removed"
+
+
 class PeriodCloseRequestStatus(str, enum.Enum):
     PENDING = "pending"
     APPROVED = "approved"
@@ -295,6 +303,12 @@ class PlaidTransactionMapping(Base):
     provider_account_id: Mapped[Optional[str]] = mapped_column(String(128))
     journal_entry_id: Mapped[Optional[int]] = mapped_column(ForeignKey("journal_entries.id"), unique=True)
     pending: Mapped[bool] = mapped_column(Boolean, default=False)
+    reconciliation_status: Mapped[BankReconciliationStatus] = mapped_column(
+        SQLEnum(BankReconciliationStatus), default=BankReconciliationStatus.NEEDS_REVIEW, nullable=False, index=True
+    )
+    reconciliation_note: Mapped[Optional[str]] = mapped_column(String(500))
+    reconciled_by_user_id: Mapped[Optional[int]] = mapped_column(ForeignKey("users.id"), index=True)
+    reconciled_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
     raw_payload: Mapped[Optional[str]] = mapped_column(Text)
     imported_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

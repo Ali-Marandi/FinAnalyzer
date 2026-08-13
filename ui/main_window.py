@@ -15,6 +15,7 @@ from ui.pages.dashboard import DashboardPage
 from ui.pages.transactions import TransactionsPage
 from ui.pages.accounts import AccountsPage
 from ui.pages.banking import BankingPage
+from ui.pages.bank_reconciliation import BankReconciliationPage
 from ui.pages.reports import ReportsPage
 from ui.pages.forecasting import ForecastingPage
 from ui.pages.period_close import PeriodClosePage
@@ -30,7 +31,7 @@ class MainWindow(QMainWindow):
         self.app_instance = app_instance
         self.identity_service = None
         self.principal = None
-        self.setWindowTitle("FinAnalyzer Enterprise v2.6.1")
+        self.setWindowTitle("FinAnalyzer Enterprise v2.7.0")
         self.resize(1400, 900)
 
         self.init_ui()
@@ -89,6 +90,7 @@ class MainWindow(QMainWindow):
             "💳 Transactions",
             "📚 Chart of Accounts",
             "🏦 Bank Connections",
+            "🔎 Bank Reconciliation",
             "📑 Financial Reports",
             "🤖 AI Forecasting",
             "🔒 Period Close Controls",
@@ -153,6 +155,7 @@ class MainWindow(QMainWindow):
         self.transactions_page = TransactionsPage()
         self.accounts_page = AccountsPage()
         self.banking_page = BankingPage(principal=self.principal)
+        self.bank_reconciliation_page = BankReconciliationPage(principal=self.principal)
         self.reports_page = ReportsPage(principal=self.principal)
         self.forecasting_page = ForecastingPage()
         self.period_close_page = PeriodClosePage(principal=self.principal)
@@ -163,6 +166,7 @@ class MainWindow(QMainWindow):
         self.stack.addWidget(self.transactions_page)
         self.stack.addWidget(self.accounts_page)
         self.stack.addWidget(self.banking_page)
+        self.stack.addWidget(self.bank_reconciliation_page)
         self.stack.addWidget(self.reports_page)
         self.stack.addWidget(self.forecasting_page)
         self.stack.addWidget(self.period_close_page)
@@ -197,6 +201,7 @@ class MainWindow(QMainWindow):
             self.identity_service = IdentityService(database)
             self.principal = self.identity_service.sign_in_interactive()
             self.banking_page.set_principal(self.principal)
+            self.bank_reconciliation_page.set_principal(self.principal)
             self.reports_page.set_principal(self.principal)
             self.period_close_page.set_principal(self.principal)
             self.compliance_evidence_page.set_principal(self.principal)
@@ -220,6 +225,7 @@ class MainWindow(QMainWindow):
                 return
         self.principal = None
         self.banking_page.set_principal(None)
+        self.bank_reconciliation_page.set_principal(None)
         self.reports_page.set_principal(None)
         self.period_close_page.set_principal(None)
         self.compliance_evidence_page.set_principal(None)

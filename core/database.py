@@ -52,6 +52,7 @@ class DatabaseManager:
         Base.metadata.create_all(bind=self.engine)
         self._migrate_v24_audit_schema()
         self._migrate_v25_period_close_schema()
+        self._migrate_v27_bank_reconciliation_schema()
         self.bootstrap_enterprise_security()
 
     def _migrate_v24_audit_schema(self) -> None:
@@ -101,6 +102,27 @@ class DatabaseManager:
                 "CREATE UNIQUE INDEX IF NOT EXISTS uq_period_close_requests_active_v25 "
                 "ON period_close_requests(company_id, fiscal_year_id) "
                 "WHERE status IN ('PENDING', 'APPROVED')"
+            ))
+
+    def _migrate_v27_bank_reconciliation_schema(self) -> None:
+        """Add workflow state for bank-feed reconciliation without rewriting local history."""
+        inspector = inspect(self.engine)
+        if "plaid_transaction_mappings" not in inspector.get_table_names():
+            return
+        existing = {column["name"] for column in inspector.get_columns("plaid_transaction_mappings")}
+        additions = {
+            "reconciliation_status": "VARCHAR(32) NOT NULL DEFAULT 'NEEDS_REVIEW'",
+            "reconciliation_note": "VARCHAR(500)",
+            "reconciled_by_user_id": "INTEGER",
+            "reconciled_at": "DATETIME",
+        }
+        with self.engine.begin() as connection:
+            for name, sql_type in additions.items():
+                if name not in existing:
+                    connection.execute(text(f"ALTER TABLE plaid_transaction_mappings ADD COLUMN {name} {sql_type}"))
+            connection.execute(text(
+                "CREATE INDEX IF NOT EXISTS ix_plaid_mappings_reconciliation_v27 "
+                "ON plaid_transaction_mappings(reconciliation_status)"
             ))
 
     def bootstrap_enterprise_security(self) -> None:

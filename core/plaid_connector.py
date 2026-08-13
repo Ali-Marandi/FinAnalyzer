@@ -28,6 +28,7 @@ from core.models import (
     Account,
     AccountType,
     AuditLog,
+    BankReconciliationStatus,
     Company,
     JournalEntry,
     PlaidAccount,
@@ -402,6 +403,10 @@ class PlaidConnector:
                     self._assert_entry_not_locked(session, item.company_id, mapping.journal_entry)
                     mapping.journal_entry.status = TransactionStatus.VOIDED
                 mapping.pending = False
+                mapping.reconciliation_status = BankReconciliationStatus.REMOVED
+                mapping.reconciliation_note = "Provider removed this bank-feed transaction."
+                mapping.reconciled_by_user_id = None
+                mapping.reconciled_at = None
                 mapping.raw_payload = json.dumps({"removed": True, "transaction_id": provider_id})
                 counts["removed"] += 1
         return counts
@@ -466,6 +471,11 @@ class PlaidConnector:
         mapping.journal_entry_id = entry.id
         mapping.provider_account_id = provider_account_id
         mapping.pending = bool(record.get("pending"))
+        # Every new or provider-revised posting must be reviewed again before period close.
+        mapping.reconciliation_status = BankReconciliationStatus.NEEDS_REVIEW
+        mapping.reconciliation_note = None
+        mapping.reconciled_by_user_id = None
+        mapping.reconciled_at = None
         mapping.raw_payload = json.dumps(record, default=str, ensure_ascii=False)
         return True
 

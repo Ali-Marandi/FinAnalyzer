@@ -64,6 +64,8 @@ PERMISSION_CATALOG: dict[str, dict[str, Any]] = {
     "bank.link": {"description": "Initiate a bank connection", "sensitive": True},
     "bank.sync": {"description": "Synchronize a linked bank connection", "sensitive": False},
     "bank.unlink": {"description": "Revoke a linked bank connection", "sensitive": True},
+    "bank.reconcile.match": {"description": "Match a bank-feed transaction to a company account", "sensitive": True},
+    "bank.reconcile.exception.resolve": {"description": "Resolve a bank-feed reconciliation exception", "sensitive": True},
     "report.generate": {"description": "Generate a company report", "sensitive": False},
     "report.schedule.manage": {"description": "Create or change report schedules", "sensitive": True},
     "report.deliver.external": {"description": "Send reports to external recipients", "sensitive": True},
@@ -76,16 +78,17 @@ DEFAULT_ROLE_PERMISSIONS: dict[str, set[str]] = {
     "finance_manager": {
         "company.read", "ledger.read", "ledger.draft.create", "ledger.entry.post",
         "ledger.entry.void", "ledger.period.close.request", "account.manage", "bank.link", "bank.sync", "bank.unlink",
+        "bank.reconcile.match", "bank.reconcile.exception.resolve",
         "report.generate", "report.schedule.manage", "report.deliver.external", "audit.read", "compliance.evidence.export",
     },
-    "accountant": {"company.read", "ledger.read", "ledger.draft.create", "ledger.entry.post", "ledger.period.close.request", "report.generate", "bank.sync"},
+    "accountant": {"company.read", "ledger.read", "ledger.draft.create", "ledger.entry.post", "ledger.period.close.request", "report.generate", "bank.sync", "bank.reconcile.match"},
     "financial_controller": {
         "company.read", "ledger.read", "ledger.period.close.approve", "audit.read", "report.generate",
-        "compliance.evidence.export",
+        "compliance.evidence.export", "bank.reconcile.match", "bank.reconcile.exception.resolve",
     },
     "analyst": {"company.read", "ledger.read", "report.generate"},
     "auditor": {"company.read", "ledger.read", "audit.read", "compliance.evidence.export"},
-    "bank_operator": {"company.read", "ledger.read", "bank.link", "bank.sync"},
+    "bank_operator": {"company.read", "ledger.read", "bank.link", "bank.sync", "bank.reconcile.match"},
     "viewer": {"company.read", "ledger.read", "report.generate"},
 }
 
