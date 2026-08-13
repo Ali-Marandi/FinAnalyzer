@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<style>
+  body{margin:0}
+  .slide-container{width:1280px;min-height:720px;box-sizing:border-box;background:#101f39;color:#f5f9ff;font-family:Tahoma,Arial,sans-serif;position:relative;overflow:hidden}
+  .accent{position:absolute;right:92px;top:70px;width:86px;height:5px;background:#58d3c8}
+  .title{position:absolute;right:92px;top:99px;font-size:34px;font-weight:800}
+  .subtitle{position:absolute;right:92px;top:151px;color:#9fb2ca;font-size:18px}
+  .flow{position:absolute;right:92px;top:225px;width:480px;height:290px}
+  .stage{height:84px;border-top:1px solid #365070;display:grid;grid-template-columns:104px 1fr;align-items:center}
+  .badge{width:56px;height:56px;border:1px solid #58d3c8;color:#58d3c8;text-align:center;line-height:56px;font-weight:800;font-size:21px}
+  .stage h3{margin:0;color:#58d3c8;font-size:21px}.stage p{margin:7px 0 0;color:#c4d1e2;font-size:16px;line-height:1.45}
+  .chain-zone{position:absolute;left:88px;top:207px;width:510px;height:350px;border:1px solid #365070;box-sizing:border-box}
+  .chain-title{position:absolute;right:24px;top:23px;color:#c4d1e2;font-size:18px}.node{position:absolute;width:118px;height:92px;border:1px solid #58d3c8;box-sizing:border-box;text-align:center;padding-top:18px}.node b{display:block;color:#58d3c8;font-size:18px}.node span{display:block;color:#b9c7d9;font-size:13px;margin-top:8px}.n1{right:30px;top:104px}.n2{right:195px;top:104px}.n3{right:360px;top:104px}.link{position:absolute;top:149px;width:46px;border-top:1px solid #58d3c8}.l1{right:148px}.l2{right:313px}.checkpoint{position:absolute;left:96px;top:242px;width:316px;border-top:1px solid #58d3c8;color:#c4d1e2;font-size:15px;padding-top:14px;text-align:center}.checkpoint strong{color:#58d3c8}.limitation{position:absolute;right:92px;left:88px;bottom:66px;border-top:1px solid #8e6e34;color:#d9c8a7;font-size:16px;line-height:1.6;padding-top:14px}.limitation strong{color:#f3c56b}.footer{position:absolute;right:92px;bottom:30px;color:#7890af;font-size:14px}
+</style>
+</head>
+<body>
+<div class="slide-container">
+  <div class="accent"></div>
+  <div class="title">تمامیت evidence با DPAPI و HMAC-SHA256</div>
+  <div class="subtitle">کلید محافظت‌شده، payload استاندارد و زنجیره رخدادها، تغییر محلی را قابل‌تشخیص می‌سازند.</div>
+  <div class="flow">
+    <div class="stage"><div class="badge">۱</div><div><h3>حفاظت کلید</h3><p>کلید ۳۲ بایتی audit در Windows با DPAPI و context کاربر/دستگاه نگهداری می‌شود.</p></div></div>
+    <div class="stage"><div class="badge">۲</div><div><h3>امضای رخداد</h3><p>details پس از redaction، در JSON canonical با HMAC-SHA256 امضا می‌شوند.</p></div></div>
+    <div class="stage"><div class="badge">۳</div><div><h3>اعتبارسنجی زنجیره</h3><p>sequence، previous_hash، event_hash و checkpoint در `verify_chain()` بررسی می‌شوند.</p></div></div>
+  </div>
+  <div class="chain-zone">
+    <div class="chain-title">زنجیره قابل‌راستی‌آزمایی رخدادها</div>
+    <div class="node n1"><b>Event 1</b><span>GENESIS_HASH</span></div><div class="link l1"></div>
+    <div class="node n2"><b>Event 2</b><span>previous_hash</span></div><div class="link l2"></div>
+    <div class="node n3"><b>Event 3</b><span>previous_hash</span></div>
+    <div class="checkpoint"><strong>AuditChainState</strong><br>last_sequence · last_hash · key_id</div>
+  </div>
+  <div class="limitation"><strong>محدودیت شفاف:</strong> این مدل tamper-evident محلی است؛ برای مقاومت در برابر compromise کامل workstation، head hash و Evidence Pack باید به SIEM یا WORM مستقل منتقل شوند.</div>
+  <div class="footer">DPAPI protects key-at-rest · HMAC protects event integrity</div>
+</div>
+</body>
+</html>

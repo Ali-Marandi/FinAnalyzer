@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<style>
+body{margin:0}
+.slide-container{width:1280px;min-height:720px;box-sizing:border-box;background:#101f39;color:#f5f9ff;font-family:Tahoma,Arial,sans-serif;position:relative;overflow:hidden}
+.accent{position:absolute;right:92px;top:70px;width:84px;height:5px;background:#58d3c8}.title{position:absolute;right:92px;top:100px;font-size:35px;font-weight:800}.lead{position:absolute;right:92px;top:156px;font-size:20px;color:#c4d1e2}.gate{position:absolute;right:92px;top:232px;width:175px;height:290px;border:1px solid #58d3c8;box-sizing:border-box;text-align:center;padding-top:85px}.gate b{font-size:28px;color:#58d3c8;display:block}.gate span{font-size:16px;color:#9db0c9;display:block;line-height:1.55;margin-top:13px}.flow{position:absolute;right:310px;top:270px;width:830px;height:220px;border-top:1px solid #365070}.item{position:absolute;top:-1px;width:145px;border-top:5px solid #e97870;padding-top:16px}.item h3{font-size:19px;color:#f5f9ff;margin:0 0 12px}.item p{font-size:15px;color:#9fb2ca;line-height:1.55;margin:0}.i1{right:0}.i2{right:170px}.i3{right:340px}.i4{right:510px}.i5{right:680px}.recheck{position:absolute;right:310px;bottom:110px;width:830px;font-size:23px;color:#58d3c8;font-weight:700;border-top:1px solid #365070;padding-top:20px}.recheck span{font-size:17px;color:#c4d1e2;font-weight:400;margin-right:12px}.footer{position:absolute;right:92px;bottom:44px;color:#7890af;font-size:15px}
+</style>
+</head>
+<body>
+<div class="slide-container">
+  <div class="accent"></div>
+  <div class="title">آمادگی close یک gate قابل‌توضیح است</div>
+  <div class="lead">هر blocker دلیل، reference و مسیر رفع دارد؛ نتیجه صرفاً یک پیام «مجاز/غیرمجاز» نیست.</div>
+  <div class="gate"><b>READY?</b><span>فقط پس از عبور تمام کنترل‌ها، workflow می‌تواند به close نزدیک شود.</span></div>
+  <div class="flow">
+    <div class="item i1"><h3>دوره مالی</h3><p>دوره باید در scope شرکت وجود داشته و هنوز قفل نشده باشد.</p></div>
+    <div class="item i2"><h3>حساب close</h3><p>حساب retained earnings باید فعال، Equity و هم‌شرکت باشد.</p></div>
+    <div class="item i3"><h3>دفتر</h3><p>هر journal entry در بازه باید debit و credit متوازن داشته باشد.</p></div>
+    <div class="item i4"><h3>بانک</h3><p>pending transactionهای بانک باید پیش از قفل دوره تعیین تکلیف شوند.</p></div>
+    <div class="item i5"><h3>audit chain</h3><p>تمامیت زنجیره باید با verify_chain تأیید شود.</p></div>
+  </div>
+  <div class="recheck">بازبینی مجدد پیش از approval <span>وضعیت request در گذشته، جایگزین کنترل وضعیت فعلی نیست.</span></div>
+  <div class="footer">Close Readiness Controls · v2.6.0</div>
+</div>
+</body>
+</html>

@@ -18,6 +18,7 @@ from ui.pages.banking import BankingPage
 from ui.pages.reports import ReportsPage
 from ui.pages.forecasting import ForecastingPage
 from ui.pages.period_close import PeriodClosePage
+from ui.pages.compliance_evidence import ComplianceEvidencePage
 from ui.pages.settings import SettingsPage
 from ui.theme import ThemeManager
 from core.database import DatabaseManager
@@ -29,7 +30,7 @@ class MainWindow(QMainWindow):
         self.app_instance = app_instance
         self.identity_service = None
         self.principal = None
-        self.setWindowTitle("FinAnalyzer Enterprise v2.6.0")
+        self.setWindowTitle("FinAnalyzer Enterprise v2.6.1")
         self.resize(1400, 900)
 
         self.init_ui()
@@ -91,6 +92,7 @@ class MainWindow(QMainWindow):
             "📑 Financial Reports",
             "🤖 AI Forecasting",
             "🔒 Period Close Controls",
+            "🛡️ Compliance Evidence",
             "⚙️ Settings"
         ]
         for item_text in nav_items:
@@ -154,6 +156,7 @@ class MainWindow(QMainWindow):
         self.reports_page = ReportsPage(principal=self.principal)
         self.forecasting_page = ForecastingPage()
         self.period_close_page = PeriodClosePage(principal=self.principal)
+        self.compliance_evidence_page = ComplianceEvidencePage(principal=self.principal)
         self.settings_page = SettingsPage(theme_toggle_callback=self.change_theme)
 
         self.stack.addWidget(self.dashboard_page)
@@ -163,6 +166,7 @@ class MainWindow(QMainWindow):
         self.stack.addWidget(self.reports_page)
         self.stack.addWidget(self.forecasting_page)
         self.stack.addWidget(self.period_close_page)
+        self.stack.addWidget(self.compliance_evidence_page)
         self.stack.addWidget(self.settings_page)
 
         right_layout.addWidget(self.stack)
@@ -195,6 +199,7 @@ class MainWindow(QMainWindow):
             self.banking_page.set_principal(self.principal)
             self.reports_page.set_principal(self.principal)
             self.period_close_page.set_principal(self.principal)
+            self.compliance_evidence_page.set_principal(self.principal)
             self.identity_label.setText(f"Enterprise session: user #{self.principal.user_id} | {self.principal.provider_code}")
             self.sign_in_button.setEnabled(False)
             self.sign_out_button.setEnabled(True)
@@ -217,6 +222,7 @@ class MainWindow(QMainWindow):
         self.banking_page.set_principal(None)
         self.reports_page.set_principal(None)
         self.period_close_page.set_principal(None)
+        self.compliance_evidence_page.set_principal(None)
         self.identity_label.setText("Enterprise session: not signed in")
         self.sign_in_button.setEnabled(True)
         self.sign_out_button.setEnabled(False)

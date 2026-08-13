@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<style>
+  /* remove default body margin so slide top aligns to 0, then nudge up 1px to make total <720 */
+  body{margin:0;padding:0}
+  .slide-container{width:1280px;min-height:720px;box-sizing:border-box;background:#101f39;color:#f5f9ff;font-family:Tahoma,Arial,sans-serif;position:relative;overflow:hidden;margin-top:-1px}
+  .accent{position:absolute;right:92px;top:70px;width:82px;height:5px;background:#58d3c8}
+  .title{position:absolute;right:92px;top:99px;font-size:34px;font-weight:800}
+  .subtitle{position:absolute;right:92px;top:151px;color:#9fb2ca;font-size:18px}
+  .input{position:absolute;right:92px;top:255px;width:185px;height:126px;border:1px solid #58d3c8;box-sizing:border-box;text-align:center;padding-top:28px}
+  .input strong{display:block;color:#58d3c8;font-size:21px}.input span{display:block;color:#c4d1e2;font-size:15px;line-height:1.6;margin-top:8px}
+  .arrow{position:absolute;right:292px;top:315px;width:48px;height:1px;background:#58d3c8}.arrow:after{content:"";position:absolute;left:0;top:-4px;border-top:4px solid transparent;border-bottom:4px solid transparent;border-right:7px solid #58d3c8}
+  .transaction{position:absolute;right:360px;top:225px;width:685px;height:198px;border-top:1px solid #365070;border-bottom:1px solid #365070;box-sizing:border-box}
+  .transaction-label{position:absolute;right:0;top:-28px;font-size:15px;color:#58d3c8;letter-spacing:.5px}
+  .items{position:absolute;right:0;top:35px;width:685px;display:grid;grid-template-columns:repeat(4,1fr);gap:0}
+  .item{height:118px;border-left:1px solid #365070;box-sizing:border-box;text-align:center;padding-top:20px}.item:last-child{border-left:none}.item b{display:block;color:#f5f9ff;font-size:19px}.item small{display:block;color:#91a8c4;font-size:14px;line-height:1.55;margin-top:10px}
+  .atomic{position:absolute;left:92px;top:254px;width:105px;height:126px;border:1px solid #58d3c8;color:#58d3c8;box-sizing:border-box;text-align:center;padding-top:22px;font-size:18px;font-weight:700;line-height:1.55}.atomic span{display:block;color:#c4d1e2;font-size:13px;font-weight:400;margin-top:7px}
+  .rule{position:absolute;right:92px;left:92px;top:490px;height:116px;border-top:1px solid #365070;border-bottom:1px solid #365070;display:grid;grid-template-columns:265px 1fr 1fr 1fr;box-sizing:border-box}
+  .rule-head{color:#ffb4b4;font-size:21px;font-weight:800;padding-top:35px}.rule-head span{display:block;font-size:14px;color:#c4d1e2;font-weight:400;margin-top:6px}.rule-cell{border-right:1px solid #365070;text-align:center;padding-top:33px;font-size:19px}.rule-cell b{display:block;color:#ffb4b4;font-size:17px}.rule-cell small{display:block;color:#9fb2ca;font-size:14px;margin-top:8px}
+  .footer{position:absolute;right:92px;bottom:38px;color:#7890af;font-size:15px}
+</style>
+</head>
+<body>
+<div class="slide-container">
+  <div class="accent"></div>
+  <div class="title">Sync بانکی اتمیک و idempotent</div>
+  <div class="subtitle">سینک فقط زمانی موفق است که همه اثرهای accounting و tracking با هم commit شوند.</div>
+  <div class="input"><strong>Provider payload</strong><span>added / modified / removed<br>provider transaction ID</span></div>
+  <div class="arrow"></div>
+  <div class="transaction"><div class="transaction-label">یک database transaction واحد</div><div class="items"><div class="item"><b>Journal entry</b><small>ثبت متوازن در ledger</small></div><div class="item"><b>Transaction lines</b><small>debit و credit مرتبط</small></div><div class="item"><b>Mapping</b><small>کلید یکتای provider</small></div><div class="item"><b>Cursor</b><small>پیشروی فقط پس از commit</small></div></div></div>
+  <div class="atomic">همه یا هیچ<span>failure → rollback کامل<br>retry → بدون entry تکراری</span></div>
+  <div class="rule"><div class="rule-head">دوره مالی بسته<span>mutation پیش از هر تغییر متوقف می‌شود</span></div><div class="rule-cell"><b>Created</b><small>entry جدید ثبت نمی‌شود</small></div><div class="rule-cell"><b>Modified</b><small>entry قبلی void نمی‌شود</small></div><div class="rule-cell"><b>Removed</b><small>mapping و cursor تغییر نمی‌کنند</small></div></div>
+  <div class="footer">Atomicity protects ledger integrity; idempotency protects against provider retries.</div>
+</div>
+</body>
+</html>

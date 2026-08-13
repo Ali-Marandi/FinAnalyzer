@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<style>
+body{margin:0}
+.slide-container{width:1280px;min-height:720px;box-sizing:border-box;background:#101f39;color:#f5f9ff;font-family:Tahoma,Arial,sans-serif;position:relative;overflow:hidden}
+.accent{position:absolute;right:92px;top:70px;width:82px;height:5px;background:#58d3c8}.title{position:absolute;right:92px;top:99px;font-size:34px;font-weight:800}.subtitle{position:absolute;right:92px;top:151px;color:#a8bad1;font-size:18px}.coverage{position:absolute;right:92px;left:92px;top:237px;height:260px;display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid #365070;border-bottom:1px solid #365070}.pillar{position:relative;border-left:1px solid #365070;padding-top:31px;box-sizing:border-box}.pillar:last-child{border-left:none}.marker{width:40px;height:40px;border:1px solid #58d3c8;color:#58d3c8;line-height:40px;text-align:center;font-size:19px;font-weight:800;margin-right:25px}.pillar h3{font-size:21px;margin:17px 25px 0;color:#f5f9ff}.pillar p{font-size:15px;line-height:1.7;color:#aebfd4;margin:11px 25px 0;width:175px}.test{position:absolute;right:25px;bottom:22px;color:#58d3c8;font-size:14px;font-weight:700}.test.warn{color:#ffb4b4}.accept{position:absolute;right:92px;left:92px;top:548px;height:78px;border-top:1px solid #58d3c8;display:grid;grid-template-columns:270px 1fr;align-items:center}.accept h4{color:#58d3c8;font-size:20px;margin:0}.accept p{color:#c4d1e2;font-size:17px;line-height:1.55;margin:0}.footer{position:absolute;right:92px;bottom:35px;color:#7890af;font-size:15px}
+</style>
+</head>
+<body>
+<div class="slide-container">
+  <div class="accent"></div>
+  <div class="title">پوشش آزمون تا مرز rollback</div>
+  <div class="subtitle">Regression suite فقط مسیر موفق را نمی‌سنجد؛ policy denial، tamper و mutation نیمه‌کاره نیز باید قابل‌تشخیص باشند.</div>
+  <div class="coverage">
+    <div class="pillar"><div class="marker">۱</div><h3>Identity و MFA</h3><p>token منقضی، کاربر provision‌نشده و MFA قدیمی پیش از ایجاد session یا عملیات حساس رد می‌شوند.</p><div class="test">SESSION + ASSURANCE</div></div>
+    <div class="pillar"><div class="marker">۲</div><h3>SoD و Scope</h3><p>self-approval، self-rejection، permission precedence و دسترسی خارج از شرکت مجاز نیستند.</p><div class="test">DENY-BY-DEFAULT</div></div>
+    <div class="pillar"><div class="marker">۳</div><h3>Bank Atomicity</h3><p>created، modified و removed در دوره بسته قبل از mutation متوقف می‌شوند.</p><div class="test warn">ROLLBACK: ENTRY · MAPPING · CURSOR</div></div>
+    <div class="pillar"><div class="marker">۴</div><h3>Audit Integrity</h3><p>تغییر event، sequence یا hash در verify_chain آشکار و close/export را مسدود می‌کند.</p><div class="test">TAMPER DETECTION</div></div>
+    <div class="pillar"><div class="marker">۵</div><h3>Evidence Export</h3><p>permission، MFA، manifest hash و redaction پیش از تحویل بسته انطباقی کنترل می‌شوند.</p><div class="test">VERIFIED MANIFEST</div></div>
+  </div>
+  <div class="accept"><h4>معیار پذیرش</h4><p>در هر failure، state مالی و بانکی یا تغییر نمی‌کند یا به‌طور کامل rollback می‌شود؛ chain audit نیز پس از مسیرهای مجاز معتبر باقی می‌ماند.</p></div>
+  <div class="footer">Test policy → Failure behavior → Evidence of control</div>
+</div>
+</body>
+</html>

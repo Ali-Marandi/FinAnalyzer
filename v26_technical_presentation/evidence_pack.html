@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<style>
+body{margin:0}
+.slide-container{width:1280px;min-height:720px;box-sizing:border-box;background:#101f39;color:#f5f9ff;font-family:Tahoma,Arial,sans-serif;position:relative;overflow:hidden}
+.accent{position:absolute;right:92px;top:70px;width:82px;height:5px;background:#58d3c8}.title{position:absolute;right:92px;top:98px;font-size:34px;font-weight:800}.subtitle{position:absolute;right:92px;top:150px;color:#a8bad1;font-size:18px}.pipeline{position:absolute;right:92px;top:248px;width:850px;height:250px;display:flex;flex-direction:row;gap:0;direction:rtl}.stage{width:200px;height:205px;border-top:2px solid #365070;position:relative;padding-top:26px;box-sizing:border-box}.stage:after{content:"";position:absolute;left:-22px;top:91px;width:43px;height:2px;background:#58d3c8}.stage:last-child:after{display:none}.number{color:#58d3c8;font-size:16px;font-weight:700;letter-spacing:1px}.stage-title{font-size:22px;font-weight:800;margin-top:14px}.stage-text{font-size:16px;line-height:1.65;color:#b8c8db;margin-top:12px;width:170px}.hash{position:absolute;right:92px;bottom:96px;width:850px;border-top:1px solid #365070;padding-top:20px;box-sizing:border-box;font-size:17px;color:#c4d1e2}.hash b{color:#58d3c8}.destination{position:absolute;left:88px;top:236px;width:220px;height:305px;border:1px solid #58d3c8;box-sizing:border-box;text-align:center;padding-top:56px}.destination .icon{font-size:42px;color:#58d3c8;font-weight:700}.destination .label{font-size:23px;font-weight:800;margin-top:15px}.destination .text{font-size:15px;line-height:1.65;color:#b8c8db;margin-top:16px;padding-right:20px;padding-left:20px}.arrow{position:absolute;left:293px;top:385px;color:#58d3c8;font-size:30px}.footer{position:absolute;right:92px;bottom:45px;color:#7890af;font-size:15px}
+</style>
+</head>
+<body>
+<div class="slide-container">
+  <div class="accent"></div>
+  <div class="title">Evidence Pack قابل‌انتقال</div>
+  <div class="subtitle">Export یک فایل نیست؛ یک فرآیند کنترل‌شده برای تبدیل evidence محلی به شواهد قابل‌نگهداری سازمانی است.</div>
+  <div class="pipeline">
+    <div class="stage"><div class="number">01 / ACCESS</div><div class="stage-title">MFA و RBAC</div><div class="stage-text">کاربر باید session معتبر، MFA تازه و permission صریح export داشته باشد.</div></div>
+    <div class="stage"><div class="number">02 / VERIFY</div><div class="stage-title">Verify Chain</div><div class="stage-text">زنجیره HMAC کامل بررسی می‌شود؛ tamper یا checkpoint نامعتبر export را متوقف می‌کند.</div></div>
+    <div class="stage"><div class="number">03 / PACKAGE</div><div class="stage-title">Company Evidence</div><div class="stage-text">رخدادهای audit، سال‌های مالی و تاریخچه Period Close در JSON جدا می‌شوند.</div></div>
+    <div class="stage"><div class="number">04 / MANIFEST</div><div class="stage-title">SHA-256 Manifest</div><div class="stage-text">هش هر فایل، head hash و sequence برای verify مستقل ثبت می‌شود.</div></div>
+  </div>
+  <div class="arrow">←</div>
+  <div class="destination"><div class="icon">◆</div><div class="label">مقصد مستقل</div><div class="text">SIEM، DMS یا WORM سازمانی<br>دیسک محلی مقصد نهایی evidence نیست.</div></div>
+  <div class="hash"><b>نتیجه عملیاتی:</b> اگر audit chain نامعتبر باشد، هیچ بسته قابل‌استفاده‌ای تولید نمی‌شود؛ اگر معتبر باشد، خود export نیز به‌عنوان رخداد انطباقی ثبت می‌گردد.</div>
+  <div class="footer">Access → Verify → Package → Manifest → Retain</div>
+</div>
+</body>
+</html>

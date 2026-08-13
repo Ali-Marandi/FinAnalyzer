@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<style>
+body{margin:0}
+.slide-container{width:1280px;min-height:720px;box-sizing:border-box;background:#0b1830;color:#f5f9ff;font-family:Tahoma,Arial,sans-serif;position:relative;overflow:hidden}
+.side{position:absolute;right:0;top:0;width:8px;min-height:720px;background:#58d3c8}.accent{position:absolute;right:92px;top:73px;width:88px;height:5px;background:#58d3c8}.title{position:absolute;right:92px;top:102px;font-size:38px;font-weight:800}.lead{position:absolute;right:92px;top:161px;width:790px;color:#c4d1e2;font-size:21px;line-height:1.7}.steps{position:absolute;right:92px;left:92px;top:280px;height:220px;display:grid;grid-template-columns:repeat(3,1fr);gap:0}.step{border-top:1px solid #365070;border-left:1px solid #365070;box-sizing:border-box;padding-top:24px;padding-right:24px}.step:last-child{border-left:none}.num{color:#58d3c8;font-size:17px;font-weight:800;letter-spacing:1px}.step h3{font-size:24px;margin:13px 0;color:#f5f9ff}.step p{width:285px;color:#aebed2;font-size:16px;line-height:1.65;margin:0}.success{position:absolute;right:92px;left:92px;top:555px;height:83px;border-top:1px solid #c99b43;border-bottom:1px solid #c99b43;box-sizing:border-box;display:grid;grid-template-columns:240px 1fr;align-items:center}.success b{color:#f3c56b;font-size:20px}.success span{color:#e4ebf4;font-size:18px;line-height:1.5}.footer{position:absolute;right:92px;bottom:34px;color:#7890af;font-size:15px}
+</style>
+</head>
+<body>
+<div class="slide-container">
+  <div class="side"></div><div class="accent"></div>
+  <div class="title">تصمیم اجرایی بعدی</div>
+  <div class="lead">v2.6.0 کنترل‌های محلی قابل‌راستی‌آزمایی را آماده کرده است. حرکت بعدی، اتصال این کنترل‌ها به یک مسیر انتشار و نگهداری evidence مستقلِ سازمانی است.</div>
+  <div class="steps">
+    <div class="step"><div class="num">01 / PRODUCTION-SIGNING</div><h3>پیکربندی OIDC</h3><p>Azure Artifact Signing، Entra federated credential و GitHub Environment با approval مستقل تکمیل شوند؛ private key وارد CI نشود.</p></div>
+    <div class="step"><div class="num">02 / STAGING RELEASE</div><h3>امضای نخستین artifact</h3><p>یک tag کنترل‌شده در staging ساخته، EXE با Authenticode و RFC 3161 timestamp امضا و روی Windows clean verify شود.</p></div>
+    <div class="step"><div class="num">03 / EXTERNAL RETENTION</div><h3>انتخاب مقصد evidence</h3><p>SIEM، DMS یا WORM مورد تأیید سازمان برای Evidence Pack و audit-chain head انتخاب و policy retention تعریف شود.</p></div>
+  </div>
+  <div class="success"><b>معیار موفقیت</b><span>close بدون exception پنهان، artifact قابل‌راستی‌آزمایی خارج از runner، و evidence قابل دفاع خارج از دیسک محلی.</span></div>
+  <div class="footer">FinAnalyzer Enterprise v2.6.0 · Build trust into financial operations</div>
+</div>
+</body>
+</html>

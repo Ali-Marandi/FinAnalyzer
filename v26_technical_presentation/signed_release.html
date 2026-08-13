@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<style>
+body{margin:0}
+.slide-container{width:1280px;min-height:720px;box-sizing:border-box;background:#101f39;color:#f5f9ff;font-family:Tahoma,Arial,sans-serif;position:relative;overflow:hidden}
+.accent{position:absolute;right:92px;top:70px;width:84px;height:5px;background:#58d3c8}.title{position:absolute;right:92px;top:98px;font-size:34px;font-weight:800}.subtitle{position:absolute;right:92px;top:151px;color:#a8bad1;font-size:18px}.pipeline{position:absolute;right:92px;top:247px;width:1096px;height:190px;display:grid;grid-template-columns:repeat(5,1fr);direction:rtl}.stage{height:168px;border-top:2px solid #365070;position:relative;padding-top:22px;box-sizing:border-box}.stage:not(:last-child):after{content:"←";position:absolute;left:-16px;top:59px;color:#58d3c8;font-size:28px}.step{color:#58d3c8;font-size:15px;font-weight:700;letter-spacing:.8px}.stage h3{margin:12px 0 0;font-size:21px}.stage p{width:180px;margin:12px 0 0;font-size:15px;line-height:1.6;color:#bdcbdd}.guard{position:absolute;right:92px;left:92px;top:505px;height:105px;border-top:1px solid #365070;border-bottom:1px solid #365070;display:grid;grid-template-columns:repeat(4,1fr);box-sizing:border-box}.guard-item{font-size:16px;line-height:1.5;color:#c4d1e2;padding-top:26px;padding-right:18px;box-sizing:border-box;border-left:1px solid #365070}.guard-item:last-child{border-left:none}.guard-item b{display:block;color:#58d3c8;font-size:18px;margin-bottom:6px}.note{position:absolute;right:92px;bottom:42px;color:#e7bd63;font-size:15px}.footer{position:absolute;left:92px;bottom:42px;color:#7890af;font-size:14px}
+</style>
+</head>
+<body>
+<div class="slide-container">
+  <div class="accent"></div>
+  <div class="title">Release امضاشده بدون private key در CI</div>
+  <div class="subtitle">کلید امضا در repository، PFX، command line یا GitHub runner نگهداری نمی‌شود.</div>
+  <div class="pipeline">
+    <div class="stage"><div class="step">01 / REF</div><h3>Release Tag</h3><p>تنها tag semantic و commit منطبق با tag برای build پذیرفته می‌شوند.</p></div>
+    <div class="stage"><div class="step">02 / BUILD</div><h3>Windows Runner</h3><p>build، dependency gate و test suite در runner میزبانی‌شده اجرا می‌شوند.</p></div>
+    <div class="stage"><div class="step">03 / IDENTITY</div><h3>GitHub OIDC</h3><p>JWT کوتاه‌عمر با Microsoft Entra برای token محدود مبادله می‌شود.</p></div>
+    <div class="stage"><div class="step">04 / SIGN</div><h3>Artifact Signing</h3><p>Azure، Authenticode با SHA-256 و RFC 3161 timestamp را اعمال می‌کند.</p></div>
+    <div class="stage"><div class="step">05 / VERIFY</div><h3>Evidence Release</h3><p>EXE، SHA-256 و signer/timestamp evidence برای verifier مستقل منتشر می‌شوند.</p></div>
+  </div>
+  <div class="guard">
+    <div class="guard-item"><b>Environment Approval</b>`production-signing` به reviewer مستقل و منع self-review وابسته است.</div>
+    <div class="guard-item"><b>Immutable Actions</b>Actionهای workflow روی SHA ثابت pin شده‌اند تا tag متحرک supply-chain نشود.</div>
+    <div class="guard-item"><b>Timestamp Verify</b>`signtool verify /tw` و Authenticode status، signature و RFC 3161 را کنترل می‌کنند.</div>
+    <div class="guard-item"><b>Fail Closed</b>نبود OIDC config، signature یا timestamp مانع انتشار artifact قابل اعتماد است.</div>
+  </div>
+  <div class="note">پیش‌نیاز عملیاتی: Azure Artifact Signing، Federated Credential و GitHub Environment باید پیش از اولین release واقعی پیکربندی شوند.</div>
+  <div class="footer">Tag → Build → OIDC → Sign → Verify</div>
+</div>
+</body>
+</html>

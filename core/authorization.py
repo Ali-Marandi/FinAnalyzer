@@ -68,6 +68,7 @@ PERMISSION_CATALOG: dict[str, dict[str, Any]] = {
     "report.schedule.manage": {"description": "Create or change report schedules", "sensitive": True},
     "report.deliver.external": {"description": "Send reports to external recipients", "sensitive": True},
     "audit.read": {"description": "Read audit events", "sensitive": True},
+    "compliance.evidence.export": {"description": "Export verified company compliance evidence", "sensitive": True},
 }
 
 DEFAULT_ROLE_PERMISSIONS: dict[str, set[str]] = {
@@ -75,12 +76,15 @@ DEFAULT_ROLE_PERMISSIONS: dict[str, set[str]] = {
     "finance_manager": {
         "company.read", "ledger.read", "ledger.draft.create", "ledger.entry.post",
         "ledger.entry.void", "ledger.period.close.request", "account.manage", "bank.link", "bank.sync", "bank.unlink",
-        "report.generate", "report.schedule.manage", "report.deliver.external", "audit.read",
+        "report.generate", "report.schedule.manage", "report.deliver.external", "audit.read", "compliance.evidence.export",
     },
     "accountant": {"company.read", "ledger.read", "ledger.draft.create", "ledger.entry.post", "ledger.period.close.request", "report.generate", "bank.sync"},
-    "financial_controller": {"company.read", "ledger.read", "ledger.period.close.approve", "audit.read", "report.generate"},
+    "financial_controller": {
+        "company.read", "ledger.read", "ledger.period.close.approve", "audit.read", "report.generate",
+        "compliance.evidence.export",
+    },
     "analyst": {"company.read", "ledger.read", "report.generate"},
-    "auditor": {"company.read", "ledger.read", "audit.read"},
+    "auditor": {"company.read", "ledger.read", "audit.read", "compliance.evidence.export"},
     "bank_operator": {"company.read", "ledger.read", "bank.link", "bank.sync"},
     "viewer": {"company.read", "ledger.read", "report.generate"},
 }

@@ -30,7 +30,7 @@ jobs:
 
     steps:
       - name: Check out the approved release ref
-        uses: actions/checkout@v5
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.0.0
         with:
           fetch-depth: 0
           ref: ${{ inputs.release_tag || github.ref_name }}
@@ -51,7 +51,7 @@ jobs:
           }
 
       - name: Set up Python 3.12
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
         with:
           python-version: '3.12'
           cache: pip
@@ -75,23 +75,23 @@ jobs:
         shell: pwsh
         run: |
           python build_exe.py
-          $exe = 'dist\FinAnalyzer_Enterprise_v2_6.exe'
+          $exe = 'dist\FinAnalyzer_Enterprise_v2_6_1.exe'
           if (-not (Test-Path $exe)) { throw "Expected artifact not found: $exe" }
 
       - name: Authenticate to Azure by GitHub OIDC
-        uses: azure/login@v3
+        uses: azure/login@f5d393ae46f8fde4be8b75f32e3fc50e654ad0ca # v3.0.0
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       - name: Sign EXE and request RFC 3161 timestamp
-        uses: azure/artifact-signing-action@v2
+        uses: azure/artifact-signing-action@c7ab2a863ab5f9a846ddb8265964877ef296ee82 # v2
         with:
           endpoint: ${{ vars.AZURE_ARTIFACT_SIGNING_ENDPOINT }}
           signing-account-name: ${{ vars.AZURE_ARTIFACT_SIGNING_ACCOUNT }}
           certificate-profile-name: ${{ vars.AZURE_ARTIFACT_SIGNING_PROFILE }}
-          files: ${{ github.workspace }}\dist\FinAnalyzer_Enterprise_v2_6.exe
+          files: ${{ github.workspace }}\dist\FinAnalyzer_Enterprise_v2_6_1.exe
           file-digest: SHA256
           timestamp-rfc3161: ${{ vars.RFC3161_TIMESTAMP_URL }}
           timestamp-digest: SHA256
@@ -103,7 +103,7 @@ jobs:
       - name: Verify Authenticode signature, RFC 3161 timestamp and SHA-256
         shell: pwsh
         run: |
-          $exe = 'dist\FinAnalyzer_Enterprise_v2_6.exe'
+          $exe = 'dist\FinAnalyzer_Enterprise_v2_6_1.exe'
           $signTool = Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kits\10\bin" -Recurse -Filter signtool.exe |
             Where-Object { $_.FullName -match '\\x64\\signtool\.exe$' } |
             Sort-Object FullName -Descending |
@@ -115,11 +115,11 @@ jobs:
           if ($signature.Status -ne 'Valid') { throw "Invalid Authenticode status: $($signature.Status)" }
           if ($null -eq $signature.TimeStamperCertificate) { throw 'RFC 3161 timestamp certificate is missing.' }
           $hash = (Get-FileHash $exe -Algorithm SHA256).Hash.ToLowerInvariant()
-          Set-Content -Path 'dist\FinAnalyzer_Enterprise_v2_6.exe.sha256' -Value "$hash  FinAnalyzer_Enterprise_v2_6.exe" -NoNewline
+          Set-Content -Path 'dist\FinAnalyzer_Enterprise_v2_6_1.exe.sha256' -Value "$hash  FinAnalyzer_Enterprise_v2_6_1.exe" -NoNewline
           $evidence = [ordered]@{
             release_tag = $env:RELEASE_TAG
             commit = (git rev-parse HEAD)
-            artifact = 'FinAnalyzer_Enterprise_v2_6.exe'
+            artifact = 'FinAnalyzer_Enterprise_v2_6_1.exe'
             sha256 = $hash
             signer_subject = $signature.SignerCertificate.Subject
             signer_thumbprint = $signature.SignerCertificate.Thumbprint
@@ -140,6 +140,6 @@ jobs:
             gh release create $tag --title "FinAnalyzer Enterprise $tag" --verify-tag --generate-notes
           }
           gh release upload $tag `
-            'dist\FinAnalyzer_Enterprise_v2_6.exe' `
-            'dist\FinAnalyzer_Enterprise_v2_6.exe.sha256' `
+            'dist\FinAnalyzer_Enterprise_v2_6_1.exe' `
+            'dist\FinAnalyzer_Enterprise_v2_6_1.exe.sha256' `
             'dist\signed-release-evidence.json' --clobber

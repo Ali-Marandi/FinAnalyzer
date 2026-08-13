@@ -1,4 +1,4 @@
-"""Build the FinAnalyzer Enterprise v2.6 desktop executable with close-readiness controls."""
+"""Build the FinAnalyzer Enterprise v2.6.1 desktop executable with close-readiness controls."""
 
 from __future__ import annotations
 
@@ -20,12 +20,12 @@ def build() -> None:
         subprocess.run([sys.executable, str(gate)], cwd=PROJECT_ROOT, check=True)  # nosec B603
 
     print("=" * 60)
-    print("  FinAnalyzer Enterprise v2.6.0 — Close Readiness and Controlled Financial Close Build")
+    print("  FinAnalyzer Enterprise v2.6.1 — Verified Compliance Evidence Build")
     print(f"  Platform: {platform.system()} {platform.machine()}")
     print(f"  Python: {sys.version}")
     print("=" * 60)
 
-    app_name = "FinAnalyzer_Enterprise_v2_6"
+    app_name = "FinAnalyzer_Enterprise_v2_6_1"
     separator = ";" if platform.system() == "Windows" else ":"
     args = [
         str(PROJECT_ROOT / "main.py"),
@@ -41,6 +41,7 @@ def build() -> None:
         "--hidden-import=core.authorization",
         "--hidden-import=core.audit",
         "--hidden-import=core.period_close",
+        "--hidden-import=core.compliance_evidence",
         "--hidden-import=core.identity",
         "--hidden-import=msal",
         "--hidden-import=jwt",

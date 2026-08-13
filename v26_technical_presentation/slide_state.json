@@ -1,0 +1,144 @@
+{
+  "project_info": {
+    "title": "FinAnalyzer Enterprise v2.6.0",
+    "created": 1786649403.625,
+    "last_updated": 1786649671.129,
+    "total_slides": 12
+  },
+  "slides": [
+    {
+      "id": "cover",
+      "state": "edited",
+      "pageNum": 1
+    },
+    {
+      "id": "why_v26",
+      "state": "edited",
+      "pageNum": 2
+    },
+    {
+      "id": "control_architecture",
+      "state": "edited",
+      "pageNum": 3
+    },
+    {
+      "id": "close_readiness",
+      "state": "edited",
+      "pageNum": 4
+    },
+    {
+      "id": "dual_control",
+      "state": "edited",
+      "pageNum": 5
+    },
+    {
+      "id": "bank_atomicity",
+      "state": "edited",
+      "pageNum": 6
+    },
+    {
+      "id": "audit_integrity",
+      "state": "edited",
+      "pageNum": 7
+    },
+    {
+      "id": "evidence_pack",
+      "state": "edited",
+      "pageNum": 8
+    },
+    {
+      "id": "signed_release",
+      "state": "edited",
+      "pageNum": 9
+    },
+    {
+      "id": "test_coverage",
+      "state": "edited",
+      "pageNum": 10
+    },
+    {
+      "id": "commercial_roadmap",
+      "state": "edited",
+      "pageNum": 11
+    },
+    {
+      "id": "decision",
+      "state": "edited",
+      "pageNum": 12
+    }
+  ],
+  "outline": [
+    {
+      "id": "cover",
+      "title": "FinAnalyzer Enterprise v2.6.0",
+      "summary": "امنیت قابل‌راستی‌آزمایی، بستن دوره کنترل‌شده و شواهد انطباقی برای عملیات مالی سازمانی.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "why_v26",
+      "title": "از کنترل به اثبات",
+      "summary": "تغییر تمرکز v2.6.0 از قفل ساده دوره به gateهای قابل‌توضیح و evidence قابل‌ممیزی.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "control_architecture",
+      "title": "معماری کنترل‌های حساس",
+      "summary": "SSO، MFA، RBAC deny-by-default و audit ساختاریافته در یک مدل لایه‌ای.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "close_readiness",
+      "title": "آمادگی close یک gate است",
+      "summary": "blockerهای قابل‌توضیح برای دوره، account، تراز دفتر، بانک و تمامیت audit.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "dual_control",
+      "title": "دو کنترل مستقل، یک close",
+      "summary": "workflow درخواست، تأیید مستقل، جلوگیری از self-approval و ارزیابی مجدد پیش از اجرا.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "bank_atomicity",
+      "title": "Sync بانکی اتمیک و idempotent",
+      "summary": "rollback کامل چهار اثر persistent و جلوگیری از ایجاد، اصلاح یا حذف در دوره بسته.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "audit_integrity",
+      "title": "تمامیت evidence با DPAPI و HMAC",
+      "summary": "حفاظت کلید، redaction، payload canonical و chain verification با محدودیت‌های شفاف.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "evidence_pack",
+      "title": "Evidence Pack قابل‌انتقال",
+      "summary": "بسته شواهد company-scoped با manifest هش‌شده، audit verification و export کنترل‌شده.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "signed_release",
+      "title": "Release امضاشده بدون private key",
+      "summary": "GitHub OIDC، Azure Artifact Signing، tag guard، immutable action pin و timestamp RFC 3161.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "test_coverage",
+      "title": "پوشش آزمون تا مرز rollback",
+      "summary": "لایه‌های identity، SoD، بانک، audit و evidence در آزمون‌های regression پوشش داده می‌شوند.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "commercial_roadmap",
+      "title": "گام‌های تجاری بعدی",
+      "summary": "Reconciliation Workspace، SIEM/WORM anchor، policy builder و consolidation چندشرکتی.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "decision",
+      "title": "تصمیم اجرایی بعدی",
+      "summary": "تکمیل production-signing، اجرای staging و انتخاب مقصد evidence خارجی برای حرکت بعدی.",
+      "image_plan": "Use a suitable image if needed"
+    }
+  ]
+}

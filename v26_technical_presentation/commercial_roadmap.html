@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<style>
+body{margin:0}
+.slide-container{width:1280px;min-height:720px;box-sizing:border-box;background:#101f39;color:#f5f9ff;font-family:Tahoma,Arial,sans-serif;position:relative;overflow:hidden}
+.accent{position:absolute;right:92px;top:70px;width:86px;height:5px;background:#58d3c8}.title{position:absolute;right:92px;top:99px;font-size:34px;font-weight:800}.subtitle{position:absolute;right:92px;top:151px;color:#a8bad1;font-size:18px}.rail{position:absolute;right:92px;left:92px;top:346px;border-top:1px solid #365070}.milestones{position:absolute;right:92px;left:92px;top:218px;height:350px;display:grid;grid-template-columns:repeat(4,1fr);gap:26px}.milestone{position:relative;border-top:5px solid #58d3c8;padding-top:20px;box-sizing:border-box}.milestone:nth-child(2){border-top-color:#7fb4d1}.milestone:nth-child(3){border-top-color:#e7bd63}.milestone:nth-child(4){border-top-color:#d99886}.phase{font-size:14px;letter-spacing:.7px;color:#58d3c8;font-weight:700}.milestone:nth-child(2) .phase{color:#7fb4d1}.milestone:nth-child(3) .phase{color:#e7bd63}.milestone:nth-child(4) .phase{color:#d99886}.milestone h3{font-size:23px;margin:15px 0 13px;line-height:1.35}.milestone p{font-size:16px;color:#c4d1e2;line-height:1.65;margin:0;width:225px}.milestone small{position:absolute;top:220px;right:0;color:#93a9c4;font-size:14px;line-height:1.55;width:230px}.marker{position:absolute;top:122px;right:0;width:12px;height:12px;background:#58d3c8}.milestone:nth-child(2) .marker{background:#7fb4d1}.milestone:nth-child(3) .marker{background:#e7bd63}.milestone:nth-child(4) .marker{background:#d99886}.action{position:absolute;right:92px;left:92px;bottom:82px;border-top:1px solid #58d3c8;border-bottom:1px solid #58d3c8;min-height:83px;box-sizing:border-box;display:grid;grid-template-columns:275px 1fr;align-items:center}.action b{color:#58d3c8;font-size:20px}.action span{font-size:17px;color:#d5dfeb;line-height:1.55}.footer{position:absolute;right:92px;bottom:39px;color:#7890af;font-size:15px}
+</style>
+</head>
+<body>
+<div class="slide-container">
+  <div class="accent"></div>
+  <div class="title">گام‌های تجاری بعدی</div>
+  <div class="subtitle">v2.6.0 پایه کنترل و evidence را ایجاد کرد؛ اولویت بعدی، تبدیل exceptionهای مالی به workflowهای قابل‌مدیریت در مقیاس سازمان است.</div>
+  <div class="milestones">
+    <div class="milestone"><div class="phase">NOW · FOUNDATION</div><h3>Evidence Pack</h3><p>بسته JSON company-scoped، manifest هش‌شده و export کنترل‌شده پس از verify audit chain.</p><div class="marker"></div><small>وضعیت: در v2.6.0 پیاده‌سازی و آزمون شده است.</small></div>
+    <div class="milestone"><div class="phase">NEXT · OPERATIONS</div><h3>Reconciliation Workspace</h3><p>تطبیق bank feed، statement و ledger با صف exception، مالکیت و مسیر رفع.</p><div class="marker"></div><small>پیش‌نیاز: تعریف bank statement contract و policy matching.</small></div>
+    <div class="milestone"><div class="phase">NEXT · ASSURANCE</div><h3>SIEM / WORM Anchor</h3><p>ارسال head hash و manifest به مقصد مستقل برای retention و alerting خارج از workstation.</p><div class="marker"></div><small>پیش‌نیاز: انتخاب مقصد، retention policy و کلیدهای integration.</small></div>
+    <div class="milestone"><div class="phase">SCALE · GOVERNANCE</div><h3>Policy Builder و FX</h3><p>قواعد approval بر مبنای مبلغ/entity و close چندشرکتی با consolidation و remeasurement.</p><div class="marker"></div><small>پیش‌نیاز: مدل policy قابل‌پیکربندی و استانداردهای گروه مالی.</small></div>
+  </div>
+  <div class="rail"></div>
+  <div class="action"><b>تصمیم محصول</b><span>ابتدا مقصد evidence مستقل و workflow reconciliation را انتخاب کنید؛ سپس policy builder را بر مبنای exceptionهای واقعی عملیات مالی پیکربندی کنید.</span></div>
+  <div class="footer">Foundation → Operations → Independent Assurance → Enterprise Scale</div>
+</div>
+</body>
+</html>

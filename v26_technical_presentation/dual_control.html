@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<style>
+body { margin:0; }
+.slide-container { width:1280px; min-height:720px; box-sizing:border-box; background:#101f39; color:#f5f9ff; font-family:Tahoma,Arial,sans-serif; position:relative; overflow:hidden; }
+.topline { position:absolute; right:92px; top:70px; width:76px; height:5px; background:#58d3c8; }
+.title { position:absolute; right:92px; top:100px; font-size:35px; font-weight:800; }
+.subtitle { position:absolute; right:92px; top:151px; color:#9fb2ca; font-size:18px; }
+.flow { position:absolute; right:92px; top:245px; width:1096px; height:220px; display:grid; grid-template-columns:1fr 70px 1fr 70px 1fr; align-items:center; direction:rtl; }
+.stage { height:184px; border-top:2px solid #365070; border-bottom:1px solid #365070; box-sizing:border-box; padding-top:24px; }
+.stage-number { color:#58d3c8; font-size:18px; font-weight:800; }
+.stage-title { margin-top:12px; font-size:27px; font-weight:800; }
+.stage-text { margin-top:14px; width:275px; font-size:17px; line-height:1.6; color:#c4d1e2; }
+.arrow { color:#58d3c8; font-size:38px; text-align:center; }
+.guard { position:absolute; right:92px; top:535px; width:1096px; min-height:92px; border-top:1px solid #c99b43; border-bottom:1px solid #c99b43; box-sizing:border-box; display:grid; grid-template-columns:260px 1fr 1fr; align-items:center; }
+.guard-label { color:#e7bd63; font-size:20px; font-weight:800; }
+.guard-item { color:#d6dfeb; font-size:17px; line-height:1.55; border-right:1px solid #365070; padding-right:22px; }
+.footer { position:absolute; right:92px; bottom:35px; color:#7890af; font-size:15px; }
+</style>
+</head>
+<body>
+<div class="slide-container">
+  <div class="topline"></div>
+  <div class="title">دو کنترل مستقل، یک close</div>
+  <div class="subtitle">موافقت قبلی کافی نیست؛ نزدیک‌ترین وضعیت داده و هویت درست پیش از اجرا دوباره کنترل می‌شود.</div>
+  <div class="flow">
+    <div class="stage">
+      <div class="stage-number">مرحله ۱</div>
+      <div class="stage-title">درخواست</div>
+      <div class="stage-text">Finance Manager با permission صریح و MFA تازه، دوره و retained-earnings account را برای close پیشنهاد می‌کند.</div>
+    </div>
+    <div class="arrow">←</div>
+    <div class="stage">
+      <div class="stage-number">مرحله ۲</div>
+      <div class="stage-title">بازبینی مستقل</div>
+      <div class="stage-text">Financial Controller با role جداگانه، scope شرکت و readiness جاری را برای همان درخواست کنترل می‌کند.</div>
+    </div>
+    <div class="arrow">←</div>
+    <div class="stage">
+      <div class="stage-number">مرحله ۳</div>
+      <div class="stage-title">اجرا و قفل</div>
+      <div class="stage-text">entry بستن، تغییر وضعیت درخواست، lock fiscal year و رخداد audit در یک transaction ثبت می‌شوند.</div>
+    </div>
+  </div>
+  <div class="guard">
+    <div class="guard-label">کنترل‌های غیرقابل‌دورزدن</div>
+    <div class="guard-item">Self-approval و self-rejection مسدود و به‌عنوان SoD violation در audit ثبت می‌شوند.</div>
+    <div class="guard-item">پیش از اجرا، readiness دوباره ارزیابی می‌شود؛ pending bank work یا audit invalid، close را متوقف می‌کند.</div>
+  </div>
+  <div class="footer">Request → Independent approval → Atomic execution</div>
+</div>
+</body>
+</html>
