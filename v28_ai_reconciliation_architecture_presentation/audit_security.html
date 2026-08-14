@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<style>
+body{margin:0}
+.slide-container{width:1280px;min-height:720px;box-sizing:border-box;background:#101f39;color:#f5f9ff;font-family:Tahoma,Arial,sans-serif}
+.inner{min-height:720px;box-sizing:border-box;padding:47px 70px 0;position:relative}
+.kicker{font-size:16px;color:#58d3c8;letter-spacing:.4px}
+.title{font-size:35px;font-weight:700;margin-top:12px}.sub{font-size:18px;color:#bfd1df;margin-top:13px;line-height:1.6}.rule{width:225px;height:2px;background:#58d3c8;margin-top:15px}
+.chain{display:flex;direction:rtl;align-items:center;gap:10px;margin-top:43px}.step{width:244px;min-height:258px;box-sizing:border-box;background:#152c4a;border-top:3px solid #58d3c8;padding:20px 17px 0}.step.blue{border-color:#85adff;background:#152e4d}.no{font-size:14px;color:#58d3c8}.step h3{font-size:21px;margin:16px 0 14px}.step p{font-size:15px;line-height:1.68;color:#d0dfeb;margin:0}.tag{font-size:13px;color:#a7dad5;margin-top:18px;border-top:1px solid rgba(88,211,200,.32);padding-top:10px}.blue .tag{color:#b5caff;border-color:rgba(133,173,255,.35)}.arrow{width:28px;text-align:center;color:#58d3c8;font-size:26px}
+.evidence{margin-top:33px;min-height:100px;box-sizing:border-box;border:1px solid rgba(88,211,200,.48);background:rgba(88,211,200,.06);display:flex;align-items:center;gap:22px;padding:17px 20px 0}.denial{width:285px;font-size:16px;line-height:1.6;color:#ffe1a6}.denial b{color:#ffbf64}.export{flex:1;font-size:16px;line-height:1.65;color:#d5e7ee}.export b{color:#58d3c8}.foot{position:absolute;bottom:28px;right:70px;font-size:14px;color:#8ba7bd}
+</style>
+</head>
+<body>
+<div class="slide-container"><div class="inner">
+  <div class="kicker">۸ · امنیت و ممیزی</div>
+  <div class="title">هر تصمیم، evidence زنجیره‌ای است</div>
+  <div class="sub">Audit محلی v2.7.0 با HMAC و DPAPI، پایه قابل‌راستی‌آزمایی تصمیم‌های v2.8.0 است.</div><div class="rule"></div>
+  <div class="chain">
+    <section class="step"><div class="no">۰۱ · REDACT</div><h3>پاکسازی رخداد</h3><p>actor، company، session و target ثبت می‌شوند؛ token، password و secret در details به <b>[REDACTED]</b> تبدیل می‌شوند.</p><div class="tag">Structured security event</div></section>
+    <div class="arrow">←</div>
+    <section class="step blue"><div class="no">۰۲ · CANONICALIZE</div><h3>Payload ثابت</h3><p>sequence، timestamp UTC، previous hash، key ID و details مرتب‌شده به JSON canonical تبدیل می‌شوند.</p><div class="tag">Stable bytes for signing</div></section>
+    <div class="arrow">←</div>
+    <section class="step"><div class="no">۰۳ · SIGN</div><h3>HMAC-SHA256</h3><p>رویداد با کلید audit امضا می‌شود؛ کلید در Windows با DPAPI محافظت و key ID کنترل می‌شود.</p><div class="tag">Tamper-evident chain</div></section>
+    <div class="arrow">←</div>
+    <section class="step blue"><div class="no">۰۴ · VERIFY</div><h3>راستی‌آزمایی</h3><p>sequence، previous hash، HMAC و checkpoint بررسی می‌شوند تا ویرایش یا حذف قابل تشخیص باشد.</p><div class="tag">Chain + checkpoint validation</div></section>
+  </div>
+  <section class="evidence"><div class="denial"><b>SoD denial:</b><br>خود-حل‌کردن exception رد می‌شود و evidence آن پیش از raise/rollback پایدار می‌ماند.</div><div class="export"><b>مسیر v2.8.0-c:</b> decision، policy version، actor و verification result در manifest هش‌شده صادر می‌شوند. Audit محلی tamper-evident است؛ برای immutability سازمانی، export به SIEM یا evidence store مستقل لازم است.</div></section>
+  <div class="foot">LOCAL HMAC CHAIN → VERIFIED EVIDENCE → EXTERNAL ANCHORING</div>
+</div></div>
+</body>
+</html>

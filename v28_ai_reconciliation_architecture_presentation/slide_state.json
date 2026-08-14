@@ -1,0 +1,122 @@
+{
+  "project_info": {
+    "title": "FinAnalyzer Enterprise v2.8.0",
+    "created": 1786666428.064,
+    "last_updated": 1786666505.274,
+    "total_slides": 10
+  },
+  "slides": [
+    {
+      "id": "cover",
+      "state": "edited",
+      "pageNum": 1
+    },
+    {
+      "id": "architecture_shift",
+      "state": "edited",
+      "pageNum": 2
+    },
+    {
+      "id": "three_layers",
+      "state": "edited",
+      "pageNum": 3
+    },
+    {
+      "id": "human_gate",
+      "state": "edited",
+      "pageNum": 4
+    },
+    {
+      "id": "split_matching",
+      "state": "edited",
+      "pageNum": 5
+    },
+    {
+      "id": "allocation_invariants",
+      "state": "edited",
+      "pageNum": 6
+    },
+    {
+      "id": "idempotency_cas",
+      "state": "edited",
+      "pageNum": 7
+    },
+    {
+      "id": "audit_security",
+      "state": "edited",
+      "pageNum": 8
+    },
+    {
+      "id": "release_path",
+      "state": "edited",
+      "pageNum": 9
+    },
+    {
+      "id": "decision",
+      "state": "edited",
+      "pageNum": 10
+    }
+  ],
+  "outline": [
+    {
+      "id": "cover",
+      "title": "FinAnalyzer Enterprise v2.8.0",
+      "summary": "جلد معرفی معماری هوش مصنوعی قابل‌توضیح، تطبیق بانکی کنترل‌شده و evidence برای Close.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "architecture_shift",
+      "title": "هوش مالی در مرز کنترل",
+      "summary": "گذار از Feed Review کنترل‌شده به Statement Reconciliation Intelligence با human approval.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "three_layers",
+      "title": "سه لایه، یک مرز مالی",
+      "summary": "Import/provenance، Candidate engine و Decision service/evidence به‌عنوان معماری جداشده.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "human_gate",
+      "title": "AI پیشنهاد می‌دهد؛ انسان تصمیم می‌گیرد",
+      "summary": "Candidate explanation، permission، MFA، policy و decision immutable.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "split_matching",
+      "title": "Split Matching رابطه می‌سازد",
+      "summary": "یک statement line به چند ledger entry موجود با allocationهای کنترل‌شده، بدون سند جدید.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "allocation_invariants",
+      "title": "Allocation با invariant محافظت می‌شود",
+      "summary": "مبلغ، ارز، دقت، status، tolerance، SoD و approval متناسب با ریسک.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "idempotency_cas",
+      "title": "Retry و Concurrency کنترل می‌شوند",
+      "summary": "idempotency key، Compare-and-Swap و Active Allocation Reservation به‌صورت مکمل.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "audit_security",
+      "title": "هر تصمیم، evidence زنجیره‌ای است",
+      "summary": "HMAC audit، DPAPI key، SoD denial و export به evidence store.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "release_path",
+      "title": "Rollout کنترل را مقدم می‌داند",
+      "summary": "موج‌های v2.8.0-a تا c و معیارهای UAT، evidence و rollback.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "decision",
+      "title": "تصمیم: کنترل، سپس مقیاس",
+      "summary": "Policy workshop و مسیر production مبتنی بر evidence و human approval.",
+      "image_plan": "Use a suitable image if needed"
+    }
+  ]
+}

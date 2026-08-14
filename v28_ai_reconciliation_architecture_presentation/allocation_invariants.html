@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<style>
+body{margin:0}
+.slide-container{width:1280px;min-height:720px;box-sizing:border-box;background:#101f39;color:#f5f9ff;font-family:Tahoma,Arial,sans-serif}
+.inner{min-height:720px;box-sizing:border-box;padding:48px 70px 0;position:relative}
+.kicker{font-size:16px;color:#58d3c8;letter-spacing:.4px}
+.title{font-size:35px;font-weight:700;margin-top:12px}
+.subtitle{font-size:18px;line-height:1.65;color:#bdd0df;margin-top:13px}
+.rule{width:215px;height:2px;background:#58d3c8;margin-top:16px}
+.gates{display:flex;direction:rtl;gap:10px;margin-top:40px;align-items:stretch}
+.gate{width:220px;min-height:280px;box-sizing:border-box;background:#152c4a;border-top:3px solid #85adff;padding:20px 16px 0;position:relative}
+.gate.primary{border-color:#58d3c8;background:#153550}
+.index{font-size:14px;color:#58d3c8}.gate h3{font-size:20px;margin:15px 0 13px}.gate p{font-size:15px;line-height:1.68;color:#cdddea;margin:0}.check{position:absolute;top:17px;left:16px;color:#58d3c8;font-size:22px}.tag{position:absolute;right:16px;left:16px;bottom:17px;border-top:1px solid rgba(88,211,200,.35);padding-top:10px;font-size:13px;line-height:1.5;color:#a2ded9}.gate.primary .tag{color:#c3f5ee}
+.outcome{margin-top:33px;min-height:94px;box-sizing:border-box;border:1px solid rgba(88,211,200,.52);background:rgba(88,211,200,.06);padding:17px 21px 0;display:flex;align-items:flex-start;gap:24px}.outcome strong{font-size:20px;color:#58d3c8;min-width:205px}.outcome p{font-size:16.5px;line-height:1.65;color:#d5e6ee;margin:0}.outcome b{color:#ffe0a3;font-weight:normal}
+</style>
+</head>
+<body>
+<div class="slide-container">
+  <div class="inner">
+    <div class="kicker">۶ · کنترل‌های تخصیص در Split Matching</div>
+    <div class="title">Allocation با invariant محافظت می‌شود</div>
+    <div class="subtitle">پذیرش فقط زمانی ممکن است که مقدار، زمینه، ownership و استقلال تصمیم هم‌زمان معتبر باشند.</div>
+    <div class="rule"></div>
+    <div class="gates">
+      <section class="gate primary"><div class="check">✓</div><div class="index">01 · Amount</div><h3>جمع دقیق</h3><p>جمع allocationها باید برابر مبلغ statement باشد؛ سهم صفر، منفی یا بیش‌ازظرفیت پذیرفته نیست.</p><div class="tag">Decimal؛ بدون float و round پنهان</div></section>
+      <section class="gate"><div class="check">✓</div><div class="index">02 · Currency</div><h3>ارز و دقت</h3><p>direction جریان و currency سازگارند؛ هر سهم در minor unit ارز quantize می‌شود.</p><div class="tag">FX فقط در workflow policy مجاز</div></section>
+      <section class="gate primary"><div class="check">✓</div><div class="index">03 · Eligibility</div><h3>Status و Ownership</h3><p>entry باید posted و در دوره باز باشد؛ statement یا entry در case فعال دیگر نباشد.</p><div class="tag">Active reservation مانع allocation موازی</div></section>
+      <section class="gate"><div class="check">✓</div><div class="index">04 · Policy</div><h3>Tolerance نسخه‌دار</h3><p>اختلاف فقط با policy فعال، دلیل ثبت‌شده و evidence hash قابل پذیرش است.</p><div class="tag">Policy پنهان در UI یا کد مجاز نیست</div></section>
+      <section class="gate primary"><div class="check">✓</div><div class="index">05 · Governance</div><h3>SoD و ریسک</h3><p>split، FX، مبلغ بالا یا vendor پرریسک به approval مستقل و MFA تازه نیاز دارند.</p><div class="tag">maker ≠ checker؛ denial قابل ممیزی</div></section>
+    </div>
+    <section class="outcome"><strong>نتیجه گیت‌ها</strong><p>اگر هر invariant شکست بخورد، transaction rollback می‌شود. موردِ خارج policy به <b>exception قابل پیگیری</b> می‌رود؛ هیچ مسیر خودکار برای ساخت سند یا پنهان‌کردن اختلاف وجود ندارد.</p></section>
+  </div>
+</div>
+</body>
+</html>

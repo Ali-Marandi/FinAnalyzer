@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<style>
+body{margin:0}
+.slide-container{width:1280px;min-height:720px;box-sizing:border-box;background:#101f39;color:#f5f9ff;font-family:Tahoma,Arial,sans-serif}
+.inner{min-height:720px;box-sizing:border-box;padding:50px 76px 0;position:relative}
+.kicker{font-size:16px;color:#58d3c8;letter-spacing:.4px}
+.title{font-size:35px;font-weight:700;margin-top:12px}
+.subtitle{font-size:18px;color:#bed1df;margin-top:13px;line-height:1.65}
+.flow{display:flex;direction:rtl;align-items:center;gap:36px;margin-top:52px}
+.side{width:355px;min-height:302px;box-sizing:border-box;background:#152c4a;border-top:3px solid #85adff;padding:25px 24px 0}
+.side.decision{border-top-color:#58d3c8;background:#153550}
+.label{font-size:14px;color:#91b8ff}.decision .label{color:#58d3c8}
+.side h3{font-size:24px;margin:16px 0}.side p{font-size:16px;line-height:1.72;color:#d0dfeb;margin:0}
+.list{margin-top:20px;border-top:1px solid rgba(133,173,255,.4);padding-top:13px;font-size:15px;line-height:1.78;color:#b9cde0}.decision .list{border-color:rgba(88,211,200,.42);color:#bcece6}
+.gate{width:224px;min-height:270px;box-sizing:border-box;background:rgba(88,211,200,.08);border:1px solid rgba(88,211,200,.7);padding:22px 17px 0;text-align:center}
+.gate-mark{font-size:27px;color:#58d3c8}.gate h3{font-size:21px;color:#d8fffa;margin:14px 0}.gate span{display:block;font-size:15px;line-height:1.8;color:#c8eceb;border-top:1px solid rgba(88,211,200,.24);padding-top:7px}
+.bottom{margin-top:42px;min-height:71px;box-sizing:border-box;border-top:1px solid rgba(88,211,200,.45);display:flex;align-items:center;gap:21px;color:#d3e4ec;font-size:17px}.bottom strong{color:#58d3c8;font-size:19px}.bottom em{font-style:normal;color:#ffe0a3}
+</style>
+</head>
+<body>
+<div class="slide-container">
+  <div class="inner">
+    <div class="kicker">۳ · حاکمیت هوش مصنوعی</div>
+    <div class="title">AI پیشنهاد می‌دهد؛ انسان تصمیم می‌گیرد</div>
+    <div class="subtitle">لایه پیشنهاد هرگز مسیر مستقیم به ledger ندارد؛ همه تصمیم‌ها باید از گیت هویتی، policy و تأیید انسانی عبور کنند.</div>
+    <div class="flow">
+      <section class="side">
+        <div class="label">CANDIDATE ENGINE</div>
+        <h3>پیشنهاد قابل‌توضیح</h3>
+        <p>قواعد یا مدل، رابطه احتمالی statement و ledger را براساس reference، مبلغ، تاریخ و merchant پیشنهاد می‌کنند.</p>
+        <div class="list">• score و explanation<br>• rule/model version<br>• بدون mutation مالی</div>
+      </section>
+      <section class="gate">
+        <div class="gate-mark">◆</div>
+        <h3>Control Gate</h3>
+        <span>Permission</span>
+        <span>MFA تازه</span>
+        <span>Policy version</span>
+        <span>Human approval</span>
+      </section>
+      <section class="side decision">
+        <div class="label">DECISION SERVICE</div>
+        <h3>تصمیم قابل دفاع</h3>
+        <p>service دوباره snapshot، scope، SoD و invariantها را بررسی می‌کند و فقط سپس decision را ثبت می‌نماید.</p>
+        <div class="list">• decision immutable<br>• evidence hash و actor<br>• HMAC audit chain</div>
+      </section>
+    </div>
+    <div class="bottom"><strong>قاعده کنترل:</strong><span>حتی confidence بالا، به‌تنهایی مجوز تغییر دفتر نیست؛ بدون گیت، نتیجه فقط یک <em>candidate</em> باقی می‌ماند.</span></div>
+  </div>
+</div>
+</body>
+</html>

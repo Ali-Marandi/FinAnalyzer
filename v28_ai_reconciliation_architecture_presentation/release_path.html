@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<style>
+body{margin:0}
+.slide-container{width:1280px;min-height:720px;box-sizing:border-box;background:#101f39;color:#f5f9ff;font-family:Tahoma,Arial,sans-serif}
+.inner{min-height:720px;box-sizing:border-box;padding:48px 74px 0;position:relative}
+.kicker{font-size:16px;color:#58d3c8;letter-spacing:.4px}
+.title{font-size:35px;font-weight:700;margin-top:12px}.sub{font-size:18px;line-height:1.65;color:#bfd2e0;margin-top:13px}.rule{width:235px;height:2px;background:#58d3c8;margin-top:16px}
+.road{display:flex;direction:rtl;align-items:stretch;margin-top:45px}.wave{width:342px;min-height:300px;box-sizing:border-box;background:#152c4a;border-top:3px solid #58d3c8;padding:22px 21px 0;position:relative}.wave.blue{border-color:#85adff;background:#152e4d}.wave .ver{font-size:17px;color:#58d3c8}.wave.blue .ver{color:#a6c5ff}.wave h3{font-size:23px;margin:16px 0 14px}.wave p{font-size:16px;line-height:1.7;color:#d0dfeb;margin:0}.scope{position:absolute;right:21px;left:21px;bottom:19px;border-top:1px solid rgba(88,211,200,.35);padding-top:11px;font-size:14px;line-height:1.55;color:#a9e0da}.wave.blue .scope{border-color:rgba(133,173,255,.38);color:#bad0ff}.arrow{width:48px;align-self:center;text-align:center;color:#58d3c8;font-size:29px}
+.gate{margin-top:34px;min-height:105px;box-sizing:border-box;border:1px solid rgba(88,211,200,.5);background:rgba(88,211,200,.06);display:flex;align-items:flex-start;gap:22px;padding:17px 21px 0}.gate strong{font-size:20px;color:#58d3c8;min-width:190px}.checks{display:flex;gap:16px;flex:1}.check{width:275px;font-size:15px;line-height:1.6;color:#d4e7ed}.tick{font-size:19px;color:#58d3c8}.foot{margin-top:16px;font-size:14px;color:#8faabd}
+</style>
+</head>
+<body>
+<div class="slide-container"><div class="inner">
+  <div class="kicker">۹ · مسیر rollout پیشنهادی</div>
+  <div class="title">Rollout کنترل را مقدم می‌داند</div>
+  <div class="sub">قابلیت هوشمند، مرحله‌به‌مرحله و فقط پس از عبور از گیت‌های داده، امنیت، ممیزی و تأیید مالی فعال می‌شود.</div><div class="rule"></div>
+  <div class="road">
+    <section class="wave"><div class="ver">v2.8.0-a</div><h3>پایه قابل‌اعتماد</h3><p>Import کنترل‌شده، deterministic matching، immutable history و optimistic locking برای کنترل داده و تصمیم.</p><div class="scope">خروج: idempotency، migration/restore، HMAC verification و UAT controller</div></section>
+    <div class="arrow">←</div>
+    <section class="wave blue"><div class="ver">v2.8.0-b</div><h3>هوش توضیح‌پذیر</h3><p>Candidate explanation، Split Matching، allocation reservation و approval matrix متناسب با ریسک.</p><div class="scope">خروج: invariantهای allocation، SoD negative tests و تأیید Finance/Compliance</div></section>
+    <div class="arrow">←</div>
+    <section class="wave"><div class="ver">v2.8.0-c</div><h3>Close قابل دفاع</h3><p>Statement certification، exception SLA، evidence export و re-check واقعی در Close Readiness.</p><div class="scope">خروج: certification UAT، failure injection، restore و controller sign-off مستقل</div></section>
+  </div>
+  <section class="gate"><strong>گیت مشترک Go / No-Go</strong><div class="checks"><div class="check"><span class="tick">✓</span> policy و threat model مصوب؛ scope و ownership روشن</div><div class="check"><span class="tick">✓</span> security/supply-chain، audit integrity و rollback قابل‌اثبات</div><div class="check"><span class="tick">✓</span> UAT مالی و evidence کامل؛ confidence مدل معیار انتشار نیست</div></div></section>
+  <div class="foot">در هر موج، گیت مسدودکننده یا نقص evidence، rollout را متوقف و تصمیم را به No-Go بازمی‌گرداند.</div>
+</div></div>
+</body>
+</html>
