@@ -1,193 +1,142 @@
-# 🏢 FinAnalyzer Enterprise v2.0.0
+# FinAnalyzer Enterprise
 
-<p align="center">
-  <strong>Professional Financial Analytics, Accounting & ERP Desktop Suite</strong><br>
-  <em>Enterprise-grade financial management competing with QuickBooks, Xero, Fathom & Sage</em>
-</p>
+> **Evidence-first financial controls for bank reconciliation and close readiness.**
 
----
+FinAnalyzer Enterprise is a Windows desktop application for finance teams that need a controlled, auditable path from bank activity to period close. It is designed to complement an accounting system of record—not replace a full ERP, payroll, payments, or tax platform.
 
-## 🚀 Overview
+The current public release is **v2.7.0 — Controlled Bank Reconciliation**. It adds a dedicated review workspace, separation-of-duties enforcement, and close-readiness controls to the enterprise security and accounting foundations already in the product.
 
-**FinAnalyzer Enterprise** is a commercial-grade desktop financial analysis application built with Python and PySide6 (Qt6). It provides comprehensive double-entry bookkeeping, AI-powered forecasting, professional financial reporting, and enterprise security — all in a beautiful modern interface.
+## Why FinAnalyzer
 
-### Key Differentiators
-- **True Double-Entry Accounting Engine** with GAAP/IFRS compliance
-- **AI/ML Financial Forecasting** using scikit-learn (Polynomial Regression, IsolationForest)
-- **50+ Financial KPIs** calculated in real-time
-- **Multi-Entity Support** for corporate groups and holding companies
-- **AES-256 Encrypted Database** with audit trail compliance
-- **Professional Reports** (Balance Sheet, P&L, Cash Flow, Trial Balance)
-- **Beautiful Dark/Light UI** with Fluent Design principles
+A bank feed is not evidence of a completed financial decision. Finance teams need to know which items remain unreviewed, who owns an exception, whether the reviewer is independent, whether the period is still open, and whether the close remains safe to execute.
 
----
+FinAnalyzer turns those questions into an enforceable workflow:
 
-## 📸 Features
+| Control | What it provides |
+|---|---|
+| **Controlled reconciliation queue** | New or revised bank-feed mappings return to `needs_review`; raw provider payloads are not exposed in the desktop review queue. |
+| **Contra-only classification** | Reconciliation updates only the eligible contra account on an existing balanced journal entry; it does not create a new entry or alter the amount, bank line, date, or line count. |
+| **Separation of duties** | The person who flags an exception cannot resolve the same exception, even when both permissions exist. |
+| **MFA and company scoping** | Sensitive actions require a valid authenticated principal, relevant permission, company membership, and fresh MFA. |
+| **Close Readiness** | Open bank-reconciliation items block period close at both the request and approval/execution control points. |
+| **Tamper-evident evidence** | Structured audit events are protected by an HMAC-SHA256 chain; the Windows signing key is protected with DPAPI when available. |
 
-### 💎 Executive Dashboard
-- Real-time KPI summary cards with trend indicators
-- Interactive revenue & expense charts (Matplotlib embedded)
-- Recent transactions audit table
-- Period selector (Month, Quarter, Year, Custom)
+## Current Product Scope
 
-### 💳 Transaction Management
-- Sortable/filterable transaction table with pagination
-- Add/Edit/Delete with full validation
-- Bulk import from CSV, Excel, OFX, QIF bank formats
-- Category & account filtering
-- Export to CSV, Excel (with formulas), PDF
+### v2.7.0 — Controlled Bank Reconciliation
 
-### 📚 Chart of Accounts
-- Hierarchical tree view (Assets → Liabilities → Equity → Revenue → Expenses)
-- Account type indicators with color coding
-- Balance display per account
-- Add/Edit account dialogs with validation
+Each bank-feed mapping has an explicit reconciliation state:
 
-### 📑 Professional Financial Reports
-- **Balance Sheet** — Assets = Liabilities + Equity
-- **Income Statement (P&L)** — Revenue, COGS, Operating Expenses, Net Income
-- **Cash Flow Statement** — Operating, Investing, Financing activities
-- **Trial Balance** — Debit/Credit verification
-- Export to PDF (publication-grade) and Excel (with SUM formulas)
+| State | Meaning |
+|---|---|
+| `needs_review` | Human classification is required before close. |
+| `matched` | The eligible contra classification has been approved. |
+| `exception` | The item requires independent resolution. |
+| `removed` | The provider removed the item; it is no longer in the review queue. |
 
-### 🤖 AI Forecasting & Analytics
-- Cash flow forecasting (3, 6, 12 months horizon)
-- Polynomial regression with confidence intervals
-- Anomaly detection (IsolationForest) for fraud/unusual transactions
-- What-if scenario simulator with interactive sliders
-- Budget vs Actual variance analysis
+A user with `bank.reconcile.match` can classify an eligible item to an active, in-scope contra account. A user with `bank.reconcile.exception.resolve` can resolve an exception only when they are not the person who flagged it. The service layer, not the UI, enforces these controls.
 
-### ⚙️ Enterprise Settings
-- Company profile management (multi-entity)
-- User management with RBAC (Admin, Accountant, Viewer)
-- Dark/Light theme switching
-- Encrypted database backup & restore
-- License key management
-- Two-factor authentication (2FA) support
+See [release notes for v2.7.0](RELEASE_NOTES_v2.7.0.md) for detailed behavior and constraints.
 
----
+### Enterprise Control Foundation
 
-## 🏗️ Architecture
+| Domain | Current capability |
+|---|---|
+| Identity | Microsoft Entra OIDC/PKCE and MSAL-based SSO context, with MFA freshness checks for sensitive actions. |
+| Authorization | Deny-by-default authorization service with company-scoped memberships and explicit permissions. |
+| Period close | Request/approval separation, atomic execution, Close Readiness gates, and audit evidence. |
+| Audit | Structured HMAC-SHA256 event chain with verification support and DPAPI-protected audit signing-key storage on Windows. |
+| Connectivity | Plaid-bank-feed integration with atomic synchronization behavior and controlled review of new/revised mappings. |
+| Reporting | PDF and Excel generation for financial reporting workflows. |
+| Packaging | PyInstaller-based Windows build flow and signed-release CI/CD path. |
 
-```
-FinAnalyzer_v2/
-├── main.py                          # Application entry point
-├── requirements.txt                 # Python dependencies
-├── core/                            # Business logic layer
-│   ├── models.py                    # SQLAlchemy ORM (12 enterprise models)
-│   ├── database.py                  # Database manager (SQLite, pooling, WAL)
-│   ├── accounting_engine.py         # Double-entry bookkeeping engine
-│   ├── analytics.py                 # AI/ML forecasting & KPIs
-│   ├── import_export.py             # Multi-format data I/O
-│   ├── security.py                  # Auth, encryption, RBAC, licensing
-│   └── notifications.py            # Email, in-app alerts, scheduling
-├── ui/                              # Presentation layer (PySide6)
-│   ├── theme.py                     # Dark/Light theme engine (QSS)
-│   ├── main_window.py              # Main application window
-│   ├── pages/                       # Application pages
-│   │   ├── dashboard.py            # Executive dashboard
-│   │   ├── transactions.py         # Transaction management
-│   │   ├── accounts.py             # Chart of accounts
-│   │   ├── reports.py              # Financial reports
-│   │   ├── forecasting.py          # AI forecasting
-│   │   └── settings.py            # System settings
-│   ├── widgets/                     # Reusable UI components
-│   │   ├── card_widget.py          # Summary cards
-│   │   └── chart_widget.py         # Matplotlib chart wrapper
-│   └── dialogs/                     # Modal dialogs
-│       └── transaction_dialog.py   # Transaction entry form
-└── dist/                            # Built executables
-    └── FinAnalyzer_Enterprise_v2   # Standalone binary
+## Product Direction
+
+The next product direction is **Statement Reconciliation Intelligence**, delivered only through controlled milestones. It is a roadmap, not a shipped capability.
+
+| Planned milestone | Intended outcome | Release gate |
+|---|---|---|
+| **v2.8.0-a** | Statement import, deterministic matching, immutable decision history, idempotency, and optimistic concurrency control. | Data migration, idempotency, audit, restore, and finance UAT evidence. |
+| **v2.8.0-b** | Explainable candidate suggestions, split matching, active-allocation protection, and policy-based approvals. | Allocation invariants, independent approval, SoD negative tests, and concurrency evidence. |
+| **v2.8.0-c** | Certification balance, exception SLA, evidence export, and a second Close Readiness check. | Controller sign-off, failure injection, evidence verification, and rollback readiness. |
+
+AI is intended to prepare candidates, explanations, and drafts. It is not intended to autonomously post financial changes. Permission, fresh MFA, policy, separation of duties, human approval, and audit evidence remain the decision boundary.
+
+## Architecture
+
+```text
+FinAnalyzer
+├── core/
+│   ├── authorization.py          # Deny-by-default, company-scoped authorization
+│   ├── audit.py                  # HMAC audit chain and signing-key protection
+│   ├── bank_reconciliation.py    # Controlled reconciliation and exception workflow
+│   ├── database.py               # SQLAlchemy persistence and migrations
+│   ├── period_close.py            # Controlled close and readiness gates
+│   ├── plaid_connector.py         # Bank-feed synchronization
+│   └── models.py                  # Domain models and reconciliation state
+├── ui/
+│   ├── main_window.py             # Desktop shell and principal propagation
+│   └── pages/bank_reconciliation.py
+├── tests/
+│   └── test_bank_reconciliation_v27.py
+├── .github/workflows/
+│   └── release-sign.yml           # Signed Windows release workflow
+└── docs/
 ```
 
----
-
-## 🛠️ Tech Stack
+## Technology
 
 | Component | Technology |
-|-----------|-----------|
-| Language | Python 3.11+ |
-| GUI Framework | PySide6 (Qt6) |
-| Database | SQLAlchemy 2.0 + SQLite (WAL mode) |
-| Charts | Matplotlib (embedded in Qt) |
-| AI/ML | scikit-learn (LinearRegression, IsolationForest) |
-| Data Processing | Pandas, NumPy |
-| Security | bcrypt, cryptography (Fernet/AES-256) |
-| Reports | ReportLab (PDF), openpyxl (Excel) |
-| Packaging | PyInstaller |
-| Bank Formats | ofxparse, qifparse |
+|---|---|
+| Language | Python 3.12 |
+| Desktop UI | PySide6 / Qt 6 |
+| Persistence | SQLAlchemy 2.0 with SQLite/WAL in the current release |
+| Identity | MSAL, OIDC/PKCE, Microsoft Entra integration |
+| Security | bcrypt, cryptography/Fernet, Windows DPAPI where available |
+| Audit integrity | HMAC-SHA256 chain and signing-key verification |
+| Reporting | ReportLab, openpyxl, fpdf2 |
+| Packaging | PyInstaller and Windows signing CI/CD |
 
----
+## Installation
 
-## 📦 Installation
+### From a release
 
-### From Release (Recommended)
-1. Download `FinAnalyzer_Enterprise_v2` from the [Releases](../../releases) page
-2. Run the executable directly (no installation required)
+Download the Windows executable from the [Releases](https://github.com/Ali-Marandi/FinAnalyzer/releases) page. The latest v2.7.0 release is available at [v2.7.0](https://github.com/Ali-Marandi/FinAnalyzer/releases/tag/v2.7.0).
 
-### From Source
+### From source
+
 ```bash
 git clone https://github.com/Ali-Marandi/FinAnalyzer.git
 cd FinAnalyzer
-pip install -r requirements.txt
+python -m pip install -r requirements.txt
 python main.py
 ```
 
-### Build EXE (Windows)
+### Run the test suite
+
 ```bash
-pip install pyinstaller
-pyinstaller --onefile --windowed --name=FinAnalyzer_Enterprise_v2 --add-data="core;core" --add-data="ui;ui" main.py
+python -m unittest discover -s tests -p "test_*.py"
 ```
 
----
+## Commercial and Global Readiness
 
-## 🔐 Security Features
+FinAnalyzer is pursuing a controller-led, evidence-first close-control position. The first commercial priority is to validate the workflow with design partners, rather than expand indiscriminately into ERP, payroll, payments, or tax functionality.
 
-- **bcrypt Password Hashing** — Industry-standard password protection
-- **Fernet Symmetric Encryption (AES-256)** — All sensitive data encrypted at rest
-- **Role-Based Access Control (RBAC)** — Admin, Accountant, Viewer roles
-- **HMAC-SHA256 License Keys** — Cryptographically signed enterprise licenses
-- **Comprehensive Audit Trail** — Every action logged for compliance
-- **SQLite WAL Mode** — ACID-compliant transactions with high concurrency
+The strategy, commercial validation plan, and v2.8.0 control designs are documented in:
 
----
+- [Global Product and Commercial Strategy](docs/FINANALYZER_GLOBAL_PRODUCT_AND_COMMERCIAL_STRATEGY_FA.md)
+- [90-Day Commercial Validation Plan](docs/FINANALYZER_90_DAY_COMMERCIAL_VALIDATION_PLAN_FA.md)
+- [v2.8.0 Commercial Intelligence Roadmap](docs/V2_8_COMMERCIAL_INTELLIGENCE_ROADMAP_FA.md)
+- [v2.7.0 Bank Reconciliation Code Review](docs/V2_7_BANK_RECONCILIATION_CODE_REVIEW_FA.md)
 
-## 📊 Financial KPIs (50+)
+## Security and Compliance Notice
 
-The analytics engine calculates institutional-grade financial metrics including:
+FinAnalyzer provides technical controls intended to support controlled finance workflows. It does not by itself certify compliance with GAAP, IFRS, SOX, GDPR, tax rules, banking rules, or any jurisdiction-specific regulatory obligation. Deployment, policy configuration, retention, legal review, and operational controls remain the customer’s responsibility.
 
-| Category | Metrics |
-|----------|---------|
-| Liquidity | Current Ratio, Quick Ratio, Cash Ratio, Working Capital |
-| Leverage | Debt-to-Equity, Debt-to-Assets, Equity Multiplier, Interest Coverage |
-| Profitability | Net Profit Margin, ROA, ROE, Operating Margin, Gross Margin |
-| Operational | Asset Turnover, Capital Intensity, Revenue Growth Rate |
-| Forecasting | Cash Flow Projections, Trend Analysis, Anomaly Scores |
+## License
+
+See the repository license and release terms before deploying in production.
 
 ---
 
-## 🏢 Enterprise Capabilities
-
-- **Multi-Entity Support** — Manage multiple companies/branches in one database
-- **Hierarchical Chart of Accounts** — Parent-child account relationships
-- **Fiscal Year Management** — Period locking, year-end closing entries
-- **Multi-Currency** — Real-time exchange rate conversion
-- **Invoice Management** — AR/AP tracking with status workflow
-- **Asset Depreciation** — Straight-line and declining balance methods
-- **Bank Reconciliation** — OFX/QIF import with auto-matching
-
----
-
-## 📄 License
-
-Enterprise Commercial License. © 2026 FinAnalyzer Corp. All rights reserved.
-
----
-
-## 👨‍💻 Author
-
-Developed by **Ali Marandi** — Enterprise Financial Software Engineer
-
----
-
-*Built with ❤️ for finance professionals who demand the best.*
+Developed by **Ali Marandi**.
