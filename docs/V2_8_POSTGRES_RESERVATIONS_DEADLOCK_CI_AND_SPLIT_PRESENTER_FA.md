@@ -426,10 +426,9 @@ class StatementReconciliationPostgresTests(StatementReconciliationPostgresFixtur
                 return exc
 
         with ThreadPoolExecutor(max_workers=2) as pool:
-            results = [
-                pool.submit(run, command_a, self.reviewer_a).result(timeout=15),
-                pool.submit(run, command_b, self.reviewer_b).result(timeout=15),
-            ]
+            future_a = pool.submit(run, command_a, self.reviewer_a)
+            future_b = pool.submit(run, command_b, self.reviewer_b)
+            results = [future_a.result(timeout=15), future_b.result(timeout=15)]
 
         self.assertEqual(sum(isinstance(item, ApprovalResult) for item in results), 1)
         self.assertEqual(sum(isinstance(item, ActiveAllocationConflict) for item in results), 1)
@@ -447,14 +446,7 @@ class StatementReconciliationPostgresTests(StatementReconciliationPostgresFixtur
             self.assertTrue(self.audit_logger.verify_chain(session).valid)
 ```
 
-در test واقعی، `future.result()`ها باید پس از submit هر دو future فراخوانی شوند تا ناخواسته serial نشوند:
-
-```python
-with ThreadPoolExecutor(max_workers=2) as pool:
-    future_a = pool.submit(run, command_a, self.reviewer_a)
-    future_b = pool.submit(run, command_b, self.reviewer_b)
-    results = [future_a.result(timeout=15), future_b.result(timeout=15)]
-```
+در test، هر دو future پیش از فراخوانی `result()` submit می‌شوند؛ این کار از serial شدن ناخواسته اجرای دو request جلوگیری می‌کند و `Barrier` را به یک نقطه هم‌زمانی واقعی تبدیل می‌نماید.
 
 همچنین failure injection برای `40P01` باید در محیط integration کنترل‌شده با دو transaction که resourceهای مشترک را **عمداً به ترتیب معکوس** قفل می‌کنند اجرا شود. بعد از retry bounded، assertionهای پسین ثابت‌اند: حداکثر یک owner active برای هر resource، decision تکراری صفر، audit chain معتبر و هیچ reservation نیمه‌کاره.
 
