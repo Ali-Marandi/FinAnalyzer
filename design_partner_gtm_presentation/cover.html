@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  .slide-container { width: 1280px; min-height: 720px; background: #101f39; color: #f5f9ff; font-family: Tahoma, Arial, sans-serif; position: relative; }
+  .rail { position: absolute; top: 0; right: 76px; width: 5px; min-height: 720px; background: #58d3c8; }
+  .frame { min-height: 720px; display: flex; align-items: center; justify-content: space-between; padding: 0 120px 0 150px; }
+  .copy { width: 690px; text-align: right; }
+  .eyebrow { color: #58d3c8; font-size: 18px; letter-spacing: .8px; margin-bottom: 14px; }
+  .title { font-size: 56px; line-height: 1.22; font-weight: 700; margin-bottom: 12px; }
+  .subtitle { font-size: 28px; line-height: 1.55; color: #cbd8e7; margin-bottom: 22px; }
+  .promise { border-right: 3px solid #58d3c8; padding-right: 12px; font-size: 22px; line-height: 1.7; color: #f5f9ff; margin-bottom: 8px; }
+  .tags { display: flex; gap: 12px; justify-content: flex-start; margin-top: 26px; }
+  .tag { border: 1px solid rgba(88,211,200,.7); color: #58d3c8; font-size: 15px; padding: 8px 13px; }
+  .grid { width: 270px; display: grid; grid-template-columns: repeat(3, 74px); grid-template-rows: repeat(3, 74px); gap: 12px; direction: ltr; }
+  .cell { border: 1px solid rgba(245,249,255,.18); background: rgba(255,255,255,.025); }
+  .cell.accent { background: #58d3c8; border-color: #58d3c8; }
+  .cell.soft { background: rgba(88,211,200,.18); border-color: rgba(88,211,200,.5); }
+  .foot { position: absolute; bottom: 20px; left: 120px; color: #9fb1c7; font-size: 14px; direction: ltr; }
+</style>
+</head>
+<body>
+  <div class="slide-container">
+    <div class="rail"></div>
+    <div class="frame">
+      <div class="copy">
+        <div class="eyebrow">FINANALYZER ENTERPRISE · DESIGN PARTNER PROGRAM</div>
+        <div class="title">بسته طراحی مشترک<br>برای Close Control</div>
+        <div class="subtitle">از تطبیق بانکی پراکنده تا تصمیمی که می‌توان از آن دفاع کرد.</div>
+        <div class="promise">یک workflow محدود، یک معیار موفقیت مشترک، و یک تصمیم ۹۰روزه مبتنی بر evidence.</div>
+        <div class="tags"><div class="tag">پایلوت کنترل‌شده</div><div class="tag">v2.8.0-a</div><div class="tag">Human Approval</div></div>
+      </div>
+      <div class="grid" aria-label="ماتریس کنترل">
+        <div class="cell"></div><div class="cell soft"></div><div class="cell"></div>
+        <div class="cell soft"></div><div class="cell accent"></div><div class="cell soft"></div>
+        <div class="cell"></div><div class="cell soft"></div><div class="cell"></div>
+      </div>
+    </div>
+    <div class="foot">FINANALYZER · EVIDENCE-FIRST CLOSE CONTROL</div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<style>
+* { box-sizing: border-box; }
+body { margin: -1px; }
+.slide-container { width:1280px; min-height:720px; background:#101f39; color:#f5f9ff; font-family:Tahoma,Arial,sans-serif; }
+.inner { min-height:720px; padding-top:40px; padding-right:82px; padding-left:82px; }
+.kicker { color:#58d3c8; font-size:16px; letter-spacing:.7px; }
+.title { font-size:40px; margin-top:12px; }
+.subtitle { color:#cbd8e7; font-size:21px; line-height:1.6; margin-top:12px; }
+.rail { display:grid; grid-template-columns:repeat(6, 1fr); margin-top:58px; border-top:2px solid rgba(88,211,200,.6); direction:rtl; }
+.step { min-height:242px; position:relative; border-left:1px solid rgba(245,249,255,.14); padding-top:24px; padding-right:17px; padding-left:17px; }
+.step:last-child { border-left:0; }
+.dot { width:18px; height:18px; background:#58d3c8; position:absolute; top:-10px; right:18px; }
+.index { color:#58d3c8; font-size:14px; margin-top:10px; }
+.step h2 { font-size:23px; line-height:1.45; margin-top:14px; }
+.step p { color:#b9c8da; font-size:16px; line-height:1.75; margin-top:12px; }
+.result { margin-top:50px; display:grid; grid-template-columns:300px 1fr; direction:rtl; border-top:1px solid rgba(245,249,255,.2); }
+.result-label { color:#58d3c8; font-size:18px; padding-top:19px; }
+.result-copy { font-size:23px; line-height:1.55; padding-top:15px; }
+.result-copy strong { color:#58d3c8; }
+</style>
+</head>
+<body>
+<div class="slide-container">
+  <div class="inner">
+    <div class="kicker">RELEASE-GATED FOUNDATION · PLANNED</div>
+    <div class="title">v2.8.0-a: پایه قابل اعتماد</div>
+    <div class="subtitle">قبل از AI گسترده یا Split Matching، داده، تصمیم و retry باید قابل پیش‌بینی و قابل اثبات باشند.</div>
+    <div class="rail">
+      <div class="step"><div class="dot"></div><div class="index">۰۱</div><h2>Statement Import</h2><p>CSV کنترل‌شده با schema validation و خطای قابل‌فهم.</p></div>
+      <div class="step"><div class="dot"></div><div class="index">۰۲</div><h2>Provenance</h2><p>hash، actor، زمان و منبع هر import ثبت می‌شود.</p></div>
+      <div class="step"><div class="dot"></div><div class="index">۰۳</div><h2>Match قطعی</h2><p>فقط reference ID، مبلغ و ارز دقیق؛ بدون fuzzy match.</p></div>
+      <div class="step"><div class="dot"></div><div class="index">۰۴</div><h2>Immutable History</h2><p>تصمیم تازه append می‌شود؛ تصمیم پیشین overwrite نمی‌شود.</p></div>
+      <div class="step"><div class="dot"></div><div class="index">۰۵</div><h2>Idempotency</h2><p>retry همان command، نتیجه یا linkage مضاعف ایجاد نمی‌کند.</p></div>
+      <div class="step"><div class="dot"></div><div class="index">۰۶</div><h2>Optimistic CAS</h2><p>دو reviewer نمی‌توانند یک decision را پنهانی overwrite کنند.</p></div>
+    </div>
+    <div class="result"><div class="result-label">مرز این موج</div><div class="result-copy"><strong>بدون auto-posting و بدون AI مبهم:</strong> ابتدا import، تصمیم و conflict باید در UAT مالی قابل‌راستی‌آزمایی باشند.</div></div>
+  </div>
+</div>
+</body>
+</html>

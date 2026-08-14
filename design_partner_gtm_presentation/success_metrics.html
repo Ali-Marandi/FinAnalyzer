@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  .slide-container { width:1280px; min-height:720px; background:#101f39; color:#f5f9ff; font-family:Tahoma,Arial,sans-serif; }
+  .inner { min-height:720px; padding-top:44px; padding-right:78px; padding-left:78px; }
+  .kicker { color:#58d3c8; font-size:16px; letter-spacing:.7px; }
+  .title { font-size:40px; margin-top:11px; }
+  .lead { color:#cbd8e7; font-size:21px; margin-top:11px; line-height:1.6; }
+  .metrics { display:grid; grid-template-columns:repeat(3, 1fr); gap:34px; direction:rtl; margin-top:46px; }
+  .pillar { min-height:250px; border-top:2px solid rgba(245,249,255,.22); border-bottom:1px solid rgba(245,249,255,.14); padding-top:20px; padding-right:20px; padding-left:20px; }
+  .pillar.control { border-top-color:#58d3c8; background:rgba(88,211,200,.08); }
+  .pill { color:#58d3c8; font-size:15px; letter-spacing:.6px; }
+  .pillar h2 { font-size:27px; margin-top:15px; }
+  .metric { border-top:1px solid rgba(245,249,255,.14); margin-top:15px; padding-top:10px; }
+  .metric strong { color:#f5f9ff; display:block; font-size:18px; }
+  .metric span { color:#b9c8da; display:block; font-size:16px; line-height:1.55; margin-top:5px; }
+  /* Reduced gap between metrics and decision to remove overflow while keeping min-height intact */
+  .decision { margin-top:9px; display:grid; grid-template-columns:210px repeat(4, 1fr); border-top:2px solid #58d3c8; direction:rtl; }
+  .decision-title { color:#58d3c8; font-size:20px; padding-top:18px; }
+  .choice { border-right:1px solid rgba(245,249,255,.18); padding-top:14px; padding-right:14px; padding-left:14px; min-height:86px; }
+  .choice strong { color:#f5f9ff; font-size:20px; display:block; }
+  .choice span { color:#cbd8e7; font-size:15px; line-height:1.45; display:block; margin-top:5px; }
+</style>
+</head>
+<body>
+<div class="slide-container">
+  <div class="inner">
+    <div class="kicker">PILOT MEASUREMENT</div>
+    <div class="title">موفقیت با Evidence سنجیده می‌شود</div>
+    <div class="lead">پایلوت باید هم ارزش workflow، هم enforce شدن کنترل و هم مسیر تجاری را نشان دهد.</div>
+    <div class="metrics">
+      <div class="pillar">
+        <div class="pill">PRODUCT VALUE</div>
+        <h2>ارزش عملیاتی</h2>
+        <div class="metric"><strong>Time to first controlled value</strong><span>از kickoff تا نخستین تصمیم policy-bound</span></div>
+        <div class="metric"><strong>Exception age & ownership</strong><span>مورد باز، دلیل و owner قابل مشاهده‌اند</span></div>
+        <div class="metric"><strong>Evidence completeness</strong><span>تصمیم‌های scope پایلوت، evidence لازم را دارند</span></div>
+      </div>
+      <div class="pillar control">
+        <div class="pill">CONTROL INTEGRITY</div>
+        <h2>صحت کنترل</h2>
+        <div class="metric"><strong>SoD بدون bypass</strong><span>self-resolution یا self-approval موفق وجود ندارد</span></div>
+        <div class="metric"><strong>HMAC chain معتبر</strong><span>success، denial و failure قابل verification هستند</span></div>
+        <div class="metric"><strong>No unintended mutation</strong><span>import و candidate دفتر را خارج از مسیر مجاز تغییر نمی‌دهند</span></div>
+      </div>
+      <div class="pillar">
+        <div class="pill">COMMERCIAL SIGNAL</div>
+        <h2>اعتبار بازار</h2>
+        <div class="metric"><strong>Paid pilot behavior</strong><span>تعهد زمانی، data access و proposal review واقعی</span></div>
+        <div class="metric"><strong>Buyer & pricing path</strong><span>economic buyer و value metric قابل بیان هستند</span></div>
+        <div class="metric"><strong>Week-8 retention</strong><span>champion هنوز workflow را برای Close فعال می‌داند</span></div>
+      </div>
+    </div>
+    <div class="decision">
+      <div class="decision-title">روز ۹۰<br>تصمیم مبتنی بر evidence</div>
+      <div class="choice"><strong>Convert</strong><span>ارزش، buyer و trust روشن است</span></div>
+      <div class="choice"><strong>Extend</strong><span>یک blocker محدود و قابل حل باقی است</span></div>
+      <div class="choice"><strong>Pivot</strong><span>workflow، segment یا packaging باید تغییر کند</span></div>
+      <div class="choice"><strong>Stop</strong><span>pain، fit یا willingness-to-pay کافی نیست</span></div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

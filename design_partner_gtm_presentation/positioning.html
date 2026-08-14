@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<style>
+* { box-sizing: border-box; }
+html,body { height:100%; margin:0; }
+.slide-container { width:1280px; min-height:720px; background:#101f39; color:#f5f9ff; font-family:Tahoma,Arial,sans-serif; }
+.inner { padding-top:48px; padding-right:80px; padding-left:80px; }
+.kicker { color:#58d3c8; font-size:16px; letter-spacing:.8px; }
+.title { font-size:40px; margin-top:14px; }
+.statement { font-size:22px; color:#cbd8e7; margin-top:14px; }
+.arch { display:grid; grid-template-columns: 1fr 104px 1.25fr 104px 1fr; align-items:center; margin-top:48px; direction:rtl; }
+.block { min-height:240px; border-top:2px solid rgba(245,249,255,.22); border-bottom:1px solid rgba(245,249,255,.14); padding-top:16px; padding-right:16px; padding-left:16px; }
+.block.center { border-top-color:#58d3c8; background:rgba(88,211,200,.09); }
+.label { color:#58d3c8; font-size:15px; letter-spacing:.6px; }
+.block h2 { font-size:28px; margin-top:15px; }
+.block p { color:#cbd8e7; font-size:18px; line-height:1.8; margin-top:10px; }
+.connector { color:#58d3c8; text-align:center; font-size:35px; }
+.note { margin-top:32px; color:#f5f9ff; font-size:24px; text-align:center; }
+.note strong { color:#58d3c8; }
+</style>
+</head>
+<body>
+<div class="slide-container"><div class="inner">
+  <div class="kicker">POSITIONING</div>
+  <div class="title">Control Layer، نه ERP</div>
+  <div class="statement">FinAnalyzer روی سیستم حسابداری موجود می‌نشیند و مرز تصمیم حساس را کنترل می‌کند.</div>
+  <div class="arch">
+    <div class="block">
+      <div class="label">SYSTEM OF RECORD</div>
+      <h2>سیستم حسابداری موجود</h2>
+      <p>Ledger<br>پرداخت و گزارش<br>تراکنش‌های عملیاتی</p>
+    </div>
+    <div class="connector">←</div>
+    <div class="block center">
+      <div class="label">FINANALYZER CONTROL LAYER</div>
+      <h2>تصمیم کنترل‌شده</h2>
+      <p>Policy و MFA<br>SoD و company scope<br>Evidence و Close Readiness</p>
+    </div>
+    <div class="connector">←</div>
+    <div class="block">
+      <div class="label">CONTROLLER OUTCOME</div>
+      <h2>Close قابل دفاع</h2>
+      <p>blockerهای روشن<br>owner و reviewer مستقل<br>مسیر تصمیم قابل بازسازی</p>
+    </div>
+  </div>
+  <div class="note"><strong>تمرکز:</strong> یک workflow حساس را قابل دفاع کنید، نه اینکه همه قابلیت‌های ERP را بازسازی کنید.</div>
+</div></div>
+</body>
+</html>

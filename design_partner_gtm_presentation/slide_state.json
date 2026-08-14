@@ -1,0 +1,133 @@
+{
+  "project_info": {
+    "title": "FinAnalyzer Enterprise — بسته Design Partner برای Close Control",
+    "created": 1786672133.251,
+    "last_updated": 1786672545.595,
+    "total_slides": 11
+  },
+  "slides": [
+    {
+      "id": "cover",
+      "state": "edited",
+      "pageNum": 1
+    },
+    {
+      "id": "problem",
+      "state": "edited",
+      "pageNum": 2
+    },
+    {
+      "id": "positioning",
+      "state": "edited",
+      "pageNum": 3
+    },
+    {
+      "id": "v28a",
+      "state": "edited",
+      "pageNum": 4
+    },
+    {
+      "id": "gates",
+      "state": "edited",
+      "pageNum": 5
+    },
+    {
+      "id": "pilot_path",
+      "state": "edited",
+      "pageNum": 6
+    },
+    {
+      "id": "partner_fit",
+      "state": "edited",
+      "pageNum": 7
+    },
+    {
+      "id": "interviews",
+      "state": "edited",
+      "pageNum": 8
+    },
+    {
+      "id": "controller_session",
+      "state": "edited",
+      "pageNum": 9
+    },
+    {
+      "id": "success_metrics",
+      "state": "edited",
+      "pageNum": 10
+    },
+    {
+      "id": "decision",
+      "state": "edited",
+      "pageNum": 11
+    }
+  ],
+  "outline": [
+    {
+      "id": "cover",
+      "title": "FinAnalyzer Enterprise — بسته Design Partner برای Close Control",
+      "summary": "کاور ارائه: از reconciliation پراکنده تا تصمیم قابل دفاع.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "problem",
+      "title": "مسئله، یک Feed نیست",
+      "summary": "نیاز Close به owner، review مستقل و evidence؛ استثناهای بی‌مالک ریسک عملیاتی‌اند.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "positioning",
+      "title": "Control Layer، نه ERP",
+      "summary": "جایگاه مکمل سیستم حسابداری موجود و تمرکز بر policy، SoD، evidence و Close Readiness.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "v28a",
+      "title": "v2.8.0-a: پایه قابل اعتماد",
+      "summary": "دامنه کنترل‌شده: import، provenance، match قطعی، immutable history، idempotency و CAS.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "gates",
+      "title": "گیت فنی، مدرک عملیاتی می‌خواهد",
+      "summary": "پیوند گیت‌های import، provenance، conflict، ledger integrity، audit و UAT با evidence پایلوت.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "pilot_path",
+      "title": "پایلوت کوچک و قابل توقف",
+      "summary": "مسیر Discovery تا تصمیم روز نود با gateهای داده، UAT و workflow محدود.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "partner_fit",
+      "title": "شریک مناسب چه کسی است؟",
+      "summary": "معیارهای انتخاب Design Partner: controller/practice lead، pain واقعی، champion، buyer و data readiness.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "interviews",
+      "title": "ده مصاحبه، یک فرضیه قابل آزمون",
+      "summary": "برنامه اولویت‌دار گفتگو با controller، CFO، IT/security، auditor و partner برای اعتبارسنجی beachhead.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "controller_session",
+      "title": "از گذشته شروع کنید، نه Demo",
+      "summary": "سناریوی ۴۵ دقیقه‌ای تعامل با controller برای بازسازی Close و qualification پایلوت.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "success_metrics",
+      "title": "موفقیت با Evidence سنجیده می‌شود",
+      "summary": "KPIهای محصول، کنترل و کسب‌وکار و تصمیم Convert/Extend/Pivot/Stop.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "decision",
+      "title": "تصمیم: سه تا پنج شریک طراحی مشترک",
+      "summary": "فراخوان اقدام برای یک workflow، معیار مشترک و تصمیم ۹۰روزه.",
+      "image_plan": "Use a suitable image if needed"
+    }
+  ]
+}

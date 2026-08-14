@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  .slide-container { width: 1280px; min-height: 720px; background: #101f39; color: #f5f9ff; font-family: Tahoma, Arial, sans-serif; }
+  .inner { min-height: 720px; padding-top: 46px; padding-right: 82px; padding-left: 82px; }
+  .kicker { color: #58d3c8; font-size: 16px; letter-spacing: .8px; }
+  .title { font-size: 40px; margin-top: 12px; }
+  .sub { color: #c8d6e5; font-size: 21px; margin-top: 12px; }
+  .main { display: grid; grid-template-columns: 1fr 316px 1fr; column-gap: 52px; align-items: center; margin-top: 46px; direction: rtl; }
+  .criteria { display: grid; grid-template-rows: repeat(3, 72px); row-gap: 18px; }
+  .criterion { border-top: 1px solid rgba(245,249,255,.20); padding-top: 10px; }
+  .criterion strong { display: block; color: #58d3c8; font-size: 19px; }
+  .criterion span { display: block; color: #d7e2ee; font-size: 17px; margin-top: 6px; }
+  .core { min-height: 255px; border-top: 3px solid #58d3c8; border-bottom: 1px solid rgba(88,211,200,.55); background: rgba(88,211,200,.08); text-align: center; padding-top: 38px; }
+  .core .small { color: #58d3c8; font-size: 15px; letter-spacing: .7px; }
+  .core h2 { font-size: 31px; margin-top: 18px; }
+  .core p { color: #d3e0eb; font-size: 19px; line-height: 1.7; margin-top: 18px; }
+  .no-fit { margin-top: 42px; min-height: 90px; border-top: 1px solid rgba(245,249,255,.18); display: grid; grid-template-columns: 175px 1fr; align-items: center; direction: rtl; }
+  .no-fit h3 { color: #58d3c8; font-size: 18px; }
+  .no-fit p { color: #bdcad9; font-size: 19px; line-height: 1.6; }
+</style>
+</head>
+<body>
+<div class="slide-container">
+  <div class="inner">
+    <div class="kicker">DESIGN PARTNER QUALIFICATION</div>
+    <div class="title">شریک مناسب چه کسی است؟</div>
+    <div class="sub">پایلوت را با علاقه‌مندترین فرد شروع نمی‌کنیم؛ با کسی شروع می‌کنیم که مسئله، اختیار و ظرفیت یادگیری دارد.</div>
+    <div class="main">
+      <div class="criteria">
+        <div class="criterion"><strong>Close واقعی و تکرارشونده</strong><span>۲ تا ۱۰ entity، چند حساب بانکی یا صف exception قابل مشاهده</span></div>
+        <div class="criterion"><strong>Champion عملیاتی</strong><span>زمان هفتگی، ownership workflow و دسترسی به artefactهای حذف‌هویت‌شده</span></div>
+        <div class="criterion"><strong>Data و Security آماده</strong><span>fixture حداقلی، data owner و امکان security discovery پیش از ورود داده</span></div>
+      </div>
+      <div class="core">
+        <div class="small">RIGHT-FIT PARTNER</div>
+        <h2>Controller یا<br>Practice Lead</h2>
+        <p>با یک workflow مشخص<br>و اختیار حرکت‌دادن تصمیم</p>
+      </div>
+      <div class="criteria">
+        <div class="criterion"><strong>Pain قابل اندازه‌گیری</strong><span>rework، evidence gap، owner مبهم یا blocker تکراری در Close</span></div>
+        <div class="criterion"><strong>Buyer قابل دسترس</strong><span>مسیر معرفی CFO، practice owner یا economic buyer روشن باشد</span></div>
+        <div class="criterion"><strong>Fit با Control Layer</strong><span>به evidence، SoD و readiness نیاز دارد؛ نه ERP replacement کامل</span></div>
+      </div>
+    </div>
+    <div class="no-fit"><h3>NO-FIT</h3><p>درخواست ERP/payroll کامل، posting خودکار بدون approval، production data بدون توافق یا نبود champion، دلیل تعویق یا رد پایلوت است.</p></div>
+  </div>
+</div>
+</body>
+</html>

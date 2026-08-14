@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<style>
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0}
+  .slide-container{width:1280px;min-height:720px;margin-top:-1px;background:#101f39;color:#f5f9ff;font-family:Tahoma,Arial,sans-serif}
+  .inner{min-height:720px;padding-top:48px;padding-right:76px;padding-left:76px}
+  .kicker{color:#58d3c8;font-size:16px;letter-spacing:.7px}
+  .title{font-size:40px;margin-top:13px}
+  .lead{color:#cbd8e7;font-size:21px;margin-top:13px;line-height:1.6}
+  .track{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;direction:rtl;margin-top:43px;position:relative}
+  .step{min-height:220px;border-top:2px solid rgba(245,249,255,.22);border-bottom:1px solid rgba(245,249,255,.14);padding-top:18px;padding-right:16px;padding-left:16px;position:relative}
+  .step.gate{border-top-color:#58d3c8;background:rgba(88,211,200,.07)}
+  .dot{width:16px;height:16px;background:#58d3c8;margin-top:-27px;margin-right:0}
+  .stepno{color:#58d3c8;font-size:15px;margin-top:18px}
+  .step h2{font-size:22px;line-height:1.4;margin-top:12px}
+  .step p{color:#cbd8e7;font-size:16px;line-height:1.65;margin-top:13px}
+  .gate-label{color:#58d3c8;font-size:14px;margin-top:14px}
+  .decision{margin-top:36px;display:grid;grid-template-columns:220px 1fr;gap:28px;align-items:start}
+  .day90{color:#58d3c8;font-size:31px;line-height:1.3;border-left:1px solid rgba(88,211,200,.55);padding-left:24px}
+  .outcomes{display:flex;gap:15px;direction:rtl}
+  .outcome{min-width:142px;border-top:1px solid rgba(245,249,255,.32);padding-top:11px;color:#cbd8e7;font-size:17px}
+  .outcome strong{color:#f5f9ff;display:block;font-size:20px;margin-bottom:5px}
+</style>
+</head>
+<body>
+<div class="slide-container">
+  <div class="inner">
+    <div class="kicker">CONTROLLED PILOT PATH</div>
+    <div class="title">پایلوت کوچک و قابل توقف</div>
+    <div class="lead">پایلوت با داده production شروع نمی‌شود؛ با یک workflow، policy و معیار تصمیم مشترک شروع می‌شود.</div>
+    <div class="track">
+      <div class="step">
+        <div class="dot"></div><div class="stepno">۰–۷ روز</div><h2>Discovery</h2><p>درد، champion، buyer و workflow واقعی را مشخص کنید.</p><div class="gate-label">خروج: مسئله مشترک</div>
+      </div>
+      <div class="step gate">
+        <div class="dot"></div><div class="stepno">۷–۱۴ روز</div><h2>Charter + Data Map</h2><p>scope، data-minimization، role matrix و success measure تأیید می‌شوند.</p><div class="gate-label">گیت: داده و policy</div>
+      </div>
+      <div class="step">
+        <div class="dot"></div><div class="stepno">۱۴–۲۸ روز</div><h2>Controlled Fixture</h2><p>import، provenance، retry و conflict با fixture امن سنجیده می‌شوند.</p><div class="gate-label">گیت: correctness</div>
+      </div>
+      <div class="step gate">
+        <div class="dot"></div><div class="stepno">۲۸–۴۵ روز</div><h2>Financial UAT</h2><p>controller match، no-ledger-mutation و evidence را تأیید می‌کند.</p><div class="gate-label">گیت: sign-off مالی</div>
+      </div>
+      <div class="step">
+        <div class="dot"></div><div class="stepno">۴۵–۹۰ روز</div><h2>Limited Workflow</h2><p>یک جریان محدود با telemetry، review هفتگی و rollback روشن اجرا می‌شود.</p><div class="gate-label">خروج: evidence ارزش</div>
+      </div>
+    </div>
+    <div class="decision">
+      <div class="day90">روز ۹۰<br>تصمیم، نه تمدید خودکار</div>
+      <div class="outcomes">
+        <div class="outcome"><strong>Convert</strong>ارزش و buyer روشن است</div>
+        <div class="outcome"><strong>Extend</strong>یک مانع محدود قابل حل است</div>
+        <div class="outcome"><strong>Pivot</strong>workflow یا segment اشتباه است</div>
+        <div class="outcome"><strong>Stop</strong>pain، fit یا budget کافی نیست</div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
